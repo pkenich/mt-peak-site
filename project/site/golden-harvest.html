@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Harvest — MT. PEAK · Himalayan Golden Tips Gift Box</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0a1410;--bg2:#0f1d17;--green:#16352a;--green-glow:#1f4a3a;
+  --gold:#c9a961;--gold-bright:#e8cd8f;--gold-deep:#a8893f;
+  --cream:#f4efe6;--cream-dim:rgba(244,239,230,.55);--ink:#070d0a;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--cream);
+  overflow-x:hidden;font-weight:300;line-height:1.6;letter-spacing:.5px;}
+a,button{cursor:pointer;}
+::selection{background:var(--gold);color:var(--ink);}
+img{display:block;}
+
+.grain{position:fixed;inset:0;z-index:9998;pointer-events:none;opacity:.025;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.vignette{position:fixed;inset:0;z-index:9997;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.4) 100%);}
+
+/* ===== NAV ===== */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.6rem 3.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(10,20,16,.72);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(201,169,97,.1);transition:padding .4s ease;}
+.nav-brand{display:flex;align-items:center;gap:.9rem;text-decoration:none;}
+.nav-logo{width:40px;height:auto;}
+.nav-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:500;
+  letter-spacing:4px;color:var(--gold);text-transform:uppercase;}
+.nav-links{display:flex;gap:2.6rem;align-items:center;}
+.nav-links a{color:var(--cream-dim);text-decoration:none;font-size:.72rem;letter-spacing:2px;
+  text-transform:uppercase;transition:color .4s;position:relative;}
+.nav-links a:hover{color:var(--gold);}
+.nav-cart{font-family:'Cormorant Garamond',serif;font-size:.95rem;letter-spacing:2px;
+  color:var(--gold);border:1px solid rgba(201,169,97,.4);padding:.7rem 1.5rem;min-height:44px;
+  background:none;text-transform:uppercase;transition:all .4s;}
+.nav-cart:hover{background:var(--gold);color:var(--ink);}
+@media(max-width:900px){nav{padding:1.1rem 1.25rem;}.nav-links{gap:1rem;}
+  .nav-name{font-size:1rem;letter-spacing:2px;}.nav-links a span{display:none;}
+  .nav-cart{padding:.6rem 1rem;font-size:.85rem;}}
+@media(max-width:600px){.nav-logo{width:34px;}.nav-links a:not(.nav-cart){display:none;}}
+
+/* ===== BREADCRUMB ===== */
+.crumb{max-width:1500px;margin:0 auto;padding:7.5rem 3.5rem 0;font-size:.7rem;letter-spacing:2px;
+  text-transform:uppercase;color:var(--cream-dim);}
+.crumb a{color:var(--cream-dim);text-decoration:none;transition:color .3s;}
+.crumb a:hover{color:var(--gold);}
+@media(max-width:900px){.crumb{padding:6.5rem 1.5rem 0;}}
+
+/* ===== PDP HERO ===== */
+.pdp{max-width:1500px;margin:0 auto;padding:2.5rem 3.5rem 6rem;
+  display:grid;grid-template-columns:1.15fr 1fr;gap:5rem;align-items:start;}
+@media(max-width:980px){.pdp{grid-template-columns:1fr;gap:3rem;padding:2rem 1.5rem 4rem;}}
+
+/* gallery */
+.gallery{position:sticky;top:6.5rem;}
+@media(max-width:980px){.gallery{position:static;top:auto;}}
+.gal-main{aspect-ratio:4/5;width:100%;background:radial-gradient(circle at 50% 38%,var(--green) 0%,var(--ink) 95%);
+  border:1px solid rgba(201,169,97,.14);position:relative;overflow:hidden;}
+.gal-main img{width:100%;height:100%;object-fit:cover;}
+.gal-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  background:repeating-linear-gradient(135deg,#0e1c16 0 14px,#10211a 14px 28px);}
+.gal-ph .ph-mark{font-family:'Jost',monospace;font-family:ui-monospace,'SFMono-Regular',Menlo,monospace;
+  font-size:.66rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold-deep);
+  border:1px solid rgba(201,169,97,.3);padding:.5rem .9rem;}
+.gal-ph .ph-sub{font-size:.62rem;letter-spacing:1px;color:var(--cream-dim);max-width:240px;text-align:center;line-height:1.7;}
+.gal-thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin-top:.6rem;}
+.gal-thumb{aspect-ratio:1;border:1px solid rgba(201,169,97,.14);background:var(--ink);
+  overflow:hidden;position:relative;padding:0;transition:border-color .3s;}
+.gal-thumb.active{border-color:var(--gold);}
+.gal-thumb img{width:100%;height:100%;object-fit:cover;opacity:.85;transition:opacity .3s;}
+.gal-thumb:hover img{opacity:1;}
+.gal-thumb .tph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:repeating-linear-gradient(135deg,#0e1c16 0 8px,#10211a 8px 16px);
+  font-size:.5rem;letter-spacing:1px;text-transform:uppercase;color:var(--gold-deep);text-align:center;padding:.3rem;}
+
+/* info column */
+.info-eyebrow{font-size:.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold-deep);
+  display:flex;align-items:center;gap:.9rem;margin-bottom:1.4rem;}
+.info-eyebrow::before{content:'';width:30px;height:1px;background:var(--gold-deep);}
+.info-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(3rem,6vw,4.8rem);
+  line-height:1;letter-spacing:.01em;margin-bottom:1.1rem;}
+.info-tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.15rem;
+  color:var(--gold);letter-spacing:2px;margin-bottom:2rem;}
+.info-desc{color:var(--cream-dim);font-size:1.02rem;line-height:1.95;max-width:480px;margin-bottom:2.4rem;}
+.info-price{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.4rem;}
+.info-price .amt{font-family:'Cormorant Garamond',serif;font-size:2.6rem;color:var(--gold);}
+.info-price .unit{font-size:.8rem;letter-spacing:1px;color:var(--cream-dim);}
+.info-stock{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream-dim);
+  margin-bottom:2.2rem;display:flex;align-items:center;gap:.6rem;}
+.info-stock .pip{width:6px;height:6px;border-radius:50%;background:#7bbf8e;box-shadow:0 0 8px rgba(123,191,142,.6);}
+.buy-row{display:flex;gap:1rem;align-items:stretch;margin-bottom:1.6rem;flex-wrap:wrap;}
+.qty{display:flex;align-items:center;border:1px solid rgba(201,169,97,.4);}
+.qty button{width:48px;height:56px;background:none;border:none;color:var(--cream);font-size:1.2rem;
+  transition:color .3s,background .3s;}
+.qty button:hover{color:var(--gold);}
+.qty input{width:46px;height:56px;background:none;border:none;color:var(--cream);text-align:center;
+  font-family:'Cormorant Garamond',serif;font-size:1.3rem;-moz-appearance:textfield;}
+.qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.btn-add{flex:1;min-width:200px;min-height:56px;background:var(--gold);color:var(--ink);border:none;
+  font-family:'Jost',sans-serif;font-weight:500;font-size:.78rem;letter-spacing:3px;text-transform:uppercase;
+  transition:all .4s;position:relative;overflow:hidden;}
+.btn-add:hover{background:var(--gold-bright);}
+.btn-add.added{background:var(--green-glow);color:var(--cream);}
+.info-meta{display:flex;flex-direction:column;gap:.7rem;padding-top:1.8rem;margin-top:.6rem;
+  border-top:1px solid rgba(201,169,97,.12);}
+.info-meta div{font-size:.78rem;letter-spacing:.5px;color:var(--cream-dim);display:flex;gap:.7rem;align-items:center;}
+.info-meta .k{color:var(--gold);font-size:.66rem;letter-spacing:2px;text-transform:uppercase;min-width:120px;}
+
+/* ===== SECTION SHELL ===== */
+.sec{padding:7rem 3.5rem;max-width:1300px;margin:0 auto;}
+@media(max-width:900px){.sec{padding:4.5rem 1.5rem;}}
+.sec-label{font-size:.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);
+  margin-bottom:2.4rem;display:flex;align-items:center;gap:1rem;}
+.sec-label::before{content:'';width:40px;height:1px;background:var(--gold);}
+.sec-h{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2.2rem,4.5vw,3.4rem);
+  letter-spacing:.01em;margin-bottom:1rem;line-height:1.1;}
+.divider{height:1px;background:linear-gradient(90deg,rgba(201,169,97,.25),transparent);max-width:1300px;margin:0 auto;}
+
+/* tasting */
+.tasting{background:linear-gradient(180deg,var(--bg),var(--bg2));}
+.taste-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+  background:rgba(201,169,97,.12);border:1px solid rgba(201,169,97,.12);margin-top:1rem;}
+.taste-cell{background:var(--bg);padding:2.8rem 2.2rem;}
+.taste-cell .tk{font-size:.66rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold-deep);margin-bottom:1.1rem;}
+.taste-cell .tv{font-family:'Cormorant Garamond',serif;font-size:1.5rem;line-height:1.35;color:var(--cream);}
+.taste-foot{display:flex;gap:3rem;flex-wrap:wrap;margin-top:2.5rem;}
+.taste-foot div{display:flex;flex-direction:column;gap:.4rem;}
+.taste-foot .fk{font-size:.64rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream-dim);}
+.taste-foot .fv{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);}
+@media(max-width:780px){.taste-grid{grid-template-columns:1fr;}.taste-cell{padding:2rem 1.6rem;}}
+
+/* brewing */
+.brew-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:1rem;
+  background:rgba(201,169,97,.12);border:1px solid rgba(201,169,97,.12);}
+.brew-cell{background:var(--bg2);padding:2.6rem 1.6rem;text-align:center;}
+.brew-cell .bn{font-family:'Cormorant Garamond',serif;font-size:2.8rem;color:var(--gold);line-height:1;margin-bottom:.6rem;}
+.brew-cell .bn small{font-size:1.1rem;color:var(--cream-dim);}
+.brew-cell .bl{font-size:.64rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream-dim);}
+.brew-method{display:grid;grid-template-columns:repeat(2,1fr);gap:1.6rem 3rem;margin-top:3rem;}
+.brew-step{display:flex;gap:1.2rem;align-items:flex-start;}
+.brew-step .bs-n{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold-deep);
+  min-width:1.8rem;border-bottom:1px solid rgba(201,169,97,.3);padding-bottom:.2rem;}
+.brew-step p{color:var(--cream-dim);font-size:.95rem;line-height:1.8;}
+@media(max-width:780px){.brew-grid{grid-template-columns:repeat(2,1fr);}.brew-method{grid-template-columns:1fr;gap:1.4rem;}}
+
+/* manufacture */
+.make{background:var(--bg2);}
+.make-wrap{max-width:1300px;margin:0 auto;padding:7rem 3.5rem;}
+@media(max-width:900px){.make-wrap{padding:4.5rem 1.5rem;}}
+.make-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:1.5rem;
+  background:rgba(201,169,97,.1);border:1px solid rgba(201,169,97,.1);}
+.make-cell{background:var(--bg2);padding:2.4rem 1.5rem;display:flex;flex-direction:column;gap:1rem;}
+.make-cell .mn{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);letter-spacing:2px;}
+.make-cell .mt{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream);}
+.make-cell .md{font-size:.85rem;line-height:1.75;color:var(--cream-dim);}
+@media(max-width:980px){.make-grid{grid-template-columns:1fr;}}
+
+/* origin story */
+.origin-story{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch;min-height:74vh;}
+.os-visual{position:relative;overflow:hidden;min-height:380px;
+  background:radial-gradient(circle at 50% 40%,var(--green) 0%,var(--ink) 90%);
+  display:flex;align-items:center;justify-content:center;}
+.os-visual img{width:70%;height:auto;filter:drop-shadow(0 12px 50px rgba(0,0,0,.55));
+  animation:float 9s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.os-content{padding:6rem 4.5rem;display:flex;flex-direction:column;justify-content:center;}
+.os-content p{color:var(--cream-dim);font-size:1.05rem;line-height:2;max-width:520px;margin-bottom:1.6rem;}
+.os-content p.lead{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.6rem;
+  color:var(--cream);line-height:1.5;margin-bottom:2rem;}
+@media(max-width:900px){.origin-story{grid-template-columns:1fr;min-height:auto;}
+  .os-visual{min-height:300px;}.os-content{padding:4rem 1.5rem;}}
+
+/* spec */
+.spec-table{margin-top:1rem;border-top:1px solid rgba(201,169,97,.18);max-width:760px;}
+.spec-row{display:grid;grid-template-columns:240px 1fr;gap:1rem;padding:1.25rem 0;
+  border-bottom:1px solid rgba(201,169,97,.1);}
+.spec-row .sk{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream-dim);padding-top:.2rem;}
+.spec-row .sv{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--cream);}
+@media(max-width:600px){.spec-row{grid-template-columns:1fr;gap:.3rem;}}
+
+/* closer */
+.pdp-closer{text-align:center;padding:7rem 2rem 8rem;position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 120%,var(--green-glow),var(--bg) 65%);}
+.pdp-closer img{width:84px;height:auto;margin:0 auto 2rem;filter:drop-shadow(0 4px 24px rgba(201,169,97,.2));}
+.pdp-closer h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2.2rem,5vw,3.6rem);
+  margin-bottom:1.4rem;}
+.pdp-closer h2 em{font-style:italic;color:var(--gold);}
+.pdp-closer p{color:var(--cream-dim);max-width:440px;margin:0 auto 2.6rem;font-size:1rem;}
+.pdp-closer .cbtn{display:inline-block;font-family:'Cormorant Garamond',serif;font-size:1rem;letter-spacing:3px;
+  text-transform:uppercase;color:var(--ink);background:var(--gold);padding:1.2rem 3.2rem;border:none;
+  text-decoration:none;transition:all .5s;}
+.pdp-closer .cbtn:hover{transform:translateY(-4px);box-shadow:0 25px 60px rgba(201,169,97,.3);}
+
+/* footer */
+footer{background:var(--ink);padding:5rem 3.5rem 2.5rem;border-top:1px solid rgba(201,169,97,.1);}
+.foot-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;max-width:1400px;margin:0 auto 4rem;}
+.foot-brand .nav-name{font-size:1.6rem;margin-bottom:1.2rem;display:block;}
+.foot-brand p{color:var(--cream-dim);font-size:.85rem;line-height:1.8;max-width:280px;}
+.foot-col h4{font-family:'Cormorant Garamond',serif;font-size:.95rem;letter-spacing:1px;margin-bottom:1.4rem;color:var(--gold);}
+.foot-col a{display:block;color:var(--cream-dim);text-decoration:none;font-size:.8rem;margin-bottom:.9rem;
+  letter-spacing:.5px;transition:color .4s;}
+.foot-col a:hover{color:var(--gold);}
+.foot-bottom{border-top:1px solid rgba(201,169,97,.1);padding-top:2.5rem;text-align:center;
+  font-size:.72rem;letter-spacing:1.5px;color:var(--cream-dim);max-width:1400px;margin:0 auto;}
+@media(max-width:900px){.foot-top{grid-template-columns:1fr 1fr;gap:2.5rem;}footer{padding:4rem 1.5rem 2rem;}}
+
+/* cart */
+.cart-overlay{position:fixed;inset:0;background:rgba(7,13,10,.8);backdrop-filter:blur(8px);
+  z-index:2000;opacity:0;visibility:hidden;transition:all .5s;}
+.cart-overlay.open{opacity:1;visibility:visible;}
+.cart-panel{position:fixed;top:0;right:0;height:100%;width:min(440px,100%);background:var(--bg2);
+  z-index:2001;transform:translateX(100%);transition:transform .6s cubic-bezier(.16,1,.3,1);
+  display:flex;flex-direction:column;border-left:1px solid rgba(201,169,97,.15);}
+.cart-panel.open{transform:translateX(0);}
+.cart-top{padding:2.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,169,97,.12);}
+.cart-top h2{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:1.6rem;letter-spacing:2px;}
+.cart-close{background:none;border:none;color:var(--cream);font-size:1.3rem;transition:color .3s;
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin:-.5rem;}
+.cart-close:hover{color:var(--gold);}
+.cart-body{flex:1;overflow-y:auto;padding:1.5rem 2.5rem;}
+.cart-line{display:flex;justify-content:space-between;align-items:flex-start;padding:1.8rem 0;border-bottom:1px solid rgba(201,169,97,.08);}
+.cart-line h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:.4rem;font-weight:400;}
+.cart-line .q{font-size:.75rem;color:var(--cream-dim);letter-spacing:1px;}
+.cart-line .right{text-align:right;display:flex;flex-direction:column;gap:.6rem;align-items:flex-end;}
+.cart-line .price{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--gold);}
+.cart-line button{background:none;border:none;color:var(--cream-dim);font-size:.68rem;letter-spacing:1px;
+  text-transform:uppercase;text-decoration:underline;transition:color .3s;padding:.4rem 0;}
+.cart-line button:hover{color:var(--gold);}
+.cart-empty{text-align:center;padding:4rem 1rem;color:var(--cream-dim);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;}
+.cart-note{font-size:.7rem;color:var(--cream-dim);letter-spacing:.5px;line-height:1.7;margin-top:1.4rem;text-align:center;}
+.cart-foot{padding:2.5rem;border-top:1px solid rgba(201,169,97,.12);}
+.cart-total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.8rem;}
+.cart-total span:first-child{font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream-dim);}
+.cart-total span:last-child{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--gold);}
+.cart-checkout{width:100%;background:var(--gold);color:var(--ink);border:none;padding:1.2rem;font-size:.75rem;
+  letter-spacing:3px;text-transform:uppercase;transition:all .4s;font-family:'Jost',sans-serif;font-weight:500;}
+.cart-checkout:hover{background:var(--gold-bright);}
+/* polish: entrance + reveals */
+@keyframes pageIn{from{opacity:0;}to{opacity:1;}}
+body{animation:pageIn .7s ease both;}
+.rv{opacity:0;transform:translateY(26px);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1);}
+.rv.in{opacity:1;transform:none;}
+.gal-main img,.gal-main .gal-ph{transition:opacity .45s ease;}
+.nav-links a::after{content:'';position:absolute;bottom:-6px;left:0;width:0;height:1px;background:var(--gold);transition:width .4s ease;}
+.nav-links a:hover::after{width:100%;}
+.gal-thumb{transition:border-color .3s,transform .3s ease;}
+.gal-thumb:hover{transform:translateY(-2px);}
+.btn-add:hover{box-shadow:0 12px 34px rgba(201,169,97,.28);}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-brand" href="index.html">
+    <img class="nav-logo" src="assets/mtpeak-emblem.png" alt="Mt. Peak">
+    <div class="nav-name">Mt. Peak</div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#origin"><span>The </span>Origin</a>
+    <a href="index.html#ritual"><span>The </span>Ritual</a>
+    <a href="index.html#collection">Collection</a>
+    <button class="nav-cart" id="navCart">Cart · 0</button>
+  </div>
+</nav>
+
+<div class="crumb"><a href="index.html">Mt. Peak</a> &nbsp;·&nbsp; <a href="index.html#collection">The Reserve</a> &nbsp;·&nbsp; Golden Harvest</div>
+
+<!-- PDP HERO -->
+<section class="pdp">
+  <div class="gallery">
+    <div class="gal-main" id="galMain">
+      <img src="assets/tea-giftset.png" alt="Mt. Peak Golden Harvest — gift box · 100g">
+    </div>
+    <div class="gal-thumbs" id="galThumbs">
+      <button class="gal-thumb active" data-type="img" data-src="assets/tea-giftset.png" data-alt="Golden Harvest gift box"><img src="assets/tea-giftset.png" alt="Gift box"></button>
+      <button class="gal-thumb" data-type="img" data-src="assets/giftset-wide.png" data-alt="Gift box, open"><img src="assets/giftset-wide.png" alt="Gift box open"></button>
+      <button class="gal-thumb" data-type="img" data-src="assets/tea-tin.png" data-alt="Caddy detail"><img src="assets/tea-tin.png" alt="Caddy detail"></button>
+      <button class="gal-thumb" data-type="ph" data-label="DRY LEAF — MACRO" data-sub="Golden tips, selected one by one, shot like jewellery"><span class="tph">Dry leaf<br>macro</span></button>
+      <button class="gal-thumb" data-type="ph" data-label="THE LIQUOR — DEEP AMBER" data-sub="The brewed cup, backlit so the deep amber colour glows"><span class="tph">Liquor<br>in glass</span></button>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="info-eyebrow">№ 03 · Golden Tips · Gift Box</div>
+    <h1 class="info-title">Golden Harvest</h1>
+    <div class="info-tagline">Honey-Sweet · Golden Tips · Round</div>
+    <p class="info-desc">Golden tips, selected one by one and oxidised under close watch — round, honey-sweet, burnished with apricot and warm spice. Presented in the hand-finished gift box, made to be given.</p>
+
+    <div class="info-price"><span class="amt">£115</span><span class="unit">/ gift box · 100g</span></div>
+    <div class="info-stock"><span class="pip"></span>In stock · ships within 2 working days</div>
+
+    <div class="buy-row">
+      <div class="qty">
+        <button id="qMinus" aria-label="Decrease quantity">−</button>
+        <input id="qVal" type="number" value="1" min="1" max="20" inputmode="numeric" aria-label="Quantity">
+        <button id="qPlus" aria-label="Increase quantity">+</button>
+      </div>
+      <button class="btn-add" id="btnAdd">Add to Reserve — £115</button>
+    </div>
+
+    <div class="info-meta">
+      <div><span class="k">Origin</span> Eastern Nepal · single garden</div>
+      <div><span class="k">Harvest</span> Peak season golden-tip selection, by hand</div>
+      <div><span class="k">Format</span> gift box · 100g</div>
+      <div><span class="k">Delivery</span> Complimentary UK · gift wrap available</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TASTING -->
+<section class="sec tasting">
+  <div class="sec-label">Tasting Notes</div>
+  <h2 class="sec-h">A deep amber cup, honeyed and round</h2>
+  <div class="taste-grid">
+    <div class="taste-cell"><div class="tk">Aroma</div><div class="tv">Dried apricot, warm spice, a deep note of wildflower honey.</div></div>
+    <div class="taste-cell"><div class="tk">Palate</div><div class="tv">Full and round, honey-sweet, with a smooth, malty depth.</div></div>
+    <div class="taste-cell"><div class="tk">Finish</div><div class="tv">Long, warm and lingering — like the last light before dusk.</div></div>
+  </div>
+  <div class="taste-foot">
+    <div><span class="fk">Cup Colour</span><span class="fv">Deep Amber</span></div>
+    <div><span class="fk">Body</span><span class="fv">Full</span></div>
+    <div><span class="fk">Oxidation</span><span class="fv">Full</span></div>
+    <div><span class="fk">Caffeine</span><span class="fv">Moderate–High</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- BREWING -->
+<section class="sec" id="brewing">
+  <div class="sec-label">Brewing Guide</div>
+  <h2 class="sec-h">How to draw it out</h2>
+  <div class="brew-grid">
+    <div class="brew-cell"><div class="bn">95<small>°C</small></div><div class="bl">Water Temp</div></div>
+    <div class="brew-cell"><div class="bn">4<small>g</small></div><div class="bl">Per 200ml</div></div>
+    <div class="brew-cell"><div class="bn">4<small>min</small></div><div class="bl">First Steep</div></div>
+    <div class="brew-cell"><div class="bn">2<small>×</small></div><div class="bl">Infusions</div></div>
+  </div>
+  <div class="brew-method">
+    <div class="brew-step"><div class="bs-n">01</div><p>Warm the pot properly — this leaf is dense and gives its best at full temperature.</p></div>
+    <div class="brew-step"><div class="bs-n">02</div><p>Measure four grams of leaf per 200ml. A generous hand rewards you here.</p></div>
+    <div class="brew-step"><div class="bs-n">03</div><p>Use water close to a full boil, around 95°C, to draw out the depth and sweetness fully.</p></div>
+    <div class="brew-step"><div class="bs-n">04</div><p>Steep four minutes for the first cup. A second infusion, slightly longer, is rich and rewarding.</p></div>
+  </div>
+</section>
+
+<!-- MANUFACTURE -->
+<section class="make">
+  <div class="make-wrap">
+    <div class="sec-label">How It's Made</div>
+    <h2 class="sec-h">Five deliberate steps</h2>
+    <div class="make-grid">
+      <div class="make-cell"><div class="mn">01</div><div class="mt">Selection</div><div class="md">Golden tips chosen one by one at peak season.</div></div>
+      <div class="make-cell"><div class="mn">02</div><div class="mt">Withering</div><div class="md">A full day on bamboo trays, until the leaf turns supple.</div></div>
+      <div class="make-cell"><div class="mn">03</div><div class="mt">Rolling</div><div class="md">Rolled fully, to open the leaf for complete oxidation.</div></div>
+      <div class="make-cell"><div class="mn">04</div><div class="mt">Oxidation</div><div class="md">Carried through fully, under close watch, for depth and colour.</div></div>
+      <div class="make-cell"><div class="mn">05</div><div class="mt">Firing</div><div class="md">Finished slowly, then hand-packed into the gift box.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ORIGIN STORY -->
+<section class="origin-story">
+  <div class="os-visual"><img src="assets/mtpeak-emblem.png" alt="Mt. Peak emblem"></div>
+  <div class="os-content">
+    <div class="sec-label">The Origin</div>
+    <p class="lead">At the peak of the season, when the tips turn gold, our pickers choose only the very best of the garden.</p>
+    <p>Golden Harvest is our most generous tea — fully oxidised, deep in colour, honeyed in the cup. Every tip is selected by hand at the height of the season, then carried through a full, careful oxidation to bring out its warmth and depth.</p>
+    <p>Presented in a hand-finished gift box, it is built to be given as much as brewed. Certified organic, single-origin, and finished at our own factory — no middlemen, only the mountain and the hands that tend it.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SPECIFICATION -->
+<section class="sec">
+  <div class="sec-label">Specification</div>
+  <h2 class="sec-h">Every detail, on the record</h2>
+  <div class="spec-table">
+    <div class="spec-row"><div class="sk">Style</div><div class="sv">Fully oxidised black tea · golden tips</div></div>
+    <div class="spec-row"><div class="sk">Oxidation</div><div class="sv">Full</div></div>
+    <div class="spec-row"><div class="sk">Origin</div><div class="sv">Eastern Nepal, single Himalayan garden</div></div>
+    <div class="spec-row"><div class="sk">Altitude</div><div class="sv">2,400 metres</div></div>
+    <div class="spec-row"><div class="sk">Cultivation</div><div class="sv">100% certified organic</div></div>
+    <div class="spec-row"><div class="sk">Plucking</div><div class="sv">Golden tips, selected by hand</div></div>
+    <div class="spec-row"><div class="sk">Harvest</div><div class="sv">Peak season selection</div></div>
+    <div class="spec-row"><div class="sk">Format</div><div class="sv">100g loose leaf · hand-finished gift box</div></div>
+    <div class="spec-row"><div class="sk">Caffeine</div><div class="sv">Moderate–high</div></div>
+  </div>
+</section>
+
+<!-- CLOSER -->
+<section class="pdp-closer">
+  <img src="assets/mtpeak-emblem.png" alt="Mt. Peak">
+  <h2>Give the mountain<br>as a <em>gift</em></h2>
+  <p>£115 for the hand-finished gift box — 100g of golden-tip Himalayan black tea, honeyed and full.</p>
+  <a class="cbtn" id="btnAdd2" href="#">Add to Reserve</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-top">
+    <div class="foot-brand">
+      <span class="nav-name">Mt. Peak</span>
+      <p>Single-origin Himalayan black tea, grown at altitude in eastern Nepal and plucked by hand. Sourced with intention. Crafted for ritual.</p>
+    </div>
+    <div class="foot-col">
+      <h4>Collection</h4>
+      <a href="light-and-bright.html">Light &amp; Bright</a>
+      <a href="mountain-green.html">Mountain Green</a>
+      <a href="golden-harvest.html">Golden Harvest</a>
+      <a href="#brewing">Brewing Guide</a>
+    </div>
+    <div class="foot-col">
+      <h4>The House</h4>
+      <a href="index.html#origin">Our Origin</a>
+      <a href="index.html#ritual">The Ritual</a>
+      <a href="#">Sourcing &amp; Trade</a>
+      <a href="#">Wholesale</a>
+    </div>
+    <div class="foot-col">
+      <h4>Connect</h4>
+      <a href="#">Instagram</a>
+      <a href="#">Journal</a>
+      <a href="#">Contact</a>
+      <a href="#">Newsletter</a>
+    </div>
+  </div>
+  <div class="foot-bottom">© 2026 Mt. Peak — Himalayan Black Tea · Sourced at Altitude · Nepal</div>
+</footer>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<aside class="cart-panel" id="cartPanel">
+  <div class="cart-top">
+    <h2>Your Reserve</h2>
+    <button class="cart-close" onclick="closeCart()" aria-label="Close cart">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>Total</span><span>£<span id="cartTotal">0</span></span></div>
+    <button class="cart-checkout" onclick="checkout()">Proceed to Checkout</button>
+    <p class="cart-note">Complimentary UK delivery · Gift wrapping at checkout</p>
+  </div>
+</aside>
+
+<script>
+/* ===== GALLERY ===== */
+const galMain=document.getElementById('galMain');
+const thumbs=[...document.querySelectorAll('.gal-thumb')];
+function swapMain(html){
+  const cur=galMain.firstElementChild;
+  if(cur){cur.style.opacity='0';}
+  setTimeout(()=>{
+    galMain.innerHTML=html;
+    const el=galMain.firstElementChild;
+    el.style.opacity='0';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{el.style.opacity='1';}));
+  },220);
+}
+thumbs.forEach(t=>t.addEventListener('click',()=>{
+  if(t.classList.contains('active'))return;
+  thumbs.forEach(x=>x.classList.remove('active'));t.classList.add('active');
+  if(t.dataset.type==='img'){
+    swapMain(`<img src="${t.dataset.src}" alt="${t.dataset.alt}">`);
+  }else{
+    swapMain(`<div class="gal-ph"><div class="ph-mark">${t.dataset.label}</div><div class="ph-sub">${t.dataset.sub}</div></div>`);
+  }
+}));
+
+/* ===== QUANTITY ===== */
+const qVal=document.getElementById('qVal');
+function clampQ(){let v=parseInt(qVal.value)||1;v=Math.max(1,Math.min(20,v));qVal.value=v;return v;}
+document.getElementById('qMinus').onclick=()=>{qVal.value=Math.max(1,(parseInt(qVal.value)||1)-1);};
+document.getElementById('qPlus').onclick=()=>{qVal.value=Math.min(20,(parseInt(qVal.value)||1)+1);};
+qVal.addEventListener('change',clampQ);
+
+const PRODUCT={n:'Golden Harvest · Gift Box',p:115};
+const btnAdd=document.getElementById('btnAdd');
+btnAdd.addEventListener('click',()=>{
+  addToCart(PRODUCT.n,PRODUCT.p,clampQ());
+  btnAdd.classList.add('added');btnAdd.textContent='Added to Reserve ✓';
+  setTimeout(()=>{btnAdd.classList.remove('added');btnAdd.textContent='Add to Reserve — £115';},1600);
+});
+document.getElementById('btnAdd2').addEventListener('click',e=>{e.preventDefault();addToCart(PRODUCT.n,PRODUCT.p,1);});
+
+/* ===== CART (shared via localStorage) ===== */
+const STORE='mtpeak_cart';
+let cart=[];
+try{cart=JSON.parse(localStorage.getItem(STORE))||[];}catch(e){cart=[];}
+const navCart=document.getElementById('navCart');
+function save(){try{localStorage.setItem(STORE,JSON.stringify(cart));}catch(e){}}
+function addToCart(n,p,q=1){const e=cart.find(i=>i.n===n);if(e)e.q+=q;else cart.push({n,p,q});save();render();openCart();}
+function render(){const b=document.getElementById('cartBody');
+  const t=cart.reduce((s,i)=>s+i.p*i.q,0);
+  document.getElementById('cartTotal').textContent=t;
+  navCart.textContent='Cart · '+cart.reduce((s,i)=>s+i.q,0);
+  if(!cart.length){b.innerHTML='<div class="cart-empty">Your reserve is empty</div>';return;}
+  b.innerHTML=cart.map((i,x)=>`<div class="cart-line"><div><h3>${i.n}</h3><div class="q">Quantity · ${i.q}</div></div>
+    <div class="right"><div class="price">£${i.p*i.q}</div><button onclick="rm(${x})">Remove</button></div></div>`).join('');}
+function rm(x){cart.splice(x,1);save();render();}
+function openCart(){document.getElementById('cartOverlay').classList.add('open');document.getElementById('cartPanel').classList.add('open');}
+function closeCart(){document.getElementById('cartOverlay').classList.remove('open');document.getElementById('cartPanel').classList.remove('open');}
+function checkout(){if(!cart.length){return;}alert('Proceeding to secure checkout · connect Stripe or Shopify');}
+navCart.addEventListener('click',openCart);
+render();
+
+/* scroll reveals */
+const rvEls=[...document.querySelectorAll('.info,.sec-label,.sec-h,.taste-grid,.taste-foot,.brew-grid,.brew-method,.make-grid,.os-content,.spec-table,.pdp-closer h2,.pdp-closer p,.pdp-closer .cbtn')];
+rvEls.forEach(el=>el.classList.add('rv'));
+const rio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rio.unobserve(e.target);}}),{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+rvEls.forEach(el=>rio.observe(el));
+</script>
+</body>
+</html>
