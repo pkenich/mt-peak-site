@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mountain Green — MT. PEAK · Himalayan Green Tea</title>
+<meta name="description" content="Mountain Green — a pan-fired single-origin green tea from eastern Nepal. Fresh, vegetal, crisp, pale jade cup. Certified organic, hand-plucked.">
+<link rel="icon" href="assets/mtpeak-emblem.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/pdp.css">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-brand" href="index.html">
+    <img class="nav-logo" src="assets/mtpeak-emblem.png" alt="Mt. Peak">
+    <div class="nav-name">Mt. Peak</div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#origin"><span>The </span>Origin</a>
+    <a href="index.html#ritual"><span>The </span>Ritual</a>
+    <a href="index.html#collection">Collection</a>
+    <button class="nav-cart" id="navCart">Cart · 0</button>
+  </div>
+</nav>
+
+<div class="crumb"><a href="index.html">Mt. Peak</a> &nbsp;·&nbsp; <a href="index.html#collection">The Reserve</a> &nbsp;·&nbsp; Mountain Green</div>
+
+<!-- PDP HERO -->
+<section class="pdp">
+  <div class="gallery">
+    <div class="gal-main" id="galMain">
+      <img src="assets/tea-tin-beyond.png" alt="Mt. Peak Mountain Green — 100g loose-leaf caddy">
+    </div>
+    <div class="gal-thumbs" id="galThumbs">
+      <button class="gal-thumb active" data-type="img" data-src="assets/tea-tin-beyond.png" data-alt="Mountain Green caddy"><img src="assets/tea-tin-beyond.png" alt="Caddy"></button>
+      <button class="gal-thumb" data-type="img" data-src="assets/tea-box.png" data-alt="Mountain Green presentation box"><img src="assets/tea-box.png" alt="Box"></button>
+      <button class="gal-thumb" data-type="img" data-src="assets/giftset-wide.png" data-alt="Gift set"><img src="assets/giftset-wide.png" alt="Gift set"></button>
+      <button class="gal-thumb" data-type="ph" data-label="DRY LEAF — MACRO" data-sub="Whole pan-fired leaf, still faintly downy — shot like jewellery"><span class="tph">Dry leaf<br>macro</span></button>
+      <button class="gal-thumb" data-type="ph" data-label="THE LIQUOR — PALE JADE" data-sub="The brewed cup, backlit so the pale jade colour glows"><span class="tph">Liquor<br>in glass</span></button>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="info-eyebrow">№ 02 · Single-Origin Green Tea</div>
+    <h1 class="info-title">Mountain Green</h1>
+    <div class="info-tagline">Fresh · Vegetal · Crisp</div>
+    <p class="info-desc">Pan-fired within hours of plucking, the leaf never oxidises. What reaches the cup is the mountain itself — fresh, vegetal, crisp as thin air, with a sweetness drawn from above the cloud line.</p>
+
+    <div class="info-price"><span class="amt">£74</span><span class="unit">/ 100g loose-leaf caddy</span></div>
+    <div class="info-stock"><span class="pip"></span>In stock · ships within 2 working days</div>
+
+    <div class="buy-row">
+      <div class="qty">
+        <button id="qMinus" aria-label="Decrease quantity">−</button>
+        <input id="qVal" type="number" value="1" min="1" max="20" inputmode="numeric" aria-label="Quantity">
+        <button id="qPlus" aria-label="Increase quantity">+</button>
+      </div>
+      <button class="btn-add" id="btnAdd" data-name="Mountain Green · 100g" data-price="74">Add to Reserve — £74</button>
+    </div>
+
+    <div class="info-meta">
+      <div><span class="k">Origin</span> Eastern Nepal · single garden</div>
+      <div><span class="k">Harvest</span> Spring flush, hand-picked and fired same day</div>
+      <div><span class="k">Format</span> 100g loose-leaf caddy</div>
+      <div><span class="k">Delivery</span> Complimentary UK · gift wrap available</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TASTING -->
+<section class="sec tasting">
+  <div class="sec-label">Tasting Notes</div>
+  <h2 class="sec-h">A pale jade cup, crisp as altitude</h2>
+  <div class="taste-grid">
+    <div class="taste-cell"><div class="tk">Aroma</div><div class="tv">Fresh-cut grass, steamed edamame, a cool mineral note.</div></div>
+    <div class="taste-cell"><div class="tk">Palate</div><div class="tv">Crisp and vegetal, light-bodied, with a clean sweetness underneath.</div></div>
+    <div class="taste-cell"><div class="tk">Finish</div><div class="tv">Short and refreshing — the taste of thin, cold mountain air.</div></div>
+  </div>
+  <div class="taste-foot">
+    <div><span class="fk">Cup Colour</span><span class="fv">Pale Jade</span></div>
+    <div><span class="fk">Body</span><span class="fv">Light</span></div>
+    <div><span class="fk">Oxidation</span><span class="fv">None · pan-fired</span></div>
+    <div><span class="fk">Caffeine</span><span class="fv">Moderate–Low</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- BREWING -->
+<section class="sec" id="brewing">
+  <div class="sec-label">Brewing Guide</div>
+  <h2 class="sec-h">How to draw it out</h2>
+  <div class="brew-grid">
+    <div class="brew-cell"><div class="bn">75<small>°C</small></div><div class="bl">Water Temp</div></div>
+    <div class="brew-cell"><div class="bn">2<small>g</small></div><div class="bl">Per 200ml</div></div>
+    <div class="brew-cell"><div class="bn">2<small>min</small></div><div class="bl">First Steep</div></div>
+    <div class="brew-cell"><div class="bn">2<small>×</small></div><div class="bl">Infusions</div></div>
+  </div>
+  <div class="brew-method">
+    <div class="brew-step"><div class="bs-n">01</div><p>Warm the vessel briefly — green tea is unforgiving of heat, so keep it gentle throughout.</p></div>
+    <div class="brew-step"><div class="bs-n">02</div><p>Measure two grams of leaf per 200ml. Less is more with a leaf this delicate.</p></div>
+    <div class="brew-step"><div class="bs-n">03</div><p>Cool the water well below boiling, to around 75°C, to avoid scorching the leaf and turning it bitter.</p></div>
+    <div class="brew-step"><div class="bs-n">04</div><p>Steep two minutes for the first cup. A second, shorter infusion is often the sweetest.</p></div>
+  </div>
+</section>
+
+<!-- MANUFACTURE -->
+<section class="make">
+  <div class="make-wrap">
+    <div class="sec-label">How It's Made</div>
+    <h2 class="sec-h">Four deliberate steps</h2>
+    <div class="make-grid">
+      <div class="make-cell"><div class="mn">01</div><div class="mt">Plucking</div><div class="md">Two leaves and a bud, taken by hand at first light.</div></div>
+      <div class="make-cell"><div class="mn">02</div><div class="mt">Withering</div><div class="md">A brief rest, just long enough to soften the leaf.</div></div>
+      <div class="make-cell"><div class="mn">03</div><div class="mt">Pan-Firing</div><div class="md">Fired within hours of plucking, halting oxidation entirely.</div></div>
+      <div class="make-cell"><div class="mn">04</div><div class="mt">Drying</div><div class="md">Low, slow heat locks in the fresh, vegetal character.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ORIGIN STORY -->
+<section class="origin-story">
+  <div class="os-visual"><img src="assets/mtpeak-emblem.png" alt="Mt. Peak emblem"></div>
+  <div class="os-content">
+    <div class="sec-label">The Origin</div>
+    <p class="lead">Above the cloud line, where the air thins and the nights turn cold, the leaf grows slowly and stays green.</p>
+    <p>Mountain Green is fired within hours of plucking — no oxidation, no waiting. What reaches the cup is the closest thing to the living leaf: fresh, crisp, and faintly sweet, the way the garden tastes at first light.</p>
+    <p>Every leaf is certified organic, plucked by hands that have read these slopes for generations, and finished at our own factory. No middlemen. Only the mountain, the leaf, and the people who tend both.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SPECIFICATION -->
+<section class="sec">
+  <div class="sec-label">Specification</div>
+  <h2 class="sec-h">Every detail, on the record</h2>
+  <div class="spec-table">
+    <div class="spec-row"><div class="sk">Style</div><div class="sv">Pan-fired green tea</div></div>
+    <div class="spec-row"><div class="sk">Oxidation</div><div class="sv">None</div></div>
+    <div class="spec-row"><div class="sk">Origin</div><div class="sv">Eastern Nepal, single Himalayan garden</div></div>
+    <div class="spec-row"><div class="sk">Altitude</div><div class="sv">2,500 metres</div></div>
+    <div class="spec-row"><div class="sk">Cultivation</div><div class="sv">100% certified organic</div></div>
+    <div class="spec-row"><div class="sk">Plucking</div><div class="sv">Two leaves and a bud · by hand</div></div>
+    <div class="spec-row"><div class="sk">Harvest</div><div class="sv">Spring flush</div></div>
+    <div class="spec-row"><div class="sk">Format</div><div class="sv">100g loose leaf · resealable caddy</div></div>
+    <div class="spec-row"><div class="sk">Caffeine</div><div class="sv">Moderate–low</div></div>
+  </div>
+</section>
+
+<!-- CLOSER -->
+<section class="pdp-closer">
+  <img src="assets/mtpeak-emblem.png" alt="Mt. Peak">
+  <h2>Bring the altitude<br>home with <em>you</em></h2>
+  <p>£74 for 100g of single-origin, hand-plucked, pan-fired Himalayan green tea — crisp, fresh, unmistakably alive.</p>
+  <a class="cbtn" id="btnAdd2" href="#" data-name="Mountain Green · 100g" data-price="74">Add to Reserve</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-top">
+    <div class="foot-brand">
+      <span class="nav-name">Mt. Peak</span>
+      <p>Single-origin Himalayan black tea, grown at altitude in eastern Nepal and plucked by hand. Sourced with intention. Crafted for ritual.</p>
+    </div>
+    <div class="foot-col">
+      <h4>Collection</h4>
+      <a href="light-and-bright.html">Light &amp; Bright</a>
+      <a href="mountain-green.html">Mountain Green</a>
+      <a href="golden-harvest.html">Golden Harvest</a>
+      <a href="#brewing">Brewing Guide</a>
+    </div>
+    <div class="foot-col">
+      <h4>The House</h4>
+      <a href="index.html#origin">Our Origin</a>
+      <a href="index.html#ritual">The Ritual</a>
+      <a href="#">Sourcing &amp; Trade</a>
+      <a href="#">Wholesale</a>
+    </div>
+    <div class="foot-col">
+      <h4>Connect</h4>
+      <a href="#">Instagram</a>
+      <a href="#">Journal</a>
+      <a href="#">Contact</a>
+      <a href="#">Newsletter</a>
+    </div>
+  </div>
+  <div class="foot-bottom">© 2026 Mt. Peak — Himalayan Black Tea · Sourced at Altitude · Nepal</div>
+</footer>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<aside class="cart-panel" id="cartPanel">
+  <div class="cart-top">
+    <h2>Your Reserve</h2>
+    <button class="cart-close" onclick="closeCart()" aria-label="Close cart">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>Total</span><span>£<span id="cartTotal">0</span></span></div>
+    <button class="cart-checkout" onclick="checkout()">Proceed to Checkout</button>
+    <p class="cart-note">Complimentary UK delivery · Gift wrapping at checkout</p>
+  </div>
+</aside>
+
+<script src="js/cart.js"></script>
+<script src="js/pdp.js"></script>
+</body>
+</html>
