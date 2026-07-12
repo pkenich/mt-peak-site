@@ -95,6 +95,31 @@
   const UK_RE = /^(uk|gb|united kingdom|great britain|england|scotland|wales|northern ireland)$/i;
   const isUK = (prefix) => UK_RE.test($(`#${prefix}Country`).value.trim());
 
+  /* Approx country centroids [lat, lon] — used only to *bias* Photon's
+     global ranking toward the buyer's country. Unknown/blank country → no
+     bias, so results stay worldwide. Not an allow-list; just a nudge. */
+  const COUNTRY_BIAS = {
+    'united kingdom': [54, -2.5], uk: [54, -2.5], gb: [54, -2.5], england: [52.5, -1.5],
+    scotland: [56.8, -4], wales: [52.3, -3.8], 'northern ireland': [54.6, -6.7],
+    'united states': [39.8, -98.6], usa: [39.8, -98.6], us: [39.8, -98.6], america: [39.8, -98.6],
+    canada: [56.1, -106.3], ca: [56.1, -106.3],
+    australia: [-25.3, 133.8], au: [-25.3, 133.8], 'new zealand': [-41.5, 172.8], nz: [-41.5, 172.8],
+    ireland: [53.4, -8], ie: [53.4, -8],
+    france: [46.6, 2.2], fr: [46.6, 2.2], germany: [51.2, 10.4], de: [51.2, 10.4], deutschland: [51.2, 10.4],
+    spain: [40.2, -3.6], es: [40.2, -3.6], españa: [40.2, -3.6], italy: [42.8, 12.6], it: [42.8, 12.6],
+    netherlands: [52.1, 5.3], nl: [52.1, 5.3], belgium: [50.6, 4.7], be: [50.6, 4.7],
+    switzerland: [46.8, 8.2], ch: [46.8, 8.2], austria: [47.6, 14.1], at: [47.6, 14.1],
+    portugal: [39.6, -8], pt: [39.6, -8], sweden: [62.2, 15.3], se: [62.2, 15.3],
+    norway: [64.6, 12.6], no: [64.6, 12.6], denmark: [56, 9.5], dk: [56, 9.5], finland: [64.5, 26], fi: [64.5, 26],
+    poland: [52, 19.1], pl: [52, 19.1], india: [22.4, 79.6], in: [22.4, 79.6],
+    nepal: [28.3, 84], np: [28.3, 84], japan: [36.2, 138.3], jp: [36.2, 138.3],
+    china: [35.9, 104.2], cn: [35.9, 104.2], singapore: [1.35, 103.8], sg: [1.35, 103.8],
+    'hong kong': [22.3, 114.2], hk: [22.3, 114.2], uae: [23.9, 54], 'united arab emirates': [23.9, 54],
+    'south africa': [-30.6, 22.9], za: [-30.6, 22.9], brazil: [-14.2, -51.9], br: [-14.2, -51.9],
+    mexico: [23.6, -102.5], mx: [23.6, -102.5],
+  };
+  const countryBias = (prefix) => COUNTRY_BIAS[$(`#${prefix}Country`).value.trim().toLowerCase()] || null;
+
   function dropdown(input, list, { fetcher, onPick }) {
     let timer, results = [], sel = -1, aborter;
     const hide = () => { list.hidden = true; sel = -1; };
@@ -136,10 +161,13 @@
     dropdown(input, $(`#${prefix}Line1Ac`), {
       fetcher: async (qy, signal) => {
         const city = $(`#${prefix}City`).value.trim();
-        const pc = $(`#${prefix}Postcode`).value.trim();
-        const q = [qy, city, pc].filter(Boolean).join(', ');
-        let url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=8&lang=en&lat=54.2&lon=-2.5`;
-        if (isUK(prefix)) url += '&bbox=-8.65,49.8,1.78,60.9';
+        const country = $(`#${prefix}Country`).value.trim();
+        const countryLc = country.toLowerCase();
+        // context (city + country) sharpens Photon's worldwide ranking
+        const q = [qy, city, country].filter(Boolean).join(', ');
+        let url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=12&lang=en`;
+        const bias = countryBias(prefix); // nudge toward the buyer's country; absent → global
+        if (bias) url += `&lat=${bias[0]}&lon=${bias[1]}`;
         const res = await fetch(url, { signal });
         if (!res.ok) return [];
         const data = await res.json();
@@ -149,13 +177,17 @@
           .filter(p => p.street || p.name)
           .map(p => ({
             line1: [p.housenumber, p.street || p.name].filter(Boolean).join(' '),
-            city: p.city || p.town || p.village || p.district || '',
+            city: p.city || p.town || p.village || p.district || p.county || '',
             postcode: p.postcode || '', country: p.country || '',
             hasNum: !!p.housenumber,
+            // does the result's country match what the buyer typed?
+            match: countryLc && (p.country || '').toLowerCase().includes(countryLc) ? 1
+                 : countryLc && p.countrycode && countryLc.startsWith(p.countrycode.toLowerCase()) ? 1 : 0,
           }))
           .filter(r => { const k = `${r.line1}|${r.city}|${r.postcode}`; if (seen.has(k)) return false; seen.add(k); return true; })
-          .sort((a, b) => (b.hasNum - a.hasNum))
-          .slice(0, 6)
+          // country match first, then street-with-number, then the rest
+          .sort((a, b) => (b.match - a.match) || (b.hasNum - a.hasNum))
+          .slice(0, 7)
           .map(r => ({ ...r, main: r.line1, sub: [r.city, r.postcode, r.country].filter(Boolean).join(', ') }));
       },
       onPick: (r) => {
