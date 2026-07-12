@@ -43,7 +43,9 @@ export function bad(message, code = 400) {
 }
 
 export const normEmail = (s) => String(s || '').trim().toLowerCase();
-export const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s) && s.length <= 254;
+// excludes <>'"`\ and whitespace — kills markup-shaped "emails" before they
+// reach storage (defence in depth alongside output escaping)
+export const isEmail = (s) => /^[^\s@<>'"`\\]+@[^\s@<>'"`\\]+\.[^\s@<>'"`\\]+$/.test(s) && s.length <= 254;
 
 export function publicOrderId() {
   // unambiguous alphabet (no 0/O/1/I)

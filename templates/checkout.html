@@ -29,7 +29,9 @@
             <div class="ac-list" id="shLine1Ac" hidden></div></div>
           <div class="field wide"><label for="shLine2">Apartment, suite, etc. <span class="opt">(optional)</span></label><input id="shLine2" autocomplete="shipping address-line2"></div>
           <div class="field"><label for="shCity">City</label><input id="shCity" autocomplete="shipping address-level2" required></div>
-          <div class="field"><label for="shPostcode">Postcode</label><input id="shPostcode" autocomplete="shipping postal-code" required></div>
+          <div class="field ac-wrap"><label for="shPostcode">Postcode</label>
+            <input id="shPostcode" autocomplete="shipping postal-code" required>
+            <div class="ac-list" id="shPostcodeAc" hidden></div></div>
           <div class="field wide"><label for="shCountry">Country</label><input id="shCountry" autocomplete="shipping country-name" value="United Kingdom" required></div>
         </div>
       </div>
@@ -50,7 +52,9 @@
             <div class="ac-list" id="biLine1Ac" hidden></div></div>
           <div class="field wide"><label for="biLine2">Apartment, suite, etc. <span class="opt">(optional)</span></label><input id="biLine2" autocomplete="billing address-line2"></div>
           <div class="field"><label for="biCity">City</label><input id="biCity" autocomplete="billing address-level2"></div>
-          <div class="field"><label for="biPostcode">Postcode</label><input id="biPostcode" autocomplete="billing postal-code"></div>
+          <div class="field ac-wrap"><label for="biPostcode">Postcode</label>
+            <input id="biPostcode" autocomplete="billing postal-code">
+            <div class="ac-list" id="biPostcodeAc" hidden></div></div>
           <div class="field wide"><label for="biCountry">Country</label><input id="biCountry" autocomplete="billing country-name"></div>
         </div>
       </div>

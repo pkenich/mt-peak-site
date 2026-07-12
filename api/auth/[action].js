@@ -57,6 +57,9 @@ async function login(req, res) {
 const passFingerprint = (hash) => createHash('sha256').update(hash).digest('base64url').slice(0, 16);
 
 async function requestReset(req, res) {
+  if (!process.env.RESEND_API_KEY) {
+    throw bad('Password reset by email isn’t set up yet — contact us and we’ll sort you out.', 503);
+  }
   await ensureSchema();
   const ipKey = `reset:${clientIp(req)}`;
   await checkThrottle(ipKey);

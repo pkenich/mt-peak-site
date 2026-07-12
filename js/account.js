@@ -7,8 +7,9 @@
     reserved: 'Reserved', pending_payment: 'Awaiting payment', paid: 'Paid',
     fulfilled: 'Shipped', cancelled: 'Cancelled',
   };
+  const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const fmtDate = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const fmtItems = items => items.map(l => `${l.name} × ${l.qty}`).join('<br>');
+  const fmtItems = items => items.map(l => `${esc(l.name)} × ${esc(l.qty)}`).join('<br>');
 
   function showMsg(text, cls) {
     const m = $('#accountMsg');

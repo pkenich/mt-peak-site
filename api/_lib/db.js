@@ -71,15 +71,19 @@ export function ensureSchema() {
   return _ready;
 }
 
-/* Simple credential throttle: 8 failures locks the key for 15 minutes. */
+/* Simple credential throttle: 8 failures locks the key for 15 minutes.
+   An expired lock deletes the row, so the counter starts fresh — otherwise
+   one failure after an old lockout would re-lock immediately, forever. */
 export async function checkThrottle(key) {
   const q = sql();
   const rows = await q`SELECT locked_until FROM throttle WHERE key = ${key}`;
-  if (rows[0]?.locked_until && new Date(rows[0].locked_until) > new Date()) {
+  const until = rows[0]?.locked_until && new Date(rows[0].locked_until);
+  if (until && until > new Date()) {
     const err = new Error('Too many attempts. Try again in a few minutes.');
     err.statusCode = 429;
     throw err;
   }
+  if (until) await q`DELETE FROM throttle WHERE key = ${key}`;
 }
 
 export async function recordFailure(key) {

@@ -6,7 +6,10 @@ let cart = [];
 try { cart = JSON.parse(localStorage.getItem(STORE)) || []; } catch (e) { cart = []; }
 const navCart = document.getElementById('navCart');
 
-function save() { try { localStorage.setItem(STORE, JSON.stringify(cart)); } catch (e) {} }
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify(cart)); } catch (e) {}
+  window.dispatchEvent(new CustomEvent('mtpeak:cart')); // checkout page resyncs
+}
 
 function addToCart(slug, name, price, q = 1) {
   const e = cart.find(i => i.s === slug);

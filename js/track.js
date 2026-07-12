@@ -33,7 +33,7 @@
         <div class="order-row">
           <div class="oid">${o.public_id}</div>
           <div class="odate">${new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-          <div class="oitems">${o.items.map(l => `${l.name} × ${l.qty}`).join('<br>')}</div>
+          <div class="oitems">${o.items.map(l => `${String(l.name).replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]))} × ${Number(l.qty) || 0}`).join('<br>')}</div>
           <div class="ototal">£${(o.total_pence / 100).toFixed(0)}</div>
           <div><span class="status ${o.status}">${STATUS_LABEL[o.status] || o.status}</span></div>
         </div>

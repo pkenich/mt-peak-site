@@ -6,6 +6,9 @@
   const banner = $('#saveBanner');
   let products = null, site = null, currentSlug = null;
 
+  const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
   const api = async (url, opts = {}) => {
     const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
     const data = await res.json().catch(() => ({}));
@@ -160,7 +163,7 @@
     return `<div class="chart-title" style="margin-top:1.6rem;">Top teas — by paid revenue</div>` +
       products.map(p => `
       <div class="pbar-row">
-        <div class="pbar-name">${p.name}</div>
+        <div class="pbar-name">${esc(p.name)}</div>
         <div class="pbar-track"><div class="pbar-fill" style="width:${Math.max((p.revenue_pence / max) * 100, 2)}%"></div></div>
         <div class="pbar-val">${gbp(p.revenue_pence)} · ${p.qty}</div>
       </div>`).join('');
@@ -239,17 +242,17 @@
           ${orders.map((o, i) => `
           <div class="order-row" data-x="${i}" style="cursor:pointer;">
             <div><div class="oid">${o.public_id}</div><div class="odate">${new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</div></div>
-            <div class="oemail">${o.email}</div>
-            <div class="oitems">${o.items.map(l => `${l.name} × ${l.qty}`).join('<br>')}</div>
+            <div class="oemail">${esc(o.email)}</div>
+            <div class="oitems">${o.items.map(l => `${esc(l.name)} × ${esc(l.qty)}`).join('<br>')}</div>
             <div class="ototal">${gbp(o.total_pence)}${o.discount_pence ? `<div class="odate">−${gbp(o.discount_pence)} (${o.promo_code || 'promo'})</div>` : ''}</div>
             <div><select data-order="${o.public_id}">
               ${Object.entries(STATUS_LABEL).map(([v, l]) => `<option value="${v}"${v === o.status ? ' selected' : ''}>${l}</option>`).join('')}
             </select></div>
           </div>
           <div class="order-detail" id="od-${i}" hidden>
-            <div><span class="odk">Deliver to</span>${fmtAddr(o.shipping)}</div>
-            <div><span class="odk">Billing</span>${fmtAddr(o.billing)}</div>
-            ${o.gift_note ? `<div><span class="odk">Gift message</span><em>${o.gift_note.replace(/</g, '&lt;')}</em></div>` : ''}
+            <div><span class="odk">Deliver to</span>${esc(fmtAddr(o.shipping))}</div>
+            <div><span class="odk">Billing</span>${esc(fmtAddr(o.billing))}</div>
+            ${o.gift_note ? `<div><span class="odk">Gift message</span><em>${esc(o.gift_note)}</em></div>` : ''}
           </div>`).join('')}
         </div>`;
       for (const row of document.querySelectorAll('.order-row[data-x]')) {
