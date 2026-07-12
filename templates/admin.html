@@ -50,6 +50,23 @@
     <div class="orders-admin" id="adminOrders"></div>
   </div>
 
+  <div class="admin-card" id="promoCard">
+    <h3>Promo codes</h3>
+    <div class="promo-create">
+      <div class="field"><label>Code <span class="opt">(blank = auto)</span></label>
+        <input id="pcCode" maxlength="24" placeholder="MP-XXXXXX" style="text-transform:uppercase;"></div>
+      <div class="field"><label>Type</label>
+        <select id="pcKind"><option value="percent">% off</option><option value="fixed">£ off</option></select></div>
+      <div class="field"><label>Value</label><input id="pcValue" type="number" min="1" placeholder="10"></div>
+      <div class="field"><label>Uses <span class="opt">(blank = universal)</span></label>
+        <input id="pcUses" type="number" min="1" placeholder="∞"></div>
+      <button class="btn-gold" id="pcCreate" style="width:auto;padding:0 1.8rem;">Create</button>
+    </div>
+    <p class="admin-note" style="margin:.6rem 0 1.4rem;">Universal = leave uses blank (anyone, any number of times).
+      Single-use gift code = uses 1. A batch of N issuable codes = uses N.</p>
+    <div id="promoList"><p class="admin-note">Loading codes…</p></div>
+  </div>
+
   <div class="admin-tabs" id="productTabs"></div>
 
   <div id="productEditor"></div>

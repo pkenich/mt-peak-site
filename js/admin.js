@@ -59,7 +59,59 @@
     selectProduct(Object.keys(products)[0]);
     fillSiteForm();
     loadOrders();
+    loadPromos();
   }
+
+  /* ---------- promo codes ---------- */
+  async function loadPromos() {
+    try {
+      const { promos } = await api('/api/admin/promos');
+      const list = $('#promoList');
+      if (!promos.length) {
+        list.innerHTML = '<p class="admin-note">No codes yet — create your first above.</p>';
+        return;
+      }
+      list.innerHTML = `
+        <div class="promo-row head"><div>Code</div><div>Discount</div><div>Kind</div><div>Uses</div><div></div></div>` +
+        promos.map(p => `
+        <div class="promo-row${p.active ? '' : ' off'}">
+          <div class="pcode">${p.code}</div>
+          <div class="pmeta">${p.kind === 'percent' ? p.value + '% off' : gbp(p.value) + ' off'}</div>
+          <div class="pmeta">${p.max_uses === null ? 'Universal' : p.max_uses === 1 ? 'Single-use' : `Issue of ${p.max_uses}`}</div>
+          <div class="pmeta">${p.uses}${p.max_uses !== null ? ' / ' + p.max_uses : ''} used</div>
+          <div><button class="btn-quiet" data-code="${p.code}" data-active="${p.active}">
+            ${p.active ? 'Deactivate' : 'Reactivate'}</button></div>
+        </div>`).join('');
+      for (const b of list.querySelectorAll('button[data-code]')) {
+        b.addEventListener('click', async () => {
+          try {
+            await api('/api/admin/promo-toggle', { method: 'PUT',
+              body: JSON.stringify({ code: b.dataset.code, active: b.dataset.active !== 'true' }) });
+            loadPromos();
+          } catch (err) { notify(err.message, true); }
+        });
+      }
+    } catch (err) {
+      $('#promoList').innerHTML = `<p class="admin-note">${err.message}</p>`;
+    }
+  }
+
+  $('#pcCreate').addEventListener('click', async () => {
+    try {
+      const { code } = await api('/api/admin/promo-create', {
+        method: 'POST',
+        body: JSON.stringify({
+          code: $('#pcCode').value.trim() || undefined,
+          kind: $('#pcKind').value,
+          value: Number($('#pcValue').value),
+          maxUses: $('#pcUses').value.trim() === '' ? null : Number($('#pcUses').value),
+        }),
+      });
+      $('#pcCode').value = ''; $('#pcValue').value = ''; $('#pcUses').value = '';
+      notify(`Code ${code} created — it works at checkout immediately.`);
+      loadPromos();
+    } catch (err) { notify(err.message, true); }
+  });
 
   /* ---------- sales & orders ---------- */
   const STATUS_LABEL = {

@@ -3,7 +3,7 @@
   const $ = s => document.querySelector(s);
   const msg = $('#formMsg');
   const next = new URLSearchParams(location.search).get('next');
-  const dest = next === 'checkout' ? '/?checkout=1#collection' : '/account';
+  const dest = next === 'checkout' ? '/checkout' : '/account';
 
   // already signed in? straight through
   fetch('/api/auth/me').then(r => r.json()).then(({ user }) => {

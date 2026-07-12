@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/account.css">
+<link rel="stylesheet" href="/css/checkout.css">
+<meta name="robots" content="noindex">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+{{> nav}}
+
+<div class="page-wrap">
+  <div class="page-eyebrow">The Final Step</div>
+  <h1 class="page-h">Checkout</h1>
+
+  <div class="form-msg" id="formMsg"></div>
+
+  <div class="co-grid" id="coGrid">
+    <form class="co-forms" id="coForm">
+      <div class="co-card">
+        <h3>Delivery address</h3>
+        <div class="admin-grid">
+          <div class="field wide"><label for="shName">Full name</label><input id="shName" autocomplete="shipping name" required></div>
+          <div class="field wide"><label for="shLine1">Street address</label><input id="shLine1" autocomplete="shipping address-line1" required></div>
+          <div class="field wide"><label for="shLine2">Apartment, suite, etc. <span class="opt">(optional)</span></label><input id="shLine2" autocomplete="shipping address-line2"></div>
+          <div class="field"><label for="shCity">City</label><input id="shCity" autocomplete="shipping address-level2" required></div>
+          <div class="field"><label for="shPostcode">Postcode</label><input id="shPostcode" autocomplete="shipping postal-code" required></div>
+          <div class="field wide"><label for="shCountry">Country</label><input id="shCountry" autocomplete="shipping country-name" value="United Kingdom" required></div>
+        </div>
+      </div>
+
+      <div class="co-card">
+        <h3>Billing address</h3>
+        <label class="co-same"><input type="checkbox" id="billSame" checked><span></span>Same as delivery address</label>
+        <div class="admin-grid" id="billFields" hidden>
+          <div class="field wide"><label for="biName">Full name</label><input id="biName" autocomplete="billing name"></div>
+          <div class="field wide"><label for="biLine1">Street address</label><input id="biLine1" autocomplete="billing address-line1"></div>
+          <div class="field wide"><label for="biLine2">Apartment, suite, etc. <span class="opt">(optional)</span></label><input id="biLine2" autocomplete="billing address-line2"></div>
+          <div class="field"><label for="biCity">City</label><input id="biCity" autocomplete="billing address-level2"></div>
+          <div class="field"><label for="biPostcode">Postcode</label><input id="biPostcode" autocomplete="billing postal-code"></div>
+          <div class="field wide"><label for="biCountry">Country</label><input id="biCountry" autocomplete="billing country-name"></div>
+        </div>
+      </div>
+    </form>
+
+    <aside class="co-summary">
+      <div class="co-card">
+        <h3>Your reserve</h3>
+        <div id="coItems"></div>
+        <div class="co-promo">
+          <input id="promoInput" placeholder="Promo code" autocomplete="off" maxlength="24">
+          <button type="button" class="btn-quiet" id="promoApply">Apply</button>
+        </div>
+        <div class="co-promo-note" id="promoNote"></div>
+        <div class="co-totals">
+          <div><span>Subtotal</span><span id="coSubtotal"></span></div>
+          <div id="coDiscountRow" hidden><span>Discount</span><span id="coDiscount" class="gold"></span></div>
+          <div><span>Delivery</span><span class="gold">Complimentary</span></div>
+          <div class="grand"><span>Total</span><span id="coTotal"></span></div>
+        </div>
+        <button class="btn-gold" id="coPlace" form="coForm" type="submit">Place order</button>
+        <p class="co-note">{{site.cartNote}}</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="empty-state" id="coEmpty" hidden>Your reserve is empty. <a class="text-link" href="/#collection">Choose your tea</a></div>
+</div>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/lux.js"></script>
+<script src="/js/checkout.js"></script>
+</body>
+</html>

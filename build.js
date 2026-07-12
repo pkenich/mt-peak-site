@@ -124,7 +124,7 @@ for (const p of products) {
     pageTitle: p.title, pageDesc: p.metaDesc, pageUrl: p.url, ogImage: p.ogImage }]));
 }
 
-for (const name of ['login', 'account', 'track', 'admin', '404']) {
+for (const name of ['login', 'account', 'track', 'checkout', 'admin', '404']) {
   emit(`${name}.html`, render(page(`${name}.html`), [{ site,
     pageTitle: `${site.brand} — ${name === '404' ? 'Not Found' : name[0].toUpperCase() + name.slice(1)}`,
     pageDesc: site.metaDesc, pageUrl: `${site.siteUrl}/${name}`, ogImage: `${site.siteUrl}/assets/tea-giftset.webp` }]));

@@ -48,6 +48,19 @@ export function ensureSchema() {
         fails int NOT NULL DEFAULT 0,
         locked_until timestamptz
       )`;
+      await q`CREATE TABLE IF NOT EXISTS promos (
+        code text PRIMARY KEY,
+        kind text NOT NULL,             -- 'percent' | 'fixed'
+        value int NOT NULL,             -- percent (1-90) or pence
+        max_uses int,                   -- NULL = universal/unlimited
+        uses int NOT NULL DEFAULT 0,
+        active boolean NOT NULL DEFAULT true,
+        created_at timestamptz NOT NULL DEFAULT now()
+      )`;
+      await q`ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping jsonb`;
+      await q`ALTER TABLE orders ADD COLUMN IF NOT EXISTS billing jsonb`;
+      await q`ALTER TABLE orders ADD COLUMN IF NOT EXISTS promo_code text`;
+      await q`ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_pence int NOT NULL DEFAULT 0`;
     })().catch(e => { _ready = null; throw e; });
   }
   return _ready;

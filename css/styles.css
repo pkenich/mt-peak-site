@@ -26,6 +26,7 @@ body{
 }
 a,button{cursor:pointer;}
 img{display:block;}
+[hidden]{display:none!important;}
 
 ::selection{background:var(--gold);color:var(--ink);}
 

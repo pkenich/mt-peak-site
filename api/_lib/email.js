@@ -59,12 +59,23 @@ function orderEmailHtml({ heading, message, order, siteUrl }) {
             <td style="padding:12px 0;text-align:right;font-family:Georgia,serif;color:${GOLD};font-size:16px;letter-spacing:1px;">${esc(order.public_id)}</td>
           </tr>
           ${rows}
+          ${order.discount_pence ? `<tr>
+            <td style="padding:12px 0;color:${DIM};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">DISCOUNT</td>
+            <td colspan="2" style="padding:12px 0;text-align:right;font-family:Georgia,serif;color:${CREAM};font-size:14px;">−${gbp(order.discount_pence)}</td>
+          </tr>` : ''}
           <tr>
             <td style="padding:14px 0;color:${DIM};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">TOTAL</td>
             <td colspan="2" style="padding:14px 0;text-align:right;font-family:Georgia,serif;color:${GOLD};font-size:22px;">${gbp(order.total_pence)}</td>
           </tr>
         </table>
       </div>
+      ${order.shipping ? `<div style="border:1px solid ${BORDER};padding:16px 18px;margin-bottom:26px;">
+        <div style="color:${DIM};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;padding-bottom:8px;">DELIVERING TO</div>
+        <div style="font-family:Helvetica,Arial,sans-serif;color:${CREAM};font-size:13px;line-height:1.7;">
+          ${esc(order.shipping.name)}<br>${esc(order.shipping.line1)}${order.shipping.line2 ? '<br>' + esc(order.shipping.line2) : ''}<br>
+          ${esc(order.shipping.city)}, ${esc(order.shipping.postcode)}<br>${esc(order.shipping.country)}
+        </div>
+      </div>` : ''}
       <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;">
         <tr><td style="background:${GOLD};">
           <a href="${siteUrl}/track" style="display:inline-block;padding:14px 34px;font-family:Helvetica,Arial,sans-serif;font-size:12px;letter-spacing:3px;color:#070d0a;text-decoration:none;">TRACK YOUR ORDER</a>

@@ -35,26 +35,9 @@ function rm(x) { cart.splice(x, 1); save(); render(); }
 function openCart() { document.getElementById('cartOverlay').classList.add('open'); document.getElementById('cartPanel').classList.add('open'); }
 function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartPanel').classList.remove('open'); }
 
-async function checkout() {
+function checkout() {
   if (!cart.length) return;
-  const btn = document.getElementById('cartCheckout');
-  btn.disabled = true; btn.textContent = 'One moment…';
-  try {
-    const res = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: cart.map(i => ({ slug: i.s, q: i.q })) }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (res.status === 401) { location.href = '/login?next=checkout'; return; }
-    if (!res.ok) throw new Error(data.error || 'Checkout failed — please try again.');
-    cart = []; save();
-    if (data.mode === 'stripe' && data.url) { location.href = data.url; return; }
-    location.href = `/account?placed=${encodeURIComponent(data.orderId)}`;
-  } catch (e) {
-    btn.disabled = false; btn.textContent = 'Proceed to Checkout';
-    alert(e.message);
-  }
+  location.href = '/checkout';
 }
 
 /* home-page collection "Add" buttons */

@@ -2,6 +2,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { sql, ensureSchema, checkThrottle, recordFailure, clearThrottle } from '../_lib/db.js';
 import { issueAdmin, readAdmin, clearAdmin, requireAdmin } from '../_lib/session.js';
 import { readRepoFile, writeRepoFile } from '../_lib/github.js';
+import { normCode, isCode } from '../_lib/promo.js';
 import { dispatch, bad } from '../_lib/util.js';
 
 /* ---------- session ---------- */
@@ -140,7 +141,7 @@ async function orderStatus(req, res) {
   if (!ORDER_STATUSES.includes(status)) throw bad('Bad status.');
   const rows = await sql()`UPDATE orders SET status = ${status}, updated_at = now()
     WHERE public_id = ${publicId} AND status <> ${status}
-    RETURNING public_id, email, items, total_pence`;
+    RETURNING public_id, email, items, total_pence, discount_pence, shipping`;
   if (!rows.length) {
     const exists = await sql()`SELECT 1 FROM orders WHERE public_id = ${publicId}`;
     if (!exists.length) throw bad('Order not found.', 404);
@@ -148,6 +149,55 @@ async function orderStatus(req, res) {
   }
   // customers hear about meaningful transitions only
   if (['paid', 'fulfilled', 'cancelled'].includes(status)) await sendOrderEmail(rows[0], status);
+  res.json({ ok: true });
+}
+
+/* ---------- promo codes ---------- */
+
+async function promos(req, res) {
+  requireAdmin(req);
+  await ensureSchema();
+  const rows = await sql()`SELECT code, kind, value, max_uses, uses, active, created_at
+    FROM promos ORDER BY created_at DESC LIMIT 100`;
+  res.json({ promos: rows });
+}
+
+async function promoCreate(req, res) {
+  requireAdmin(req);
+  await ensureSchema();
+  const kind = req.body?.kind;
+  const value = Math.floor(Number(req.body?.value));
+  if (!['percent', 'fixed'].includes(kind)) throw bad('Pick a discount type.');
+  if (kind === 'percent' && (!Number.isFinite(value) || value < 1 || value > 90)) throw bad('Percentage must be 1–90.');
+  if (kind === 'fixed' && (!Number.isFinite(value) || value < 1 || value > 1000)) throw bad('Fixed discount must be £1–£1000.');
+  let maxUses = req.body?.maxUses;
+  if (maxUses !== null && maxUses !== undefined && maxUses !== '') {
+    maxUses = Math.floor(Number(maxUses));
+    if (!Number.isFinite(maxUses) || maxUses < 1 || maxUses > 100000) throw bad('Uses must be at least 1 (or blank for unlimited).');
+  } else maxUses = null;
+
+  let code = normCode(req.body?.code);
+  if (!code) {
+    const alpha = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    code = 'MP-' + Array.from(globalThis.crypto.getRandomValues(new Uint8Array(6)), b => alpha[b % alpha.length]).join('');
+  }
+  if (!isCode(code)) throw bad('Codes are 3–24 letters, numbers or dashes.');
+
+  const valuePence = kind === 'fixed' ? value * 100 : value;
+  const rows = await sql()`INSERT INTO promos (code, kind, value, max_uses)
+    VALUES (${code}, ${kind}, ${valuePence}, ${maxUses})
+    ON CONFLICT (code) DO NOTHING RETURNING code`;
+  if (!rows.length) throw bad(`Code ${code} already exists.`, 409);
+  res.status(201).json({ ok: true, code });
+}
+
+async function promoToggle(req, res) {
+  requireAdmin(req);
+  await ensureSchema();
+  const code = normCode(req.body?.code);
+  const active = !!req.body?.active;
+  const rows = await sql()`UPDATE promos SET active = ${active} WHERE code = ${code} RETURNING code`;
+  if (!rows.length) throw bad('Code not found.', 404);
   res.json({ ok: true });
 }
 
@@ -159,4 +209,7 @@ export default dispatch({
   upload: { methods: ['POST'], fn: upload },
   orders: { methods: ['GET'], fn: orders },
   'order-status': { methods: ['PUT'], fn: orderStatus },
+  promos: { methods: ['GET'], fn: promos },
+  'promo-create': { methods: ['POST'], fn: promoCreate },
+  'promo-toggle': { methods: ['PUT'], fn: promoToggle },
 });
