@@ -24,7 +24,7 @@
     const sessionId = params.get('session_id');
     if (sessionId) {
       showMsg('Confirming your payment…', 'ok');
-      await fetch('/api/stripe-confirm', {
+      await fetch('/api/stripe/confirm', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId }),
       }).catch(() => {});

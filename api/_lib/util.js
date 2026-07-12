@@ -1,3 +1,24 @@
+/* Routes one [action].js function across several endpoints — Vercel's Hobby
+   plan caps deployments at 12 functions, so actions share a function each.
+   spec: { actionName: { methods: [...], fn } } */
+export function dispatch(spec) {
+  return async (req, res) => {
+    const action = spec[req.query.action];
+    if (!action) return res.status(404).json({ error: 'Not found' });
+    if (!action.methods.includes(req.method)) {
+      res.setHeader('Allow', action.methods.join(', '));
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+    try {
+      await action.fn(req, res);
+    } catch (e) {
+      const code = e.statusCode || 500;
+      if (code === 500) console.error(e);
+      res.status(code).json({ error: code === 500 ? 'Something went wrong on our side.' : e.message });
+    }
+  };
+}
+
 /* Wraps a handler with method enforcement and uniform error responses. */
 export function handler(methods, fn) {
   return async (req, res) => {
