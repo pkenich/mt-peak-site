@@ -58,6 +58,60 @@
     renderTabs();
     selectProduct(Object.keys(products)[0]);
     fillSiteForm();
+    loadOrders();
+  }
+
+  /* ---------- sales & orders ---------- */
+  const STATUS_LABEL = {
+    reserved: 'Reserved', pending_payment: 'Awaiting payment', paid: 'Paid',
+    fulfilled: 'Shipped', cancelled: 'Cancelled',
+  };
+  const gbp = pence => '£' + (pence / 100).toLocaleString('en-GB', { maximumFractionDigits: 0 });
+
+  async function loadOrders() {
+    try {
+      const { orders, stats } = await api('/api/admin/orders');
+      $('#statRow').innerHTML = [
+        [gbp(stats.revenue_pence), 'Revenue (paid)'],
+        [gbp(stats.awaiting_pence), 'Awaiting payment'],
+        [stats.orders, 'Orders'],
+        [stats.open_orders, 'Open orders'],
+        [stats.customers, 'Customers'],
+      ].map(([v, l]) => `<div class="stat"><div class="sv">${v}</div><div class="sl">${l}</div></div>`).join('');
+
+      if (!orders.length) {
+        $('#adminOrders').innerHTML = '<p class="admin-note">No orders yet — they’ll appear here the moment someone checks out.</p>';
+        return;
+      }
+      $('#adminOrders').innerHTML = `
+        <div class="orders">
+          <div class="order-row head"><div>Order</div><div>Customer</div><div>Items</div><div>Total</div><div>Status</div></div>
+          ${orders.map(o => `
+          <div class="order-row">
+            <div><div class="oid">${o.public_id}</div><div class="odate">${new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</div></div>
+            <div class="oemail">${o.email}</div>
+            <div class="oitems">${o.items.map(l => `${l.name} × ${l.qty}`).join('<br>')}</div>
+            <div class="ototal">${gbp(o.total_pence)}</div>
+            <div><select data-order="${o.public_id}">
+              ${Object.entries(STATUS_LABEL).map(([v, l]) => `<option value="${v}"${v === o.status ? ' selected' : ''}>${l}</option>`).join('')}
+            </select></div>
+          </div>`).join('')}
+        </div>`;
+      for (const sel of document.querySelectorAll('#adminOrders select[data-order]')) {
+        sel.addEventListener('change', async () => {
+          try {
+            await api('/api/admin/order-status', {
+              method: 'PUT',
+              body: JSON.stringify({ publicId: sel.dataset.order, status: sel.value }),
+            });
+            notify(`${sel.dataset.order} → ${STATUS_LABEL[sel.value]}`);
+            loadOrders();
+          } catch (err) { notify(err.message, true); }
+        });
+      }
+    } catch (err) {
+      $('#statRow').innerHTML = `<div class="admin-note">${err.message}</div>`;
+    }
   }
 
   function renderTabs() {

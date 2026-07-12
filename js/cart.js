@@ -20,10 +20,17 @@ function render() {
   document.getElementById('cartTotal').textContent = t;
   navCart.textContent = 'Cart · ' + cart.reduce((s, i) => s + i.q, 0);
   if (!cart.length) { b.innerHTML = '<div class="cart-empty">Your reserve is empty</div>'; return; }
-  b.innerHTML = cart.map((i, x) => `<div class="cart-line"><div><h3>${i.n}</h3><div class="q">Quantity · ${i.q}</div></div>
-    <div class="right"><div class="price">£${i.p * i.q}</div><button onclick="rm(${x})">Remove</button></div></div>`).join('');
+  b.innerHTML = cart.map((i, x) => `<div class="cart-line"><div><h3>${i.n}</h3>
+    <div class="cart-qty"><button onclick="chg(${x},-1)" aria-label="Decrease quantity">−</button><span>${i.q}</span><button onclick="chg(${x},1)" aria-label="Increase quantity">+</button></div></div>
+    <div class="right"><div class="price">£${i.p * i.q}</div><button class="cart-rm" onclick="rm(${x})">Remove</button></div></div>`).join('');
 }
 
+function chg(x, d) {
+  const i = cart[x];
+  if (!i) return;
+  i.q = Math.max(1, Math.min(20, i.q + d));
+  save(); render();
+}
 function rm(x) { cart.splice(x, 1); save(); render(); }
 function openCart() { document.getElementById('cartOverlay').classList.add('open'); document.getElementById('cartPanel').classList.add('open'); }
 function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartPanel').classList.remove('open'); }

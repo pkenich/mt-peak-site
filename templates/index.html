@@ -89,6 +89,13 @@
   </div>
 </section>
 
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>{{{site.marqueeText}}}</span><span>{{{site.marqueeText}}}</span>
+  </div>
+</div>
+
 <!-- COLLECTION -->
 <section class="collection" id="collection">
   <div class="collection-head r-up">
@@ -97,7 +104,7 @@
   </div>
   <div class="collection-grid">
     {{#each products}}
-    <div class="product r-up">
+    <div class="product r-up" data-num="{{num}}">
       <a class="product-visual" href="/{{slug}}" aria-label="View {{name}}">
         <div class="product-glow"></div>
         <span class="product-tag">{{tag}}</span>
@@ -139,6 +146,7 @@
 {{> cart}}
 
 <script src="/js/cart.js"></script>
+<script src="/js/lux.js"></script>
 <script src="/js/home.js"></script>
 </body>
 </html>

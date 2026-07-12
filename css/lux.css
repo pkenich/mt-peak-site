@@ -1,0 +1,98 @@
+/* MT. PEAK — lux layer: the theatrical touches, shared by every page.
+   Everything here degrades gracefully and dies under prefers-reduced-motion
+   (global kill-switch in styles.css). */
+
+/* ---- page transitions ---- */
+body{animation:luxPageIn .65s ease both;}
+@keyframes luxPageIn{from{opacity:0;}to{opacity:1;}}
+body.page-exit{opacity:0;transition:opacity .18s ease;}
+
+/* ---- gold scrollbar ---- */
+html{scrollbar-width:thin;scrollbar-color:rgba(201,169,97,.45) var(--ink);}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--ink);}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--gold-deep),var(--gold));
+  border:2px solid var(--ink);border-radius:6px;}
+
+/* ---- keyboard focus worthy of the brand ---- */
+:focus-visible{outline:1px solid var(--gold);outline-offset:3px;}
+
+/* ---- hero: liquid gold title + aurora ---- */
+.hero-title .big{
+  background:linear-gradient(100deg,var(--cream) 0%,var(--cream) 38%,var(--gold-bright) 50%,var(--cream) 62%,var(--cream) 100%);
+  background-size:250% 100%;-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  animation:goldSweep 7s ease-in-out 2.2s infinite;}
+@keyframes goldSweep{0%,55%,100%{background-position:110% 0;}25%,35%{background-position:-10% 0;}}
+.hero-mist::before,.hero-mist::after{content:'';position:absolute;border-radius:50%;
+  filter:blur(70px);opacity:.5;}
+.hero-mist::before{width:55vw;height:55vw;left:-12vw;bottom:-18vw;
+  background:radial-gradient(circle,rgba(31,74,58,.55),transparent 65%);
+  animation:auroraA 26s ease-in-out infinite alternate;}
+.hero-mist::after{width:38vw;height:38vw;right:-8vw;top:-10vw;
+  background:radial-gradient(circle,rgba(201,169,97,.10),transparent 65%);
+  animation:auroraB 21s ease-in-out infinite alternate;}
+@keyframes auroraA{from{transform:translate(0,0) scale(1);}to{transform:translate(9vw,-7vw) scale(1.25);}}
+@keyframes auroraB{from{transform:translate(0,0) scale(1.15);}to{transform:translate(-7vw,6vw) scale(.95);}}
+
+/* ---- marquee ribbon ---- */
+.marquee{overflow:hidden;border-top:1px solid rgba(201,169,97,.14);border-bottom:1px solid rgba(201,169,97,.14);
+  background:var(--ink);padding:1.6rem 0;position:relative;}
+.marquee-track{display:flex;width:max-content;animation:marquee 38s linear infinite;}
+.marquee:hover .marquee-track{animation-play-state:paused;}
+.marquee-track span{font-family:'Cormorant Garamond',serif;font-size:clamp(1.1rem,2.4vw,1.7rem);
+  letter-spacing:6px;text-transform:uppercase;color:var(--gold-deep);white-space:nowrap;padding-right:2ch;}
+.marquee-track em{font-style:italic;color:var(--gold);}
+@keyframes marquee{to{transform:translateX(-50%);}}
+
+/* ---- collection cards: engraved numeral + gold sheen sweep ---- */
+.product{isolation:isolate;transform-style:preserve-3d;will-change:transform;}
+.product::after{content:attr(data-num);position:absolute;right:1.1rem;bottom:.4rem;z-index:0;
+  font-family:'Cormorant Garamond',serif;font-size:7rem;line-height:1;font-weight:300;
+  color:transparent;-webkit-text-stroke:1px rgba(201,169,97,.13);pointer-events:none;
+  transition:all .8s cubic-bezier(.16,1,.3,1);}
+.product:hover::after{-webkit-text-stroke-color:rgba(201,169,97,.4);transform:translateY(-6px);}
+.product-visual::after{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:linear-gradient(115deg,transparent 30%,rgba(232,205,143,.14) 48%,rgba(255,255,255,.09) 50%,transparent 68%);
+  transform:translateX(-130%);transition:transform 1.1s cubic-bezier(.16,1,.3,1);}
+.product:hover .product-visual::after{transform:translateX(130%);}
+
+/* ---- gold buttons: sheen on hover ---- */
+.closer-btn,.cart-checkout,.btn-gold,.btn-add{position:relative;overflow:hidden;}
+.closer-btn::after,.cart-checkout::after,.btn-gold::after,.btn-add::after{content:'';position:absolute;
+  top:0;bottom:0;width:45%;left:-60%;pointer-events:none;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:skewX(-20deg);transition:left .7s ease;}
+.closer-btn:hover::after,.cart-checkout:hover::after,.btn-gold:hover::after,.btn-add:hover::after{left:120%;}
+
+/* ---- PDP gallery: breathe in, lean closer ---- */
+.gal-main{will-change:transform;}
+.gal-main img{animation:galIn 1.4s cubic-bezier(.16,1,.3,1) both;transition:transform 1.2s cubic-bezier(.16,1,.3,1),opacity .25s ease;}
+@keyframes galIn{from{transform:scale(1.06);opacity:0;}to{transform:scale(1);opacity:1;}}
+.gal-main:hover img{transform:scale(1.045);}
+
+/* ---- provenance numerals in gradient gold ---- */
+.prov-num{background:linear-gradient(160deg,var(--gold-bright),var(--gold-deep));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
+
+/* ---- footer: mountain watermark ---- */
+footer{position:relative;overflow:hidden;}
+footer::before{content:'MT. PEAK';position:absolute;left:50%;bottom:-.18em;transform:translateX(-50%);
+  font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(6rem,18vw,16rem);
+  letter-spacing:.06em;line-height:1;white-space:nowrap;pointer-events:none;
+  color:transparent;-webkit-text-stroke:1px rgba(201,169,97,.07);}
+footer>*{position:relative;z-index:1;}
+
+/* ---- cart panel: gold breathing edge ---- */
+.cart-panel{box-shadow:-30px 0 80px rgba(0,0,0,.5);}
+.cart-panel::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,transparent,var(--gold),transparent);opacity:.5;
+  animation:edgePulse 4s ease-in-out infinite;}
+@keyframes edgePulse{0%,100%{opacity:.25;}50%{opacity:.7;}}
+
+/* ---- section headings: gold rule draws itself ---- */
+.sec-label::after,.collection-eyebrow::after{content:'';display:block;width:0;height:1px;
+  background:var(--gold);margin:1rem auto 0;transition:width 1.2s cubic-bezier(.16,1,.3,1) .2s;}
+.sec-label::after{margin-left:0;}
+.in .sec-label::after,.sec-label.in::after,.r-up.in .collection-eyebrow::after,
+.collection-head.in .collection-eyebrow::after{width:56px;}

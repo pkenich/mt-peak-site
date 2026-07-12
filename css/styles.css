@@ -93,9 +93,14 @@ footer{background:var(--ink);padding:5rem 3.5rem 2.5rem;border-top:1px solid rgb
 .cart-line .q{font-size:.75rem;color:var(--cream-dim);letter-spacing:1px;}
 .cart-line .right{text-align:right;display:flex;flex-direction:column;gap:.6rem;align-items:flex-end;}
 .cart-line .price{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--gold);}
-.cart-line button{background:none;border:none;color:var(--cream-dim);font-size:.68rem;
+.cart-line .cart-rm{background:none;border:none;color:var(--cream-dim);font-size:.68rem;
   letter-spacing:1px;text-transform:uppercase;text-decoration:underline;transition:color .3s;padding:.4rem 0;}
-.cart-line button:hover{color:var(--gold);}
+.cart-line .cart-rm:hover{color:var(--gold);}
+.cart-qty{display:inline-flex;align-items:center;border:1px solid rgba(201,169,97,.3);}
+.cart-qty button{width:34px;height:34px;background:none;border:none;color:var(--gold);
+  font-size:1rem;line-height:1;transition:background .3s,color .3s;}
+.cart-qty button:hover{background:var(--gold);color:var(--ink);}
+.cart-qty span{min-width:34px;text-align:center;font-size:.85rem;color:var(--cream);}
 .cart-empty{text-align:center;padding:4rem 1rem;color:var(--cream-dim);font-family:'Cormorant Garamond',serif;
   font-style:italic;font-size:1.1rem;}
 .cart-note{font-size:.7rem;color:var(--cream-dim);letter-spacing:.5px;line-height:1.7;

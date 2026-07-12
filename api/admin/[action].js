@@ -1,5 +1,5 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
-import { ensureSchema, checkThrottle, recordFailure, clearThrottle } from '../_lib/db.js';
+import { sql, ensureSchema, checkThrottle, recordFailure, clearThrottle } from '../_lib/db.js';
 import { issueAdmin, readAdmin, clearAdmin, requireAdmin } from '../_lib/session.js';
 import { readRepoFile, writeRepoFile } from '../_lib/github.js';
 import { dispatch, bad } from '../_lib/util.js';
@@ -95,10 +95,47 @@ async function upload(req, res) {
   res.json({ ok: true, path: `/assets/${name}`, commit: commit.commit?.sha?.slice(0, 7) });
 }
 
+/* ---------- sales & orders ---------- */
+
+const ORDER_STATUSES = ['reserved', 'pending_payment', 'paid', 'fulfilled', 'cancelled'];
+
+async function orders(req, res) {
+  requireAdmin(req);
+  await ensureSchema();
+  const q = sql();
+  const [rows, stats] = await Promise.all([
+    q`SELECT public_id, email, items, total_pence, status, created_at
+      FROM orders ORDER BY created_at DESC LIMIT 200`,
+    q`SELECT
+        count(*)::int AS orders,
+        coalesce(sum(total_pence) FILTER (WHERE status IN ('paid','fulfilled')), 0)::int AS revenue_pence,
+        coalesce(sum(total_pence) FILTER (WHERE status IN ('reserved','pending_payment')), 0)::int AS awaiting_pence,
+        count(*) FILTER (WHERE status IN ('reserved','pending_payment'))::int AS open_orders,
+        count(DISTINCT email)::int AS customers
+      FROM orders`,
+  ]);
+  res.json({ orders: rows, stats: stats[0] });
+}
+
+async function orderStatus(req, res) {
+  requireAdmin(req);
+  await ensureSchema();
+  const publicId = String(req.body?.publicId || '').toUpperCase();
+  const status = String(req.body?.status || '');
+  if (!/^MP-[A-Z2-9]{6}$/.test(publicId)) throw bad('Bad order number.');
+  if (!ORDER_STATUSES.includes(status)) throw bad('Bad status.');
+  const rows = await sql()`UPDATE orders SET status = ${status}, updated_at = now()
+    WHERE public_id = ${publicId} RETURNING public_id`;
+  if (!rows.length) throw bad('Order not found.', 404);
+  res.json({ ok: true });
+}
+
 export default dispatch({
   login: { methods: ['POST'], fn: login },
   logout: { methods: ['POST'], fn: async (req, res) => { clearAdmin(res); res.json({ ok: true }); } },
   me: { methods: ['GET'], fn: async (req, res) => { res.json({ admin: !!readAdmin(req) }); } },
   content: { methods: ['GET', 'PUT'], fn: content },
   upload: { methods: ['POST'], fn: upload },
+  orders: { methods: ['GET'], fn: orders },
+  'order-status': { methods: ['PUT'], fn: orderStatus },
 });

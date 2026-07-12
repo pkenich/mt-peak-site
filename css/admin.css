@@ -28,6 +28,18 @@
 .gal-slot .slot-btn:hover{background:var(--gold);color:var(--ink);}
 .admin-actions{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:1.5rem;}
 .admin-note{font-size:.75rem;color:var(--cream-dim);letter-spacing:.5px;line-height:1.7;}
+/* sales dashboard */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.8rem;}
+.stat{border:1px solid rgba(201,169,97,.2);padding:1.2rem 1.4rem;}
+.stat .sv{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--gold);line-height:1.1;}
+.stat .sl{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream-dim);margin-top:.4rem;}
+.orders-admin .order-row{grid-template-columns:1fr 1.6fr 2fr .8fr 1.1fr;}
+.orders-admin select{background:var(--ink);color:var(--cream);border:1px solid rgba(201,169,97,.3);
+  padding:.5rem .6rem;font-family:'Jost',sans-serif;font-size:.75rem;letter-spacing:.5px;width:100%;}
+.orders-admin select:focus{outline:none;border-color:var(--gold);}
+.orders-admin .oemail{font-size:.8rem;color:var(--cream-dim);word-break:break-all;}
+@media(max-width:780px){.orders-admin .order-row{grid-template-columns:1fr 1fr;}}
+
 .save-banner{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(120%);z-index:3000;
   background:var(--green-glow);border:1px solid rgba(201,169,97,.4);color:var(--cream);
   padding:1rem 2rem;font-size:.8rem;letter-spacing:1px;transition:transform .5s cubic-bezier(.16,1,.3,1);max-width:90vw;}
