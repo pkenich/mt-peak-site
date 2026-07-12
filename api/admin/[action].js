@@ -3,6 +3,7 @@ import { sql, ensureSchema, checkThrottle, recordFailure, clearThrottle } from '
 import { issueAdmin, readAdmin, clearAdmin, requireAdmin } from '../_lib/session.js';
 import { readRepoFile, writeRepoFile } from '../_lib/github.js';
 import { normCode, isCode } from '../_lib/promo.js';
+import { sendOrderEmail, sendBrandEmail } from '../_lib/email.js';
 import { dispatch, bad } from '../_lib/util.js';
 
 /* ---------- session ---------- */
@@ -104,10 +105,12 @@ async function orders(req, res) {
   requireAdmin(req);
   await ensureSchema();
   const q = sql();
-  const [rows, stats, daily, products, subs] = await Promise.all([
-    q`SELECT public_id, email, items, total_pence, status, created_at,
-        shipping, billing, promo_code, discount_pence, gift_note
-      FROM orders ORDER BY created_at DESC LIMIT 200`,
+  const [rows, stats, daily, products, subs, refunds, ratingStat] = await Promise.all([
+    q`SELECT o.public_id, o.email, o.items, o.total_pence, o.status, o.created_at,
+        o.shipping, o.billing, o.promo_code, o.discount_pence, o.gift_note,
+        r.rating, r.shipping_rating, r.body AS review_body
+      FROM orders o LEFT JOIN reviews r ON r.order_id = o.id
+      ORDER BY o.created_at DESC LIMIT 200`,
     q`SELECT
         count(*)::int AS orders,
         count(*) FILTER (WHERE status IN ('paid','fulfilled'))::int AS paid_orders,
@@ -131,9 +134,15 @@ async function orders(req, res) {
       GROUP BY 1 ORDER BY 3 DESC LIMIT 6`,
     q`SELECT count(*)::int AS n, coalesce(array_agg(email ORDER BY created_at DESC), '{}') AS emails
       FROM subscribers`,
+    q`SELECT rf.id, o.public_id, rf.reason, rf.status, rf.created_at, o.email, o.total_pence
+      FROM refunds rf JOIN orders o ON o.id = rf.order_id
+      ORDER BY (rf.status = 'requested') DESC, rf.created_at DESC LIMIT 100`,
+    q`SELECT round(avg(rating), 1) AS avg_rating, count(*)::int AS n,
+        round(avg(shipping_rating), 1) AS avg_ship FROM reviews`,
   ]);
   res.json({ orders: rows, stats: stats[0], daily, products,
-    subscribers: { count: subs[0].n, emails: subs[0].emails } });
+    subscribers: { count: subs[0].n, emails: subs[0].emails },
+    refunds, ratings: ratingStat[0] });
 }
 
 async function orderStatus(req, res) {
@@ -205,6 +214,35 @@ async function promoToggle(req, res) {
   res.json({ ok: true });
 }
 
+/* ---------- refund resolution ---------- */
+async function refundResolve(req, res) {
+  requireAdmin(req);
+  await ensureSchema();
+  const id = Math.floor(Number(req.body?.id));
+  const decision = req.body?.decision;
+  if (!Number.isFinite(id)) throw bad('Bad refund id.');
+  if (!['approved', 'denied'].includes(decision)) throw bad('Decision must be approved or denied.');
+
+  const rows = await sql()`UPDATE refunds SET status = ${decision}, updated_at = now()
+    WHERE id = ${id} AND status = 'requested' RETURNING order_id`;
+  if (!rows.length) throw bad('That request was already resolved.', 409);
+
+  const ord = await sql()`SELECT public_id, email, items, total_pence, discount_pence, shipping
+    FROM orders WHERE id = ${rows[0].order_id}`;
+  if (decision === 'approved') {
+    await sql()`UPDATE orders SET status = 'cancelled', updated_at = now() WHERE id = ${rows[0].order_id}`;
+    if (ord.length) await sendOrderEmail({ ...ord[0], gift_note: null }, 'cancelled');
+  } else if (ord.length) {
+    await sendBrandEmail({
+      to: ord[0].email,
+      subject: `An update on your refund request — ${ord[0].public_id}`,
+      heading: 'About your refund request',
+      message: `We’ve reviewed your request for order ${ord[0].public_id} and are unable to approve it on this occasion. If you’d like to discuss it, simply reply to this email — a human will answer.`,
+    });
+  }
+  res.json({ ok: true });
+}
+
 export default dispatch({
   login: { methods: ['POST'], fn: login },
   logout: { methods: ['POST'], fn: async (req, res) => { clearAdmin(res); res.json({ ok: true }); } },
@@ -216,4 +254,5 @@ export default dispatch({
   promos: { methods: ['GET'], fn: promos },
   'promo-create': { methods: ['POST'], fn: promoCreate },
   'promo-toggle': { methods: ['PUT'], fn: promoToggle },
+  'refund-resolve': { methods: ['PUT'], fn: refundResolve },
 });

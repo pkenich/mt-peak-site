@@ -184,9 +184,40 @@
     return [head.join(','), ...lines].join('\n');
   }
 
+  const STARS = n => n ? '★★★★★☆☆☆☆☆'.slice(5 - Math.round(n), 10 - Math.round(n)) : '—';
+
+  function renderRefunds(refunds) {
+    const wrap = $('#refundQueue');
+    const open = refunds.filter(r => r.status === 'requested');
+    if (!refunds.length) { wrap.innerHTML = ''; return; }
+    wrap.innerHTML = `<h3 style="font-family:'Cormorant Garamond',serif;font-weight:400;font-size:1.3rem;color:var(--gold);margin:1.6rem 0 1rem;letter-spacing:1px;">Refund requests${open.length ? ` · ${open.length} open` : ''}</h3>` +
+      refunds.map(r => `
+        <div class="refund-row ${r.status}">
+          <div><div class="oid">${esc(r.public_id)}</div><div class="odate">${new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} · ${esc(r.email)}</div></div>
+          <div class="rreason">${esc(r.reason)}</div>
+          <div class="rtotal">${gbp(r.total_pence)}</div>
+          <div class="ractions">
+            ${r.status === 'requested'
+              ? `<button class="btn-quiet" data-refund="${r.id}" data-decision="approved">Approve &amp; refund</button>
+                 <button class="btn-quiet danger" data-refund="${r.id}" data-decision="denied">Decline</button>`
+              : `<span class="status refund-${r.status}">${r.status === 'approved' ? 'Approved · cancelled' : 'Declined'}</span>`}
+          </div>
+        </div>`).join('');
+    for (const b of wrap.querySelectorAll('button[data-refund]')) {
+      b.addEventListener('click', async () => {
+        if (b.dataset.decision === 'approved' && !confirm('Approve this refund? The order will be cancelled and the customer emailed.')) return;
+        try {
+          await api('/api/admin/refund-resolve', { method: 'PUT', body: JSON.stringify({ id: +b.dataset.refund, decision: b.dataset.decision }) });
+          notify('Refund ' + (b.dataset.decision === 'approved' ? 'approved — order cancelled.' : 'declined.'));
+          loadOrders();
+        } catch (err) { notify(err.message, true); }
+      });
+    }
+  }
+
   async function loadOrders() {
     try {
-      const { orders, stats, daily, products, subscribers } = await api('/api/admin/orders');
+      const { orders, stats, daily, products, subscribers, refunds, ratings } = await api('/api/admin/orders');
       const aov = stats.paid_orders ? Math.round(stats.revenue_pence / stats.paid_orders) : 0;
       $('#statRow').innerHTML = [
         [gbp(stats.revenue_pence), 'Revenue (paid)'],
@@ -196,7 +227,9 @@
         [stats.orders, 'Orders'],
         [stats.customers, 'Customers'],
         [subscribers.count, 'Newsletter'],
-      ].map(([v, l]) => `<div class="stat"><div class="sv">${v}</div><div class="sl">${l}</div></div>`).join('');
+        [ratings && ratings.n ? `${ratings.avg_rating}★` : '—', ratings && ratings.n ? `Rating (${ratings.n})` : 'No ratings'],
+      ].map(([v, l]) => `<div class="stat"><div class="sv">${esc(v)}</div><div class="sl">${l}</div></div>`).join('');
+      renderRefunds(refunds || []);
       document.querySelectorAll('.orders-tools').forEach(e => e.remove());
       const subBtn = document.createElement('button');
       subBtn.className = 'btn-quiet orders-tools'; subBtn.textContent = 'Copy newsletter emails';
@@ -253,6 +286,8 @@
             <div><span class="odk">Deliver to</span>${esc(fmtAddr(o.shipping))}</div>
             <div><span class="odk">Billing</span>${esc(fmtAddr(o.billing))}</div>
             ${o.gift_note ? `<div><span class="odk">Gift message</span><em>${esc(o.gift_note)}</em></div>` : ''}
+            ${o.rating ? `<div><span class="odk">Tea rating</span>${STARS(o.rating)} (${o.rating}/5)${o.shipping_rating ? ` · delivery ${STARS(o.shipping_rating)} (${o.shipping_rating}/5)` : ''}</div>` : ''}
+            ${o.review_body ? `<div><span class="odk">Review</span><em>${esc(o.review_body)}</em></div>` : ''}
           </div>`).join('')}
         </div>`;
       for (const row of document.querySelectorAll('.order-row[data-x]')) {

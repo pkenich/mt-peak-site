@@ -18,6 +18,11 @@
 .co-same input:focus-visible+span{outline:1px solid var(--gold);outline-offset:3px;}
 
 .opt-h{font-size:.75rem;color:var(--cream-dim);letter-spacing:1px;}
+.saved-addr{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-bottom:1.4rem;}
+.saved-label{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream-dim);}
+.saved-chip{background:none;border:1px solid rgba(201,169,97,.35);color:var(--gold);padding:.5rem 1rem;
+  font-size:.72rem;letter-spacing:1px;font-family:'Jost',sans-serif;transition:all .3s;}
+.saved-chip:hover{background:var(--gold);color:var(--ink);}
 .co-card textarea{width:100%;background:rgba(244,239,230,.04);border:1px solid rgba(201,169,97,.25);
   color:var(--cream);padding:1rem 1.1rem;font-family:'Cormorant Garamond',serif;font-style:italic;
   font-size:1.05rem;line-height:1.6;resize:vertical;}

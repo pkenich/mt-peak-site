@@ -11,23 +11,98 @@
 
 {{> nav}}
 
-<div class="page-wrap">
+<div class="page-wrap dash">
   <div class="account-head">
     <div>
       <div class="page-eyebrow">Your Reserve</div>
-      <h1 class="page-h" id="accountTitle">Your orders</h1>
+      <h1 class="page-h" id="accountTitle" style="margin-bottom:0;">Welcome</h1>
     </div>
     <button class="btn-quiet" id="btnLogout">Sign out</button>
   </div>
 
   <div class="form-msg" id="accountMsg"></div>
 
-  <div class="orders" id="ordersWrap">
-    <div class="order-row head">
-      <div>Order</div><div>Placed</div><div>Items</div><div>Total</div><div>Status</div>
-    </div>
-    <div id="ordersBody"><div class="empty-state">Loading your orders…</div></div>
+  <div class="dash-tabs" id="dashTabs">
+    <button class="dash-tab active" data-tab="overview">Overview</button>
+    <button class="dash-tab" data-tab="orders">Orders</button>
+    <button class="dash-tab" data-tab="addresses">Addresses</button>
+    <button class="dash-tab" data-tab="profile">Profile</button>
   </div>
+
+  <!-- OVERVIEW -->
+  <section class="dash-panel" id="tab-overview">
+    <div class="stat-row" id="ovStats"></div>
+    <div class="ov-cta">
+      <div class="ov-card">
+        <h3>Your ritual awaits</h3>
+        <p id="ovBlurb">Explore the reserve and add to your collection.</p>
+        <a class="btn-gold inline" href="/#collection">Browse the Collection</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ORDERS -->
+  <section class="dash-panel" id="tab-orders" hidden>
+    <div class="filter-bar">
+      <label>Status
+        <select id="fStatus">
+          <option value="">All</option>
+          <option value="reserved">Reserved</option>
+          <option value="pending_payment">Awaiting payment</option>
+          <option value="paid">Paid</option>
+          <option value="fulfilled">Shipped</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </label>
+      <label>Timeline
+        <select id="fTime">
+          <option value="">Any time</option>
+          <option value="30">Last 30 days</option>
+          <option value="180">Last 6 months</option>
+          <option value="365">Last year</option>
+        </select>
+      </label>
+      <label>Tea
+        <select id="fProduct"><option value="">All teas</option></select>
+      </label>
+      <label>Sort
+        <select id="fSort">
+          <option value="new">Newest first</option>
+          <option value="old">Oldest first</option>
+          <option value="high">Highest value</option>
+        </select>
+      </label>
+    </div>
+    <div id="ordersList"><div class="empty-state">Loading your orders…</div></div>
+  </section>
+
+  <!-- ADDRESSES -->
+  <section class="dash-panel" id="tab-addresses" hidden>
+    <p class="admin-note" style="margin-bottom:1.4rem;">Saved addresses appear as one-tap options at checkout.</p>
+    <div id="addrList"></div>
+    <div class="dash-actions">
+      <button class="btn-quiet" id="addrAdd">＋ Add address</button>
+      <button class="btn-gold inline" id="addrSave">Save addresses</button>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="dash-panel" id="tab-profile" hidden>
+    <div class="ov-card" style="max-width:480px;">
+      <h3>Your details</h3>
+      <div class="form-msg" id="profMsg"></div>
+      <form class="form" id="profileForm">
+        <div class="field"><label for="pfName">Name</label><input id="pfName" type="text" maxlength="80" required></div>
+        <div class="field"><label for="pfEmail">Email</label><input id="pfEmail" type="email" disabled></div>
+        <details class="pf-pass">
+          <summary>Change password</summary>
+          <div class="field" style="margin-top:1rem;"><label for="pfCur">Current password</label><input id="pfCur" type="password" autocomplete="current-password"></div>
+          <div class="field"><label for="pfNew">New password (8+ characters)</label><input id="pfNew" type="password" autocomplete="new-password" minlength="8"></div>
+        </details>
+        <button class="btn-gold" type="submit">Save changes</button>
+      </form>
+    </div>
+  </section>
 </div>
 
 {{> footer}}

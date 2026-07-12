@@ -63,6 +63,20 @@
   text-transform:uppercase;color:var(--cream-dim);}
 .order-detail em{color:var(--gold-bright);font-family:'Cormorant Garamond',serif;font-size:.95rem;}
 
+/* refund queue */
+.refund-row{display:grid;grid-template-columns:1.1fr 2.2fr .7fr 1.4fr;gap:1rem;align-items:center;
+  padding:1rem 0;border-bottom:1px solid rgba(201,169,97,.1);}
+.refund-row.requested{background:rgba(213,192,138,.05);}
+.refund-row .oid{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);}
+.refund-row .rreason{font-size:.85rem;color:var(--cream-dim);line-height:1.6;}
+.refund-row .rtotal{font-family:'Cormorant Garamond',serif;color:var(--cream);}
+.refund-row .ractions{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end;}
+.btn-quiet.danger{border-color:rgba(232,160,160,.4);color:#e8a0a0;}
+.btn-quiet.danger:hover{background:#e8a0a0;color:var(--ink);}
+.status.refund-approved{color:#a8d5b5;border-color:rgba(168,213,181,.45);}
+.status.refund-denied{color:#e8a0a0;border-color:rgba(232,160,160,.45);}
+@media(max-width:700px){.refund-row{grid-template-columns:1fr 1fr;}.refund-row .ractions{justify-content:flex-start;}}
+
 /* promo manager */
 .promo-create{display:grid;grid-template-columns:1.4fr .8fr .7fr .8fr auto;gap:1rem;align-items:end;}
 @media(max-width:820px){.promo-create{grid-template-columns:1fr 1fr;}}

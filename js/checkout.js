@@ -24,6 +24,19 @@
     else if (!$('#shName').value) $('#shName').value = user.name || '';
   }).catch(() => {});
 
+  // saved addresses → one-tap fill
+  fetch('/api/account/addresses').then(r => r.ok ? r.json() : null).then(data => {
+    if (!data || !data.addresses.length) return;
+    const wrap = $('#savedAddr');
+    wrap.hidden = false;
+    wrap.innerHTML = '<span class="saved-label">Use a saved address</span>' +
+      data.addresses.map((a, i) => `<button type="button" class="saved-chip" data-i="${i}">${esc(a.label || a.name || 'Address')}</button>`).join('');
+    wrap.querySelectorAll('.saved-chip').forEach(btn => btn.addEventListener('click', () => {
+      const a = data.addresses[+btn.dataset.i];
+      for (const f of ['name', 'line1', 'line2', 'city', 'postcode', 'country']) $(`#sh${f[0].toUpperCase()}${f.slice(1)}`).value = a[f] || '';
+    }));
+  }).catch(() => {});
+
   function renderTotals() {
     const discount = promo ? promo.discountPence : 0;
     $('#coSubtotal').textContent = gbp(subtotal);

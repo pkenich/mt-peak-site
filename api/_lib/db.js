@@ -66,6 +66,25 @@ export function ensureSchema() {
         email text PRIMARY KEY,
         created_at timestamptz NOT NULL DEFAULT now()
       )`;
+      await q`ALTER TABLE users ADD COLUMN IF NOT EXISTS addresses jsonb NOT NULL DEFAULT '[]'`;
+      await q`CREATE TABLE IF NOT EXISTS reviews (
+        order_id bigint PRIMARY KEY REFERENCES orders(id),
+        user_id bigint NOT NULL REFERENCES users(id),
+        rating int NOT NULL,
+        shipping_rating int,
+        body text,
+        created_at timestamptz NOT NULL DEFAULT now()
+      )`;
+      await q`CREATE TABLE IF NOT EXISTS refunds (
+        id bigserial PRIMARY KEY,
+        order_id bigint NOT NULL REFERENCES orders(id),
+        user_id bigint NOT NULL REFERENCES users(id),
+        reason text NOT NULL,
+        status text NOT NULL DEFAULT 'requested',
+        created_at timestamptz NOT NULL DEFAULT now(),
+        updated_at timestamptz NOT NULL DEFAULT now()
+      )`;
+      await q`CREATE INDEX IF NOT EXISTS refunds_order_idx ON refunds(order_id)`;
     })().catch(e => { _ready = null; throw e; });
   }
   return _ready;
