@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/account.css">
+<meta name="robots" content="noindex">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+{{> nav}}
+
+<div class="page-wrap narrow">
+  <div class="page-eyebrow">Your Reserve</div>
+  <h1 class="page-h" id="resetTitle">Reset password</h1>
+
+  <div class="form-msg" id="formMsg"></div>
+
+  <form class="form" id="requestForm" hidden>
+    <p class="form-note" style="text-align:left;margin:0 0 .4rem;">Enter your email and we’ll send a reset link — good for one hour, one use.</p>
+    <div class="field"><label for="rqEmail">Email</label>
+      <input id="rqEmail" type="email" autocomplete="email" required></div>
+    <button class="btn-gold" type="submit">Send reset link</button>
+  </form>
+
+  <form class="form" id="setForm" hidden>
+    <div class="field"><label for="npPass">New password (8+ characters)</label>
+      <input id="npPass" type="password" autocomplete="new-password" required minlength="8"></div>
+    <button class="btn-gold" type="submit">Set new password</button>
+  </form>
+
+  <p class="form-note"><a href="/login">Back to sign in</a></p>
+</div>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/lux.js"></script>
+<script src="/js/reset.js"></script>
+</body>
+</html>

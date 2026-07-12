@@ -118,7 +118,8 @@
         <a class="product-view" href="/{{slug}}">View the tea →</a>
         <div class="product-foot">
           <div class="product-price">£{{price}} <small>{{unitShort}}</small></div>
-          <button class="product-add" data-slug="{{slug}}" data-name="{{cartName}}" data-price="{{price}}"><span>Add</span></button>
+          {{#if available}}<button class="product-add" data-slug="{{slug}}" data-name="{{cartName}}" data-price="{{price}}"><span>Add</span></button>{{/if}}
+          {{#if soldOut}}<span class="product-soldout">Sold out</span>{{/if}}
         </div>
       </div>
     </div>

@@ -10,7 +10,11 @@
     "tagline": "Floral · Bright · Golden Cup",
     "desc": "A black tea of unusual restraint. Oxidised only partially, it keeps the brightness of the high spring garden — a golden cup with a floral lift and a clean, luminous finish that lingers like morning light on the ridge.",
     "homeDesc": "A black tea of unusual restraint. Oxidised only partially, it keeps the brightness of the high spring garden — a clean, luminous finish that lingers like morning light on the ridge.",
-    "notes": ["Floral", "Bright", "Golden Cup"],
+    "notes": [
+      "Floral",
+      "Bright",
+      "Golden Cup"
+    ],
     "price": 68,
     "unitShort": "/ 100g caddy",
     "unitLong": "/ 100g loose-leaf caddy",
@@ -19,35 +23,109 @@
     "heroImage": "/assets/tea-tin.webp",
     "heroAlt": "Mt. Peak Light & Bright — 100g caddy",
     "gallery": [
-      { "type": "img", "src": "/assets/tea-tin.webp", "alt": "Light & Bright caddy", "thumb": "Caddy" },
-      { "type": "img", "src": "/assets/tea-box.webp", "alt": "Light & Bright presentation box", "thumb": "Box" },
-      { "type": "img", "src": "/assets/giftset-wide.webp", "alt": "Gift set", "thumb": "Gift set" },
-      { "type": "ph", "label": "DRY LEAF — MACRO", "sub": "Twisted black leaf with golden tips, shot like jewellery", "thumb": "Dry leaf<br>macro" },
-      { "type": "ph", "label": "THE LIQUOR — BRIGHT GOLD", "sub": "The brewed cup, backlit so the golden colour glows", "thumb": "Liquor<br>in glass" }
+      {
+        "type": "img",
+        "src": "/assets/tea-tin.webp",
+        "alt": "Light & Bright caddy",
+        "thumb": "Caddy"
+      },
+      {
+        "type": "img",
+        "src": "/assets/tea-box.webp",
+        "alt": "Light & Bright presentation box",
+        "thumb": "Box"
+      },
+      {
+        "type": "img",
+        "src": "/assets/giftset-wide.webp",
+        "alt": "Gift set",
+        "thumb": "Gift set"
+      },
+      {
+        "type": "ph",
+        "label": "DRY LEAF — MACRO",
+        "sub": "Twisted black leaf with golden tips, shot like jewellery",
+        "thumb": "Dry leaf<br>macro"
+      },
+      {
+        "type": "ph",
+        "label": "THE LIQUOR — BRIGHT GOLD",
+        "sub": "The brewed cup, backlit so the golden colour glows",
+        "thumb": "Liquor<br>in glass"
+      }
     ],
     "meta": [
-      { "k": "Origin", "v": "Eastern Nepal · single garden" },
-      { "k": "Harvest", "v": "First & spring flush, by hand" },
-      { "k": "Format", "v": "100g loose leaf · resealable caddy" },
-      { "k": "Delivery", "v": "Complimentary UK · gift wrap available" }
+      {
+        "k": "Origin",
+        "v": "Eastern Nepal · single garden"
+      },
+      {
+        "k": "Harvest",
+        "v": "First & spring flush, by hand"
+      },
+      {
+        "k": "Format",
+        "v": "100g loose leaf · resealable caddy"
+      },
+      {
+        "k": "Delivery",
+        "v": "Complimentary UK · gift wrap available"
+      }
     ],
     "tastingH": "A golden cup, drawn bright",
     "tasting": [
-      { "k": "Aroma", "v": "Orchard blossom, apricot skin, a thread of mountain honey." },
-      { "k": "Palate", "v": "Light-bodied and luminous — floral lift over a soft, golden sweetness." },
-      { "k": "Finish", "v": "Clean and lingering, like morning light holding on the ridge." }
+      {
+        "k": "Aroma",
+        "v": "Orchard blossom, apricot skin, a thread of mountain honey."
+      },
+      {
+        "k": "Palate",
+        "v": "Light-bodied and luminous — floral lift over a soft, golden sweetness."
+      },
+      {
+        "k": "Finish",
+        "v": "Clean and lingering, like morning light holding on the ridge."
+      }
     ],
     "tasteFoot": [
-      { "k": "Cup Colour", "v": "Bright Gold" },
-      { "k": "Body", "v": "Light – Medium" },
-      { "k": "Oxidation", "v": "20 – 30%" },
-      { "k": "Caffeine", "v": "Moderate" }
+      {
+        "k": "Cup Colour",
+        "v": "Bright Gold"
+      },
+      {
+        "k": "Body",
+        "v": "Light – Medium"
+      },
+      {
+        "k": "Oxidation",
+        "v": "20 – 30%"
+      },
+      {
+        "k": "Caffeine",
+        "v": "Moderate"
+      }
     ],
     "brew": [
-      { "n": "90", "u": "°C", "label": "Water Temp" },
-      { "n": "3", "u": "g", "label": "Per 200ml" },
-      { "n": "3", "u": "min", "label": "First Steep" },
-      { "n": "3", "u": "×", "label": "Infusions" }
+      {
+        "n": "90",
+        "u": "°C",
+        "label": "Water Temp"
+      },
+      {
+        "n": "3",
+        "u": "g",
+        "label": "Per 200ml"
+      },
+      {
+        "n": "3",
+        "u": "min",
+        "label": "First Steep"
+      },
+      {
+        "n": "3",
+        "u": "×",
+        "label": "Infusions"
+      }
     ],
     "brewSteps": [
       "Warm a porcelain or glass pot with hot water, then discard — the vessel should be ready, not scalding.",
@@ -57,11 +135,26 @@
     ],
     "makeH": "Five deliberate steps",
     "make": [
-      { "t": "Plucking", "d": "Two leaves and a bud, taken by hand at first light." },
-      { "t": "Withering", "d": "12–14 hours on bamboo trays, until the leaf turns supple." },
-      { "t": "Rolling", "d": "Gentle pressure, bruising the leaf only lightly." },
-      { "t": "Oxidation", "d": "Arrested early, at 20–30% — the secret to its brightness." },
-      { "t": "Firing", "d": "Low and slow, locking the luminous character in." }
+      {
+        "t": "Plucking",
+        "d": "Two leaves and a bud, taken by hand at first light."
+      },
+      {
+        "t": "Withering",
+        "d": "12–14 hours on bamboo trays, until the leaf turns supple."
+      },
+      {
+        "t": "Rolling",
+        "d": "Gentle pressure, bruising the leaf only lightly."
+      },
+      {
+        "t": "Oxidation",
+        "d": "Arrested early, at 20–30% — the secret to its brightness."
+      },
+      {
+        "t": "Firing",
+        "d": "Low and slow, locking the luminous character in."
+      }
     ],
     "originLead": "High on the southern slopes of the Himalaya, above the cloud line, the garden grows slowly in thin, clean air.",
     "originPs": [
@@ -69,20 +162,47 @@
       "Every leaf is certified organic, plucked by hands that have read these slopes for generations, and finished at our own factory. No middlemen. Only the mountain, the leaf, and the people who tend both."
     ],
     "spec": [
-      { "k": "Style", "v": "Partially oxidised black tea" },
-      { "k": "Oxidation", "v": "20 – 30%" },
-      { "k": "Origin", "v": "Eastern Nepal, single Himalayan garden" },
-      { "k": "Altitude", "v": "2,500 metres" },
-      { "k": "Cultivation", "v": "100% certified organic" },
-      { "k": "Plucking", "v": "Two leaves and a bud · by hand" },
-      { "k": "Harvest", "v": "First & spring flush" },
-      { "k": "Format", "v": "100g loose leaf · resealable caddy" },
-      { "k": "Caffeine", "v": "Moderate" }
+      {
+        "k": "Style",
+        "v": "Partially oxidised black tea"
+      },
+      {
+        "k": "Oxidation",
+        "v": "20 – 30%"
+      },
+      {
+        "k": "Origin",
+        "v": "Eastern Nepal, single Himalayan garden"
+      },
+      {
+        "k": "Altitude",
+        "v": "2,500 metres"
+      },
+      {
+        "k": "Cultivation",
+        "v": "100% certified organic"
+      },
+      {
+        "k": "Plucking",
+        "v": "Two leaves and a bud · by hand"
+      },
+      {
+        "k": "Harvest",
+        "v": "First & spring flush"
+      },
+      {
+        "k": "Format",
+        "v": "100g loose leaf · resealable caddy"
+      },
+      {
+        "k": "Caffeine",
+        "v": "Moderate"
+      }
     ],
     "closerH": "Take the ridge<br>home with <em>you</em>",
-    "closerP": "£68 for 100g of single-origin, hand-plucked Himalayan black tea — drawn bright, finished clean."
+    "closerP": "£68 for 100g of single-origin, hand-plucked Himalayan black tea — drawn bright, finished clean.",
+    "soldOut": false
   },
-
   "mountain-green": {
     "slug": "mountain-green",
     "num": "02",
@@ -94,7 +214,11 @@
     "tagline": "Fresh · Vegetal · Crisp",
     "desc": "Pan-fired within hours of plucking, the leaf never oxidises. What reaches the cup is the mountain itself — fresh, vegetal, crisp as thin air, with a sweetness drawn from above the cloud line.",
     "homeDesc": "Pan-fired within hours of plucking, the leaf never oxidises. What reaches the cup is the mountain itself — fresh, vegetal, crisp as thin air, with a sweetness drawn from above the cloud line.",
-    "notes": ["Fresh", "Vegetal", "Crisp"],
+    "notes": [
+      "Fresh",
+      "Vegetal",
+      "Crisp"
+    ],
     "price": 74,
     "unitShort": "/ 100g caddy",
     "unitLong": "/ 100g loose-leaf caddy",
@@ -103,35 +227,109 @@
     "heroImage": "/assets/tea-tin-beyond.webp",
     "heroAlt": "Mt. Peak Mountain Green — 100g loose-leaf caddy",
     "gallery": [
-      { "type": "img", "src": "/assets/tea-tin-beyond.webp", "alt": "Mountain Green caddy", "thumb": "Caddy" },
-      { "type": "img", "src": "/assets/tea-box.webp", "alt": "Mountain Green presentation box", "thumb": "Box" },
-      { "type": "img", "src": "/assets/giftset-wide.webp", "alt": "Gift set", "thumb": "Gift set" },
-      { "type": "ph", "label": "DRY LEAF — MACRO", "sub": "Whole pan-fired leaf, still faintly downy — shot like jewellery", "thumb": "Dry leaf<br>macro" },
-      { "type": "ph", "label": "THE LIQUOR — PALE JADE", "sub": "The brewed cup, backlit so the pale jade colour glows", "thumb": "Liquor<br>in glass" }
+      {
+        "type": "img",
+        "src": "/assets/tea-tin-beyond.webp",
+        "alt": "Mountain Green caddy",
+        "thumb": "Caddy"
+      },
+      {
+        "type": "img",
+        "src": "/assets/tea-box.webp",
+        "alt": "Mountain Green presentation box",
+        "thumb": "Box"
+      },
+      {
+        "type": "img",
+        "src": "/assets/giftset-wide.webp",
+        "alt": "Gift set",
+        "thumb": "Gift set"
+      },
+      {
+        "type": "ph",
+        "label": "DRY LEAF — MACRO",
+        "sub": "Whole pan-fired leaf, still faintly downy — shot like jewellery",
+        "thumb": "Dry leaf<br>macro"
+      },
+      {
+        "type": "ph",
+        "label": "THE LIQUOR — PALE JADE",
+        "sub": "The brewed cup, backlit so the pale jade colour glows",
+        "thumb": "Liquor<br>in glass"
+      }
     ],
     "meta": [
-      { "k": "Origin", "v": "Eastern Nepal · single garden" },
-      { "k": "Harvest", "v": "Spring flush, hand-picked and fired same day" },
-      { "k": "Format", "v": "100g loose-leaf caddy" },
-      { "k": "Delivery", "v": "Complimentary UK · gift wrap available" }
+      {
+        "k": "Origin",
+        "v": "Eastern Nepal · single garden"
+      },
+      {
+        "k": "Harvest",
+        "v": "Spring flush, hand-picked and fired same day"
+      },
+      {
+        "k": "Format",
+        "v": "100g loose-leaf caddy"
+      },
+      {
+        "k": "Delivery",
+        "v": "Complimentary UK · gift wrap available"
+      }
     ],
     "tastingH": "A pale jade cup, crisp as altitude",
     "tasting": [
-      { "k": "Aroma", "v": "Fresh-cut grass, steamed edamame, a cool mineral note." },
-      { "k": "Palate", "v": "Crisp and vegetal, light-bodied, with a clean sweetness underneath." },
-      { "k": "Finish", "v": "Short and refreshing — the taste of thin, cold mountain air." }
+      {
+        "k": "Aroma",
+        "v": "Fresh-cut grass, steamed edamame, a cool mineral note."
+      },
+      {
+        "k": "Palate",
+        "v": "Crisp and vegetal, light-bodied, with a clean sweetness underneath."
+      },
+      {
+        "k": "Finish",
+        "v": "Short and refreshing — the taste of thin, cold mountain air."
+      }
     ],
     "tasteFoot": [
-      { "k": "Cup Colour", "v": "Pale Jade" },
-      { "k": "Body", "v": "Light" },
-      { "k": "Oxidation", "v": "None · pan-fired" },
-      { "k": "Caffeine", "v": "Moderate–Low" }
+      {
+        "k": "Cup Colour",
+        "v": "Pale Jade"
+      },
+      {
+        "k": "Body",
+        "v": "Light"
+      },
+      {
+        "k": "Oxidation",
+        "v": "None · pan-fired"
+      },
+      {
+        "k": "Caffeine",
+        "v": "Moderate–Low"
+      }
     ],
     "brew": [
-      { "n": "75", "u": "°C", "label": "Water Temp" },
-      { "n": "2", "u": "g", "label": "Per 200ml" },
-      { "n": "2", "u": "min", "label": "First Steep" },
-      { "n": "2", "u": "×", "label": "Infusions" }
+      {
+        "n": "75",
+        "u": "°C",
+        "label": "Water Temp"
+      },
+      {
+        "n": "2",
+        "u": "g",
+        "label": "Per 200ml"
+      },
+      {
+        "n": "2",
+        "u": "min",
+        "label": "First Steep"
+      },
+      {
+        "n": "2",
+        "u": "×",
+        "label": "Infusions"
+      }
     ],
     "brewSteps": [
       "Warm the vessel briefly — green tea is unforgiving of heat, so keep it gentle throughout.",
@@ -141,10 +339,22 @@
     ],
     "makeH": "Four deliberate steps",
     "make": [
-      { "t": "Plucking", "d": "Two leaves and a bud, taken by hand at first light." },
-      { "t": "Withering", "d": "A brief rest, just long enough to soften the leaf." },
-      { "t": "Pan-Firing", "d": "Fired within hours of plucking, halting oxidation entirely." },
-      { "t": "Drying", "d": "Low, slow heat locks in the fresh, vegetal character." }
+      {
+        "t": "Plucking",
+        "d": "Two leaves and a bud, taken by hand at first light."
+      },
+      {
+        "t": "Withering",
+        "d": "A brief rest, just long enough to soften the leaf."
+      },
+      {
+        "t": "Pan-Firing",
+        "d": "Fired within hours of plucking, halting oxidation entirely."
+      },
+      {
+        "t": "Drying",
+        "d": "Low, slow heat locks in the fresh, vegetal character."
+      }
     ],
     "originLead": "Above the cloud line, where the air thins and the nights turn cold, the leaf grows slowly and stays green.",
     "originPs": [
@@ -152,20 +362,47 @@
       "Every leaf is certified organic, plucked by hands that have read these slopes for generations, and finished at our own factory. No middlemen. Only the mountain, the leaf, and the people who tend both."
     ],
     "spec": [
-      { "k": "Style", "v": "Pan-fired green tea" },
-      { "k": "Oxidation", "v": "None" },
-      { "k": "Origin", "v": "Eastern Nepal, single Himalayan garden" },
-      { "k": "Altitude", "v": "2,500 metres" },
-      { "k": "Cultivation", "v": "100% certified organic" },
-      { "k": "Plucking", "v": "Two leaves and a bud · by hand" },
-      { "k": "Harvest", "v": "Spring flush" },
-      { "k": "Format", "v": "100g loose leaf · resealable caddy" },
-      { "k": "Caffeine", "v": "Moderate–low" }
+      {
+        "k": "Style",
+        "v": "Pan-fired green tea"
+      },
+      {
+        "k": "Oxidation",
+        "v": "None"
+      },
+      {
+        "k": "Origin",
+        "v": "Eastern Nepal, single Himalayan garden"
+      },
+      {
+        "k": "Altitude",
+        "v": "2,500 metres"
+      },
+      {
+        "k": "Cultivation",
+        "v": "100% certified organic"
+      },
+      {
+        "k": "Plucking",
+        "v": "Two leaves and a bud · by hand"
+      },
+      {
+        "k": "Harvest",
+        "v": "Spring flush"
+      },
+      {
+        "k": "Format",
+        "v": "100g loose leaf · resealable caddy"
+      },
+      {
+        "k": "Caffeine",
+        "v": "Moderate–low"
+      }
     ],
     "closerH": "Bring the altitude<br>home with <em>you</em>",
-    "closerP": "£74 for 100g of single-origin, hand-plucked, pan-fired Himalayan green tea — crisp, fresh, unmistakably alive."
+    "closerP": "£74 for 100g of single-origin, hand-plucked, pan-fired Himalayan green tea — crisp, fresh, unmistakably alive.",
+    "soldOut": false
   },
-
   "golden-harvest": {
     "slug": "golden-harvest",
     "num": "03",
@@ -177,7 +414,11 @@
     "tagline": "Honey-Sweet · Golden Tips · Round",
     "desc": "Golden tips, selected one by one and oxidised under close watch — round, honey-sweet, burnished with apricot and warm spice. Presented in the hand-finished gift box, made to be given.",
     "homeDesc": "Golden tips, selected one by one and oxidised under close watch — round, honey-sweet, burnished with apricot and warm spice. Presented in the hand-finished gift box, made to be given.",
-    "notes": ["Honey-Sweet", "Golden Tips", "Round"],
+    "notes": [
+      "Honey-Sweet",
+      "Golden Tips",
+      "Round"
+    ],
     "price": 115,
     "unitShort": "/ gift box",
     "unitLong": "/ gift box · 100g",
@@ -186,35 +427,109 @@
     "heroImage": "/assets/tea-giftset.webp",
     "heroAlt": "Mt. Peak Golden Harvest — gift box · 100g",
     "gallery": [
-      { "type": "img", "src": "/assets/tea-giftset.webp", "alt": "Golden Harvest gift box", "thumb": "Gift box" },
-      { "type": "img", "src": "/assets/giftset-wide.webp", "alt": "Gift box, open", "thumb": "Gift box open" },
-      { "type": "img", "src": "/assets/tea-tin.webp", "alt": "Caddy detail", "thumb": "Caddy detail" },
-      { "type": "ph", "label": "DRY LEAF — MACRO", "sub": "Golden tips, selected one by one, shot like jewellery", "thumb": "Dry leaf<br>macro" },
-      { "type": "ph", "label": "THE LIQUOR — DEEP AMBER", "sub": "The brewed cup, backlit so the deep amber colour glows", "thumb": "Liquor<br>in glass" }
+      {
+        "type": "img",
+        "src": "/assets/tea-giftset.webp",
+        "alt": "Golden Harvest gift box",
+        "thumb": "Gift box"
+      },
+      {
+        "type": "img",
+        "src": "/assets/giftset-wide.webp",
+        "alt": "Gift box, open",
+        "thumb": "Gift box open"
+      },
+      {
+        "type": "img",
+        "src": "/assets/tea-tin.webp",
+        "alt": "Caddy detail",
+        "thumb": "Caddy detail"
+      },
+      {
+        "type": "ph",
+        "label": "DRY LEAF — MACRO",
+        "sub": "Golden tips, selected one by one, shot like jewellery",
+        "thumb": "Dry leaf<br>macro"
+      },
+      {
+        "type": "ph",
+        "label": "THE LIQUOR — DEEP AMBER",
+        "sub": "The brewed cup, backlit so the deep amber colour glows",
+        "thumb": "Liquor<br>in glass"
+      }
     ],
     "meta": [
-      { "k": "Origin", "v": "Eastern Nepal · single garden" },
-      { "k": "Harvest", "v": "Peak season golden-tip selection, by hand" },
-      { "k": "Format", "v": "gift box · 100g" },
-      { "k": "Delivery", "v": "Complimentary UK · gift wrap available" }
+      {
+        "k": "Origin",
+        "v": "Eastern Nepal · single garden"
+      },
+      {
+        "k": "Harvest",
+        "v": "Peak season golden-tip selection, by hand"
+      },
+      {
+        "k": "Format",
+        "v": "gift box · 100g"
+      },
+      {
+        "k": "Delivery",
+        "v": "Complimentary UK · gift wrap available"
+      }
     ],
     "tastingH": "A deep amber cup, honeyed and round",
     "tasting": [
-      { "k": "Aroma", "v": "Dried apricot, warm spice, a deep note of wildflower honey." },
-      { "k": "Palate", "v": "Full and round, honey-sweet, with a smooth, malty depth." },
-      { "k": "Finish", "v": "Long, warm and lingering — like the last light before dusk." }
+      {
+        "k": "Aroma",
+        "v": "Dried apricot, warm spice, a deep note of wildflower honey."
+      },
+      {
+        "k": "Palate",
+        "v": "Full and round, honey-sweet, with a smooth, malty depth."
+      },
+      {
+        "k": "Finish",
+        "v": "Long, warm and lingering — like the last light before dusk."
+      }
     ],
     "tasteFoot": [
-      { "k": "Cup Colour", "v": "Deep Amber" },
-      { "k": "Body", "v": "Full" },
-      { "k": "Oxidation", "v": "Full" },
-      { "k": "Caffeine", "v": "Moderate–High" }
+      {
+        "k": "Cup Colour",
+        "v": "Deep Amber"
+      },
+      {
+        "k": "Body",
+        "v": "Full"
+      },
+      {
+        "k": "Oxidation",
+        "v": "Full"
+      },
+      {
+        "k": "Caffeine",
+        "v": "Moderate–High"
+      }
     ],
     "brew": [
-      { "n": "95", "u": "°C", "label": "Water Temp" },
-      { "n": "4", "u": "g", "label": "Per 200ml" },
-      { "n": "4", "u": "min", "label": "First Steep" },
-      { "n": "2", "u": "×", "label": "Infusions" }
+      {
+        "n": "95",
+        "u": "°C",
+        "label": "Water Temp"
+      },
+      {
+        "n": "4",
+        "u": "g",
+        "label": "Per 200ml"
+      },
+      {
+        "n": "4",
+        "u": "min",
+        "label": "First Steep"
+      },
+      {
+        "n": "2",
+        "u": "×",
+        "label": "Infusions"
+      }
     ],
     "brewSteps": [
       "Warm the pot properly — this leaf is dense and gives its best at full temperature.",
@@ -224,11 +539,26 @@
     ],
     "makeH": "Five deliberate steps",
     "make": [
-      { "t": "Selection", "d": "Golden tips chosen one by one at peak season." },
-      { "t": "Withering", "d": "A full day on bamboo trays, until the leaf turns supple." },
-      { "t": "Rolling", "d": "Rolled fully, to open the leaf for complete oxidation." },
-      { "t": "Oxidation", "d": "Carried through fully, under close watch, for depth and colour." },
-      { "t": "Firing", "d": "Finished slowly, then hand-packed into the gift box." }
+      {
+        "t": "Selection",
+        "d": "Golden tips chosen one by one at peak season."
+      },
+      {
+        "t": "Withering",
+        "d": "A full day on bamboo trays, until the leaf turns supple."
+      },
+      {
+        "t": "Rolling",
+        "d": "Rolled fully, to open the leaf for complete oxidation."
+      },
+      {
+        "t": "Oxidation",
+        "d": "Carried through fully, under close watch, for depth and colour."
+      },
+      {
+        "t": "Firing",
+        "d": "Finished slowly, then hand-packed into the gift box."
+      }
     ],
     "originLead": "At the peak of the season, when the tips turn gold, our pickers choose only the very best of the garden.",
     "originPs": [
@@ -236,17 +566,45 @@
       "Presented in a hand-finished gift box, it is built to be given as much as brewed. Certified organic, single-origin, and finished at our own factory — no middlemen, only the mountain and the hands that tend it."
     ],
     "spec": [
-      { "k": "Style", "v": "Fully oxidised black tea · golden tips" },
-      { "k": "Oxidation", "v": "Full" },
-      { "k": "Origin", "v": "Eastern Nepal, single Himalayan garden" },
-      { "k": "Altitude", "v": "2,500 metres" },
-      { "k": "Cultivation", "v": "100% certified organic" },
-      { "k": "Plucking", "v": "Golden tips, selected by hand" },
-      { "k": "Harvest", "v": "Peak season selection" },
-      { "k": "Format", "v": "100g loose leaf · hand-finished gift box" },
-      { "k": "Caffeine", "v": "Moderate–high" }
+      {
+        "k": "Style",
+        "v": "Fully oxidised black tea · golden tips"
+      },
+      {
+        "k": "Oxidation",
+        "v": "Full"
+      },
+      {
+        "k": "Origin",
+        "v": "Eastern Nepal, single Himalayan garden"
+      },
+      {
+        "k": "Altitude",
+        "v": "2,500 metres"
+      },
+      {
+        "k": "Cultivation",
+        "v": "100% certified organic"
+      },
+      {
+        "k": "Plucking",
+        "v": "Golden tips, selected by hand"
+      },
+      {
+        "k": "Harvest",
+        "v": "Peak season selection"
+      },
+      {
+        "k": "Format",
+        "v": "100g loose leaf · hand-finished gift box"
+      },
+      {
+        "k": "Caffeine",
+        "v": "Moderate–high"
+      }
     ],
     "closerH": "Give the mountain<br>as a <em>gift</em>",
-    "closerP": "£115 for the hand-finished gift box — 100g of golden-tip Himalayan black tea, honeyed and full."
+    "closerP": "£115 for the hand-finished gift box — 100g of golden-tip Himalayan black tea, honeyed and full.",
+    "soldOut": false
   }
 }

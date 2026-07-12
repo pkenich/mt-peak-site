@@ -61,6 +61,11 @@ export function ensureSchema() {
       await q`ALTER TABLE orders ADD COLUMN IF NOT EXISTS billing jsonb`;
       await q`ALTER TABLE orders ADD COLUMN IF NOT EXISTS promo_code text`;
       await q`ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_pence int NOT NULL DEFAULT 0`;
+      await q`ALTER TABLE orders ADD COLUMN IF NOT EXISTS gift_note text`;
+      await q`CREATE TABLE IF NOT EXISTS subscribers (
+        email text PRIMARY KEY,
+        created_at timestamptz NOT NULL DEFAULT now()
+      )`;
     })().catch(e => { _ready = null; throw e; });
   }
   return _ready;

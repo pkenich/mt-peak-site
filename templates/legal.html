@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/account.css">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+{{> nav}}
+
+<div class="page-wrap" style="max-width:760px;">
+  <div class="page-eyebrow">{{legalEyebrow}}</div>
+  <h1 class="page-h">{{legalTitle}}</h1>
+  <div class="legal-body">
+    {{{legalBody}}}
+  </div>
+</div>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/lux.js"></script>
+</body>
+</html>

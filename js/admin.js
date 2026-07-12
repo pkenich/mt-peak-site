@@ -166,9 +166,24 @@
       </div>`).join('');
   }
 
+  const fmtAddr = (a) => a ? [a.name, a.line1, a.line2, a.city, a.postcode, a.country].filter(Boolean).join(', ') : '—';
+
+  function ordersCsv(orders) {
+    const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const head = ['order', 'date', 'status', 'email', 'items', 'total_gbp', 'discount_gbp', 'promo', 'gift_note',
+      'ship_name', 'ship_line1', 'ship_line2', 'ship_city', 'ship_postcode', 'ship_country'];
+    const lines = orders.map(o => [
+      o.public_id, new Date(o.created_at).toISOString(), o.status, o.email,
+      o.items.map(l => `${l.name} x${l.qty}`).join('; '),
+      (o.total_pence / 100).toFixed(2), ((o.discount_pence || 0) / 100).toFixed(2), o.promo_code || '', o.gift_note || '',
+      ...(o.shipping ? [o.shipping.name, o.shipping.line1, o.shipping.line2, o.shipping.city, o.shipping.postcode, o.shipping.country] : ['', '', '', '', '', '']),
+    ].map(esc).join(','));
+    return [head.join(','), ...lines].join('\n');
+  }
+
   async function loadOrders() {
     try {
-      const { orders, stats, daily, products } = await api('/api/admin/orders');
+      const { orders, stats, daily, products, subscribers } = await api('/api/admin/orders');
       const aov = stats.paid_orders ? Math.round(stats.revenue_pence / stats.paid_orders) : 0;
       $('#statRow').innerHTML = [
         [gbp(stats.revenue_pence), 'Revenue (paid)'],
@@ -177,7 +192,24 @@
         [gbp(stats.awaiting_pence), 'Awaiting payment'],
         [stats.orders, 'Orders'],
         [stats.customers, 'Customers'],
+        [subscribers.count, 'Newsletter'],
       ].map(([v, l]) => `<div class="stat"><div class="sv">${v}</div><div class="sl">${l}</div></div>`).join('');
+      document.querySelectorAll('.orders-tools').forEach(e => e.remove());
+      const subBtn = document.createElement('button');
+      subBtn.className = 'btn-quiet orders-tools'; subBtn.textContent = 'Copy newsletter emails';
+      subBtn.style.marginBottom = '1.2rem';
+      subBtn.onclick = () => { navigator.clipboard.writeText(subscribers.emails.join('\n'))
+        .then(() => notify(`${subscribers.count} subscriber emails copied.`)); };
+      const csvBtn = document.createElement('button');
+      csvBtn.className = 'btn-quiet orders-tools'; csvBtn.textContent = 'Export orders CSV';
+      csvBtn.style.cssText = 'margin:0 0 1.2rem .8rem;';
+      csvBtn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([ordersCsv(orders)], { type: 'text/csv' }));
+        a.download = `mtpeak-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+      };
+      $('#statRow').after(csvBtn); $('#statRow').after(subBtn);
 
       $('#salesViz').innerHTML = revenueChart(daily) + productBars(products);
       const tip = $('#chartTip');
@@ -204,17 +236,29 @@
       $('#adminOrders').innerHTML = `
         <div class="orders">
           <div class="order-row head"><div>Order</div><div>Customer</div><div>Items</div><div>Total</div><div>Status</div></div>
-          ${orders.map(o => `
-          <div class="order-row">
+          ${orders.map((o, i) => `
+          <div class="order-row" data-x="${i}" style="cursor:pointer;">
             <div><div class="oid">${o.public_id}</div><div class="odate">${new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</div></div>
             <div class="oemail">${o.email}</div>
             <div class="oitems">${o.items.map(l => `${l.name} × ${l.qty}`).join('<br>')}</div>
-            <div class="ototal">${gbp(o.total_pence)}</div>
+            <div class="ototal">${gbp(o.total_pence)}${o.discount_pence ? `<div class="odate">−${gbp(o.discount_pence)} (${o.promo_code || 'promo'})</div>` : ''}</div>
             <div><select data-order="${o.public_id}">
               ${Object.entries(STATUS_LABEL).map(([v, l]) => `<option value="${v}"${v === o.status ? ' selected' : ''}>${l}</option>`).join('')}
             </select></div>
+          </div>
+          <div class="order-detail" id="od-${i}" hidden>
+            <div><span class="odk">Deliver to</span>${fmtAddr(o.shipping)}</div>
+            <div><span class="odk">Billing</span>${fmtAddr(o.billing)}</div>
+            ${o.gift_note ? `<div><span class="odk">Gift message</span><em>${o.gift_note.replace(/</g, '&lt;')}</em></div>` : ''}
           </div>`).join('')}
         </div>`;
+      for (const row of document.querySelectorAll('.order-row[data-x]')) {
+        row.addEventListener('click', (e) => {
+          if (e.target.closest('select')) return;
+          const d = $(`#od-${row.dataset.x}`);
+          d.hidden = !d.hidden;
+        });
+      }
       for (const sel of document.querySelectorAll('#adminOrders select[data-order]')) {
         sel.addEventListener('change', async () => {
           try {
@@ -270,6 +314,9 @@
             <textarea data-k="homeDesc">${p.homeDesc || ''}</textarea></div>
           <div class="field wide"><label>Flavour notes (comma-separated chips)</label>
             <input data-k="notes" value="${(p.notes || []).join(', ').replace(/"/g, '&quot;')}"></div>
+          <div class="field wide"><label style="display:flex;align-items:center;gap:.7rem;cursor:pointer;text-transform:none;letter-spacing:.5px;font-size:.85rem;color:var(--cream);">
+            <input type="checkbox" data-k="soldOut" ${p.soldOut ? 'checked' : ''} style="width:auto;accent-color:#c9a961;">
+            Sold out (hides Add buttons and blocks checkout for this tea)</label></div>
         </div>
       </div>
       <div class="admin-card">
@@ -360,6 +407,8 @@
           const n = parseInt(input.value, 10);
           if (!Number.isInteger(n) || n < 1) throw new Error('Price must be a whole number of pounds.');
           p.price = n;
+        } else if (k === 'soldOut') {
+          p.soldOut = input.checked;
         } else if (k === 'notes') {
           p.notes = input.value.split(',').map(s => s.trim()).filter(Boolean);
         } else p[k] = input.value;

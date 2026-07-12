@@ -171,3 +171,7 @@ body{animation:pageIn .7s ease both;}
 .rv{opacity:0;transform:translateY(26px);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1);}
 .rv.in{opacity:1;transform:none;}
 .gal-main img,.gal-main .gal-ph{transition:opacity .45s ease;}
+
+/* sold-out states */
+.btn-add[disabled]{background:none;border:1px solid rgba(244,239,230,.25);color:var(--cream-dim);pointer-events:none;}
+.cbtn.is-soldout{background:none;border:1px solid rgba(244,239,230,.25);color:var(--cream-dim);pointer-events:none;}

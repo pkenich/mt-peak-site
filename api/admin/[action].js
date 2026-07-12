@@ -104,8 +104,9 @@ async function orders(req, res) {
   requireAdmin(req);
   await ensureSchema();
   const q = sql();
-  const [rows, stats, daily, products] = await Promise.all([
-    q`SELECT public_id, email, items, total_pence, status, created_at
+  const [rows, stats, daily, products, subs] = await Promise.all([
+    q`SELECT public_id, email, items, total_pence, status, created_at,
+        shipping, billing, promo_code, discount_pence, gift_note
       FROM orders ORDER BY created_at DESC LIMIT 200`,
     q`SELECT
         count(*)::int AS orders,
@@ -128,8 +129,11 @@ async function orders(req, res) {
       FROM orders, jsonb_array_elements(items) AS l
       WHERE status IN ('paid','fulfilled')
       GROUP BY 1 ORDER BY 3 DESC LIMIT 6`,
+    q`SELECT count(*)::int AS n, coalesce(array_agg(email ORDER BY created_at DESC), '{}') AS emails
+      FROM subscribers`,
   ]);
-  res.json({ orders: rows, stats: stats[0], daily, products });
+  res.json({ orders: rows, stats: stats[0], daily, products,
+    subscribers: { count: subs[0].n, emails: subs[0].emails } });
 }
 
 async function orderStatus(req, res) {
@@ -141,7 +145,7 @@ async function orderStatus(req, res) {
   if (!ORDER_STATUSES.includes(status)) throw bad('Bad status.');
   const rows = await sql()`UPDATE orders SET status = ${status}, updated_at = now()
     WHERE public_id = ${publicId} AND status <> ${status}
-    RETURNING public_id, email, items, total_pence, discount_pence, shipping`;
+    RETURNING public_id, email, items, total_pence, discount_pence, shipping, gift_note`;
   if (!rows.length) {
     const exists = await sql()`SELECT 1 FROM orders WHERE public_id = ${publicId}`;
     if (!exists.length) throw bad('Order not found.', 404);

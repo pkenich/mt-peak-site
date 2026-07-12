@@ -34,12 +34,14 @@ export default handler(['POST'], async (req, res) => {
     const p = PRODUCTS[slug];
     const qty = Math.floor(Number(q));
     if (!p || !Number.isFinite(qty) || qty < 1 || qty > 20) throw bad('Your reserve contains an unknown item — please refresh and retry.');
+    if (p.soldOut) throw bad(`${p.name} is sold out — remove it from your reserve to continue.`);
     return { slug, name: p.cartName, qty, unitPence: p.price * 100 };
   });
   const subtotal = lines.reduce((s, l) => s + l.unitPence * l.qty, 0);
 
   const shipping = cleanAddress(body.shipping, 'delivery');
   const billing = body.billingSameAsShipping ? shipping : cleanAddress(body.billing, 'billing');
+  const giftNote = String(body.giftNote || '').trim().slice(0, 300) || null;
 
   // redeem the promo atomically (race-safe for limited-issue codes)
   let promo = null, discount = 0;
@@ -58,11 +60,11 @@ export default handler(['POST'], async (req, res) => {
   try {
     if (!stripeKey) {
       await q`INSERT INTO orders (public_id, user_id, email, items, total_pence, status,
-          shipping, billing, promo_code, discount_pence)
+          shipping, billing, promo_code, discount_pence, gift_note)
         VALUES (${publicId}, ${user.uid}, ${user.email}, ${JSON.stringify(lines)}, ${total}, 'reserved',
-          ${JSON.stringify(shipping)}, ${JSON.stringify(billing)}, ${promo?.code ?? null}, ${discount})`;
+          ${JSON.stringify(shipping)}, ${JSON.stringify(billing)}, ${promo?.code ?? null}, ${discount}, ${giftNote})`;
       await sendOrderEmail({ public_id: publicId, email: user.email, items: lines,
-        total_pence: total, discount_pence: discount, shipping }, 'reserved');
+        total_pence: total, discount_pence: discount, shipping, gift_note: giftNote }, 'reserved');
       return res.status(201).json({ ok: true, mode: 'reservation', orderId: publicId });
     }
 
@@ -90,9 +92,9 @@ export default handler(['POST'], async (req, res) => {
     });
 
     await q`INSERT INTO orders (public_id, user_id, email, items, total_pence, status,
-        stripe_session_id, shipping, billing, promo_code, discount_pence)
+        stripe_session_id, shipping, billing, promo_code, discount_pence, gift_note)
       VALUES (${publicId}, ${user.uid}, ${user.email}, ${JSON.stringify(lines)}, ${total}, 'pending_payment',
-        ${session.id}, ${JSON.stringify(shipping)}, ${JSON.stringify(billing)}, ${promo?.code ?? null}, ${discount})`;
+        ${session.id}, ${JSON.stringify(shipping)}, ${JSON.stringify(billing)}, ${promo?.code ?? null}, ${discount}, ${giftNote})`;
     res.status(201).json({ ok: true, mode: 'stripe', orderId: publicId, url: session.url });
   } catch (e) {
     if (promo) await releasePromo(promo.code);

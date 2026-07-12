@@ -23,25 +23,27 @@ thumbs.forEach(t => t.addEventListener('click', () => {
   }
 }));
 
-/* ===== QUANTITY ===== */
+/* ===== QUANTITY + ADD TO CART (absent when the tea is sold out) ===== */
 const qVal = document.getElementById('qVal');
-function clampQ() { let v = parseInt(qVal.value) || 1; v = Math.max(1, Math.min(20, v)); qVal.value = v; return v; }
-document.getElementById('qMinus').onclick = () => { qVal.value = Math.max(1, (parseInt(qVal.value) || 1) - 1); };
-document.getElementById('qPlus').onclick = () => { qVal.value = Math.min(20, (parseInt(qVal.value) || 1) + 1); };
-qVal.addEventListener('change', clampQ);
-
-/* ===== ADD TO CART (identity from data attributes) ===== */
 const btnAdd = document.getElementById('btnAdd');
-const P = { slug: btnAdd.dataset.slug, name: btnAdd.dataset.name, price: Number(btnAdd.dataset.price) };
-const addLabel = 'Add to Reserve — £' + P.price;
-btnAdd.addEventListener('click', () => {
-  addToCart(P.slug, P.name, P.price, clampQ());
-  btnAdd.classList.add('added'); btnAdd.textContent = 'Added to Reserve ✓';
-  setTimeout(() => { btnAdd.classList.remove('added'); btnAdd.textContent = addLabel; }, 1600);
-});
-const btnAdd2 = document.getElementById('btnAdd2');
-if (btnAdd2) {
-  btnAdd2.addEventListener('click', e => { e.preventDefault(); addToCart(P.slug, P.name, P.price, 1); });
+function clampQ() { let v = parseInt(qVal.value) || 1; v = Math.max(1, Math.min(20, v)); qVal.value = v; return v; }
+if (qVal) {
+  document.getElementById('qMinus').onclick = () => { qVal.value = Math.max(1, (parseInt(qVal.value) || 1) - 1); };
+  document.getElementById('qPlus').onclick = () => { qVal.value = Math.min(20, (parseInt(qVal.value) || 1) + 1); };
+  qVal.addEventListener('change', clampQ);
+}
+if (btnAdd && !btnAdd.disabled) {
+  const P = { slug: btnAdd.dataset.slug, name: btnAdd.dataset.name, price: Number(btnAdd.dataset.price) };
+  const addLabel = 'Add to Reserve — £' + P.price;
+  btnAdd.addEventListener('click', () => {
+    addToCart(P.slug, P.name, P.price, clampQ());
+    btnAdd.classList.add('added'); btnAdd.textContent = 'Added to Reserve ✓';
+    setTimeout(() => { btnAdd.classList.remove('added'); btnAdd.textContent = addLabel; }, 1600);
+  });
+  const btnAdd2 = document.getElementById('btnAdd2');
+  if (btnAdd2) {
+    btnAdd2.addEventListener('click', e => { e.preventDefault(); addToCart(P.slug, P.name, P.price, 1); });
+  }
 }
 
 /* ===== SCROLL REVEALS ===== */

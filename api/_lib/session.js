@@ -57,7 +57,10 @@ export function issueCustomer(res, user) {
   setCookie(res, CUSTOMER_COOKIE, sign({ uid: user.id, email: user.email, name: user.name,
     exp: Math.floor(Date.now() / 1000) + WEEK }), WEEK);
 }
-export function readCustomer(req) { return verify(parseCookies(req)[CUSTOMER_COOKIE]); }
+export function readCustomer(req) {
+  const p = verify(parseCookies(req)[CUSTOMER_COOKIE]);
+  return p && !p.ns ? p : null; // namespaced tokens are not sessions
+}
 export function clearCustomer(res) { setCookie(res, CUSTOMER_COOKIE, '', 0); }
 
 export function issueAdmin(res) {
@@ -69,6 +72,16 @@ export function readAdmin(req) {
   return p?.role === 'admin' ? p : null;
 }
 export function clearAdmin(res) { setCookie(res, ADMIN_COOKIE, '', 0); }
+
+/* Generic signed tokens (password reset links etc.) — same HMAC secret,
+   but namespaced so a reset token can never pass as a session cookie. */
+export function signToken(payload, ttlSec) {
+  return sign({ ...payload, ns: 'tok', exp: Math.floor(Date.now() / 1000) + ttlSec });
+}
+export function verifyToken(token) {
+  const p = verify(String(token || ''));
+  return p?.ns === 'tok' ? p : null;
+}
 
 export function requireCustomer(req) {
   const s = readCustomer(req);

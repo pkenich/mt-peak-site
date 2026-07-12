@@ -105,6 +105,7 @@ const productsMap = JSON.parse(readFileSync(join(ROOT, 'content/products.json'),
 // derived fields the templates rely on
 const products = Object.values(productsMap).sort((a, b) => a.num.localeCompare(b.num));
 for (const p of products) {
+  p.available = !p.soldOut;
   p.gallery = p.gallery.map((g, i) => ({ ...g, active: i === 0, isImg: g.type === 'img', isPh: g.type === 'ph' }));
   p.url = `${site.siteUrl}/${p.slug}`;
   p.ogImage = `${site.siteUrl}${p.heroImage}`;
@@ -124,10 +125,19 @@ for (const p of products) {
     pageTitle: p.title, pageDesc: p.metaDesc, pageUrl: p.url, ogImage: p.ogImage }]));
 }
 
-for (const name of ['login', 'account', 'track', 'checkout', 'admin', '404']) {
+for (const name of ['login', 'account', 'track', 'checkout', 'reset', 'admin', '404']) {
   emit(`${name}.html`, render(page(`${name}.html`), [{ site,
     pageTitle: `${site.brand} — ${name === '404' ? 'Not Found' : name[0].toUpperCase() + name.slice(1)}`,
     pageDesc: site.metaDesc, pageUrl: `${site.siteUrl}/${name}`, ogImage: `${site.siteUrl}/assets/tea-giftset.webp` }]));
+}
+
+const legal = JSON.parse(readFileSync(join(ROOT, 'content/legal.json'), 'utf8'));
+const legalTpl = page('legal.html');
+for (const [slug, l] of Object.entries(legal)) {
+  emit(`${slug}.html`, render(legalTpl, [{ site,
+    legalEyebrow: l.eyebrow, legalTitle: l.title, legalBody: l.body,
+    pageTitle: `${site.brand} — ${l.title}`, pageDesc: site.metaDesc,
+    pageUrl: `${site.siteUrl}/${slug}`, ogImage: `${site.siteUrl}/assets/tea-giftset.webp` }]));
 }
 
 for (const dir of ['css', 'js', 'assets']) cpSync(join(ROOT, dir), join(OUT, dir), { recursive: true });
@@ -135,6 +145,6 @@ for (const dir of ['css', 'js', 'assets']) cpSync(join(ROOT, dir), join(OUT, dir
 writeFileSync(join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: ${site.siteUrl}/sitemap.xml\n`);
 writeFileSync(join(OUT, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  ['', ...products.map(p => p.slug)].map(s => `  <url><loc>${site.siteUrl}/${s}</loc></url>`).join('\n') +
+  ['', ...products.map(p => p.slug), ...Object.keys(legal), 'track'].map(s => `  <url><loc>${site.siteUrl}/${s}</loc></url>`).join('\n') +
   `\n</urlset>\n`);
 console.log('build complete');

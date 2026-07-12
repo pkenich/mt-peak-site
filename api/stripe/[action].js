@@ -15,7 +15,7 @@ async function markPaidIfSettled(sessionId) {
     // confirmation email can't double-send when webhook + confirm both fire.
     const rows = await sql()`UPDATE orders SET status = 'paid', updated_at = now()
       WHERE stripe_session_id = ${session.id} AND status = 'pending_payment'
-      RETURNING public_id, email, items, total_pence, discount_pence, shipping`;
+      RETURNING public_id, email, items, total_pence, discount_pence, shipping, gift_note`;
     if (rows.length) await sendOrderEmail(rows[0], 'paid');
     return true;
   }

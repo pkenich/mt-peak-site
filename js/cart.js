@@ -51,5 +51,24 @@ fetch('/api/auth/me').then(r => r.json()).then(({ user }) => {
   if (a && user) a.textContent = (user.name || 'Account').split(' ')[0];
 }).catch(() => {});
 
+/* footer newsletter */
+const newsForm = document.getElementById('newsForm');
+if (newsForm) {
+  newsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const m = document.getElementById('newsMsg');
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: document.getElementById('newsEmail').value }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Try again in a moment.');
+      m.textContent = 'Welcome to the mountain. ⛰';
+      newsForm.reset();
+    } catch (err) { m.textContent = err.message; }
+  });
+}
+
 navCart.addEventListener('click', openCart);
 render();

@@ -69,6 +69,14 @@ nav{padding:1.6rem 3.5rem;
 .empty-state{padding:4rem 0;color:var(--cream-dim);font-family:'Cormorant Garamond',serif;
   font-style:italic;font-size:1.2rem;}
 
+/* legal pages */
+.legal-body{color:var(--cream-dim);font-size:.95rem;line-height:1.9;letter-spacing:.3px;}
+.legal-body h2{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:1.5rem;
+  color:var(--cream);margin:2.4rem 0 .8rem;letter-spacing:.5px;}
+.legal-body p{margin-bottom:1rem;}
+.legal-body a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(201,169,97,.4);}
+.legal-body strong{color:var(--cream);font-weight:400;}
+
 /* 404 */
 .nf-wrap{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:8rem 1.5rem 4rem;}
