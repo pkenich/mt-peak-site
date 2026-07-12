@@ -68,16 +68,82 @@
   };
   const gbp = pence => '£' + (pence / 100).toLocaleString('en-GB', { maximumFractionDigits: 0 });
 
+  /* 30-day revenue bar chart: thin gold bars, rounded value-ends, recessive
+     grid, per-bar hover tooltip. Single series — the title names it. */
+  function revenueChart(daily) {
+    const days = [];
+    const byDay = Object.fromEntries(daily.map(d => [d.day, d]));
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      days.push({ day: d, rev: (byDay[d]?.revenue_pence || 0), orders: (byDay[d]?.orders || 0) });
+    }
+    const W = 640, H = 150, PAD = 6, BASE = H - 18;
+    const max = Math.max(...days.map(d => d.rev), 1);
+    const bw = (W - PAD * 2) / 30;
+    const bars = days.map((d, i) => {
+      const h = d.rev ? Math.max((d.rev / max) * (BASE - 14), 3) : 0;
+      const x = PAD + i * bw;
+      const label = new Date(d.day).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+      return `<g class="cbar" data-tip="${label} — ${gbp(d.rev)} · ${d.orders} order${d.orders === 1 ? '' : 's'}">
+        <rect x="${x}" y="0" width="${bw}" height="${BASE}" fill="transparent"></rect>
+        ${d.rev ? `<rect class="vr" x="${(x + 1).toFixed(1)}" y="${(BASE - h).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="#c9a961"></rect>
+        <rect class="vr" x="${(x + 1).toFixed(1)}" y="${(BASE - 2).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="2" fill="#c9a961"></rect>`
+        : `<rect x="${(x + 1).toFixed(1)}" y="${BASE - 2}" width="${(bw - 2).toFixed(1)}" height="2" fill="rgba(201,169,97,.18)"></rect>`}
+      </g>`;
+    }).join('');
+    const grid = [0.33, 0.66].map(f =>
+      `<line x1="${PAD}" x2="${W - PAD}" y1="${(BASE * f).toFixed(1)}" y2="${(BASE * f).toFixed(1)}" stroke="rgba(244,239,230,.07)" stroke-width="1"/>`).join('');
+    const first = new Date(days[0].day).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const last = new Date(days[29].day).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    return `<div class="chart-title">Revenue — last 30 days <span>peak ${gbp(max === 1 ? 0 : max)}/day</span></div>
+      <div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Daily revenue, last 30 days">
+        ${grid}<line x1="${PAD}" x2="${W - PAD}" y1="${BASE}" y2="${BASE}" stroke="rgba(244,239,230,.15)" stroke-width="1"/>${bars}
+      </svg><div class="chart-tip" id="chartTip" hidden></div>
+      <div class="chart-x"><span>${first}</span><span>${last}</span></div></div>`;
+  }
+
+  function productBars(products) {
+    if (!products.length) return '';
+    const max = Math.max(...products.map(p => p.revenue_pence), 1);
+    return `<div class="chart-title" style="margin-top:1.6rem;">Top teas — by paid revenue</div>` +
+      products.map(p => `
+      <div class="pbar-row">
+        <div class="pbar-name">${p.name}</div>
+        <div class="pbar-track"><div class="pbar-fill" style="width:${Math.max((p.revenue_pence / max) * 100, 2)}%"></div></div>
+        <div class="pbar-val">${gbp(p.revenue_pence)} · ${p.qty}</div>
+      </div>`).join('');
+  }
+
   async function loadOrders() {
     try {
-      const { orders, stats } = await api('/api/admin/orders');
+      const { orders, stats, daily, products } = await api('/api/admin/orders');
+      const aov = stats.paid_orders ? Math.round(stats.revenue_pence / stats.paid_orders) : 0;
       $('#statRow').innerHTML = [
         [gbp(stats.revenue_pence), 'Revenue (paid)'],
+        [gbp(stats.revenue_7d_pence), 'Last 7 days'],
+        [gbp(aov), 'Avg order value'],
         [gbp(stats.awaiting_pence), 'Awaiting payment'],
         [stats.orders, 'Orders'],
-        [stats.open_orders, 'Open orders'],
         [stats.customers, 'Customers'],
       ].map(([v, l]) => `<div class="stat"><div class="sv">${v}</div><div class="sl">${l}</div></div>`).join('');
+
+      $('#salesViz').innerHTML = revenueChart(daily) + productBars(products);
+      const tip = $('#chartTip');
+      for (const g of document.querySelectorAll('#salesViz .cbar')) {
+        g.addEventListener('mouseenter', () => {
+          tip.textContent = g.dataset.tip; tip.hidden = false;
+          g.querySelectorAll('.vr').forEach(r => r.setAttribute('fill', '#e8cd8f'));
+        });
+        g.addEventListener('mousemove', (e) => {
+          const wrap = tip.parentElement.getBoundingClientRect();
+          tip.style.left = Math.min(e.clientX - wrap.left + 12, wrap.width - tip.offsetWidth - 4) + 'px';
+          tip.style.top = (e.clientY - wrap.top - 34) + 'px';
+        });
+        g.addEventListener('mouseleave', () => {
+          tip.hidden = true;
+          g.querySelectorAll('.vr').forEach(r => r.setAttribute('fill', '#c9a961'));
+        });
+      }
 
       if (!orders.length) {
         $('#adminOrders').innerHTML = '<p class="admin-note">No orders yet — they’ll appear here the moment someone checks out.</p>';

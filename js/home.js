@@ -157,47 +157,102 @@ sizeB();addEventListener('resize',sizeB);addEventListener('orientationchange',()
 inViewObserver(ritual,v=>brewVisible=v);
 function brewP(){const r=ritual.getBoundingClientRect();const tot=ritual.offsetHeight-innerHeight;
   return tot>0?Math.min(Math.max(-r.top,0),tot)/tot:0;}
-function steamP(cx,cy){return{x:cx+(Math.random()-.5)*40,y:cy,s:5+Math.random()*8,
-  v:.5+Math.random()*.6,op:.35+Math.random()*.25,sway:Math.random()*6.28};}
+/* Brew simulation v2 — a physical pour:
+   embers while the pot warms → the pot leans and a droplet stream falls
+   under gravity, splashing and rippling on the surface → colour blooms and
+   leaves swirl while it steeps → sparkles and a ring pulse at serve.
+   All particle pools are capped (lower on small screens); the fill level
+   stays a pure function of scroll so scrubbing backwards works. */
+const drops=[],splashes=[],ripples=[],leaves2=[],embers=[],sparks=[];
+const CAP={drops:isSmall?36:80,splash:isSmall?20:44,steam:isSmall?24:54,embers:isSmall?10:18};
+for(let i=0;i<5;i++)leaves2.push({a:Math.random()*6.28,r:.14+Math.random()*.3,
+  va:.004+Math.random()*.006,rot:Math.random()*6.28,vr:(Math.random()-.5)*.05,s:3+Math.random()*3.5,d:.35+Math.random()*.5});
+let tilt=0,lastRing=0;
+
+function steamP(cx,cy){return{x:cx+(Math.random()-.5)*46,y:cy,s:4+Math.random()*9,
+  v:.4+Math.random()*.7,op:.3+Math.random()*.25,sway:Math.random()*6.28,grow:.05+Math.random()*.08};}
 
 function drawBrew(p){
   bx.clearRect(0,0,BW,BH);
-  const cx=BW/2;
+  const cx=BW/2,now=Date.now();
   glow.style.transform=`scale(${.6+p*.8})`;
   glow.style.opacity=String(.4+p*.6);
-  let stage=p<.2?0:p<.45?1:p<.82?2:3;
+  const stage=p<.2?0:p<.45?1:p<.82?2:3;
   steps.forEach(s=>s.classList.toggle('active',+s.dataset.step<=stage));
 
-  // ---- POT ----
-  const potY=BH*.24, potRx=BW*.20, potRy=BH*.13;
+  const potX=cx,potY=BH*.22,potRx=BW*.19,potRy=BH*.12;
+  const cupY=BH*.66,cupW=BW*.30,cupH=BH*.16;
+  const surfaceFill=Math.min(Math.max((p-.18)/.6,0),1);
+  const surfaceY=cupY+cupH/2-cupH*surfaceFill;
+  const pouring=p>.2&&p<.82;
+
+  // ---- WARM: embers rising around the pot ----
+  if(p>.03&&p<.3&&embers.length<CAP.embers&&Math.random()<.3)
+    embers.push({x:potX+(Math.random()-.5)*potRx*2.4,y:potY+potRy*1.4,
+      s:.8+Math.random()*1.6,v:.25+Math.random()*.4,op:.5+Math.random()*.3,sway:Math.random()*6.28});
+  for(let i=embers.length-1;i>=0;i--){const e=embers[i];
+    e.y-=e.v;e.sway+=.06;e.x+=Math.sin(e.sway)*.3;e.op-=.006;
+    if(e.op<=0){embers.splice(i,1);continue;}
+    bx.globalAlpha=e.op;bx.fillStyle='#e8cd8f';
+    bx.beginPath();bx.arc(e.x,e.y,e.s,0,6.28);bx.fill();bx.globalAlpha=1;}
+
+  // ---- POT (tilts into the pour) ----
+  const tiltTarget=pouring?.30+Math.sin(now*.003)*.035:0;
+  tilt+=(tiltTarget-tilt)*.08;
+  const spoutX=potX-potRx*1.28,spoutY=potY-potRy*.15;
+  bx.save();
+  bx.translate(potX,potY);bx.rotate(-tilt);bx.translate(-potX,-potY);
   bx.strokeStyle='#c9a961';bx.lineWidth=2;bx.fillStyle='rgba(201,169,97,.05)';
-  bx.beginPath();bx.ellipse(cx,potY,potRx,potRy,0,0,6.28);bx.fill();bx.stroke();
-  bx.beginPath();bx.ellipse(cx,potY-potRy*.85,potRx*.55,potRy*.22,0,0,6.28);bx.stroke();
-  bx.beginPath();bx.arc(cx,potY-potRy*1.05,3.5,0,6.28);bx.fillStyle='#c9a961';bx.fill();
-  const tilt=p>.2&&p<.85?Math.sin(Date.now()*.004)*.03:0;
-  bx.save();bx.translate(cx-potRx*.9,potY-potRy*.1);bx.rotate(-.3+tilt);
-  bx.beginPath();bx.moveTo(0,0);bx.quadraticCurveTo(-BW*.10,-BH*.02,-BW*.09,BH*.06);
-  bx.lineWidth=2;bx.strokeStyle='#c9a961';bx.stroke();bx.restore();
-  bx.beginPath();bx.moveTo(cx+potRx*.95,potY-potRy*.4);
-  bx.quadraticCurveTo(cx+potRx*1.7,potY,cx+potRx*.95,potY+potRy*.5);bx.stroke();
+  bx.beginPath();bx.ellipse(potX,potY,potRx,potRy,0,0,6.28);bx.fill();bx.stroke();
+  bx.beginPath();bx.ellipse(potX,potY-potRy*.85,potRx*.55,potRy*.22,0,0,6.28);bx.stroke();
+  bx.beginPath();bx.arc(potX,potY-potRy*1.05,3.5,0,6.28);bx.fillStyle='#c9a961';bx.fill();
+  // spout (left) + handle (right)
+  bx.beginPath();bx.moveTo(potX-potRx*.92,potY-potRy*.35);
+  bx.quadraticCurveTo(spoutX-6,spoutY-10,spoutX,spoutY);
+  bx.lineWidth=2;bx.stroke();
+  bx.beginPath();bx.moveTo(potX+potRx*.95,potY-potRy*.4);
+  bx.quadraticCurveTo(potX+potRx*1.7,potY,potX+potRx*.95,potY+potRy*.5);bx.stroke();
+  bx.restore();
+
+  // world-space spout tip after rotation about pot centre
+  const dx=spoutX-potX,dy=spoutY-potY,ct=Math.cos(-tilt),st=Math.sin(-tilt);
+  const tipX=potX+dx*ct-dy*st,tipY=potY+dx*st+dy*ct;
+
+  // ---- POUR: droplet stream under gravity ----
+  if(pouring){
+    const rate=isSmall?2:4;
+    for(let i=0;i<rate;i++)if(drops.length<CAP.drops)
+      drops.push({x:tipX+(Math.random()-.5)*2.5,y:tipY+Math.random()*3,
+        vx:-.55-Math.random()*.4,vy:.4+Math.random()*.6,s:1.1+Math.random()*1.5,op:.75+Math.random()*.25});
+  }
+  const targetX=cx-cupW*.13;
+  for(let i=drops.length-1;i>=0;i--){const d=drops[i];
+    d.vy+=.34;d.x+=d.vx;d.vx+=(targetX-d.x)*.0016;d.y+=d.vy;
+    if(d.y>=surfaceY-1&&surfaceFill>.01){
+      drops.splice(i,1);
+      if(splashes.length<CAP.splash)for(let k=0;k<2;k++)
+        splashes.push({x:d.x,y:surfaceY,vx:(Math.random()-.5)*1.6,vy:-1-Math.random()*1.4,
+          s:.8+Math.random()*1,op:.7});
+      if(ripples.length<6&&Math.random()<.3)ripples.push({x:d.x,y:surfaceY,r:2,op:.5});
+      continue;}
+    if(d.y>cupY+cupH){drops.splice(i,1);continue;}
+    bx.globalAlpha=d.op;bx.fillStyle='#c98a3e';
+    bx.beginPath();bx.ellipse(d.x,d.y,d.s*.75,d.s*1.5,0,0,6.28);bx.fill();bx.globalAlpha=1;}
+  // continuous stream core while pouring (droplets ride on top of it)
+  if(pouring&&surfaceFill>.005){
+    const g=bx.createLinearGradient(tipX,tipY,targetX,surfaceY);
+    g.addColorStop(0,'rgba(201,138,62,.55)');g.addColorStop(1,'rgba(201,138,62,.18)');
+    bx.strokeStyle=g;bx.lineWidth=2+Math.sin(now*.02)*.7;
+    bx.beginPath();bx.moveTo(tipX,tipY);
+    bx.quadraticCurveTo(tipX-BW*.02,(tipY+surfaceY)/2,targetX,surfaceY);bx.stroke();}
+
+  for(let i=splashes.length-1;i>=0;i--){const s=splashes[i];
+    s.vy+=.22;s.x+=s.vx;s.y+=s.vy;s.op-=.03;
+    if(s.op<=0||s.y>surfaceY+8){splashes.splice(i,1);continue;}
+    bx.globalAlpha=s.op;bx.fillStyle='#e8cd8f';
+    bx.beginPath();bx.arc(s.x,s.y,s.s,0,6.28);bx.fill();bx.globalAlpha=1;}
 
   // ---- CUP ----
-  const cupY=BH*.66,cupW=BW*.30,cupH=BH*.16;
-  if(p>.2&&p<.85){
-    const sx=cx-potRx*1.0-BW*.06;
-    bx.beginPath();bx.moveTo(sx,potY+potRy*.3);
-    bx.quadraticCurveTo(sx-5,cupY-cupH,cx-cupW*.15,cupY-cupH*.5);
-    bx.lineWidth=2.5;bx.strokeStyle='rgba(168,137,63,.7)';bx.stroke();
-    for(let i=0;i<3;i++){bx.beginPath();
-      bx.arc(cx-cupW*.15+(Math.random()-.5)*10,cupY-cupH*.4+(Math.random()-.5)*8,1.2,0,6.28);
-      bx.fillStyle='rgba(168,137,63,.5)';bx.fill();}
-  }
-  if(p>.4){if(Math.random()<.35)steam.push(steamP(cx,cupY-cupH*.5));}
-  steam.forEach((s,i)=>{s.y-=s.v;s.sway+=.04;s.x+=Math.sin(s.sway)*.5;s.op-=.005;
-    if(s.op<=0){steam.splice(i,1);return;}
-    bx.save();bx.globalAlpha=s.op*Math.min(p*1.5,1);bx.fillStyle='#e8cd8f';
-    bx.beginPath();bx.arc(s.x,s.y,s.s,0,6.28);bx.fill();bx.restore();});
-
   bx.strokeStyle='#c9a961';bx.lineWidth=2;
   bx.beginPath();bx.moveTo(cx-cupW/2,cupY-cupH/2);
   bx.lineTo(cx-cupW/2+5,cupY+cupH/2);
@@ -205,18 +260,73 @@ function drawBrew(p){
   bx.lineTo(cx+cupW/2,cupY-cupH/2);bx.stroke();
   bx.beginPath();bx.moveTo(cx+cupW/2-2,cupY-cupH*.2);
   bx.quadraticCurveTo(cx+cupW/2+20,cupY,cx+cupW/2-2,cupY+cupH*.28);bx.stroke();
-  const fill=Math.min(Math.max((p-.18)/.6,0),1);
-  if(fill>.02){bx.save();bx.beginPath();
+
+  if(surfaceFill>.02){
+    bx.save();bx.beginPath();
     bx.moveTo(cx-cupW/2+2,cupY-cupH/2);bx.lineTo(cx-cupW/2+5,cupY+cupH/2);
     bx.quadraticCurveTo(cx,cupY+cupH/2+5,cx+cupW/2-5,cupY+cupH/2);
     bx.lineTo(cx+cupW/2-2,cupY-cupH/2);bx.clip();
-    const top=cupY+cupH/2-cupH*fill;
-    const g=bx.createLinearGradient(0,top,0,cupY+cupH/2);
+    // base liquor
+    const g=bx.createLinearGradient(0,surfaceY,0,cupY+cupH/2);
     g.addColorStop(0,'#c98a3e');g.addColorStop(1,'#7a4a16');bx.fillStyle=g;
-    bx.beginPath();bx.moveTo(cx-cupW/2,top);
-    for(let x=-cupW/2;x<=cupW/2;x+=6)bx.lineTo(cx+x,top+Math.sin(x*.1+Date.now()*.003)*1.5);
+    bx.beginPath();bx.moveTo(cx-cupW/2,surfaceY);
+    for(let x=-cupW/2;x<=cupW/2;x+=6)bx.lineTo(cx+x,surfaceY+Math.sin(x*.1+now*.003)*1.5);
     bx.lineTo(cx+cupW/2,cupY+cupH);bx.lineTo(cx-cupW/2,cupY+cupH);bx.closePath();bx.fill();
-    bx.restore();}
+    // colour bloom while steeping: three drifting amber clouds deepen the cup
+    const bloom=Math.min(Math.max((p-.45)/.35,0),1);
+    if(bloom>0){
+      for(let i=0;i<3;i++){
+        const a=now*.0004*(i+1)+i*2.1;
+        const bxp=cx+Math.cos(a)*cupW*.18,byp=surfaceY+(cupY+cupH/2-surfaceY)*(.35+.25*Math.sin(a*1.3+i));
+        const rg=bx.createRadialGradient(bxp,byp,0,bxp,byp,cupW*.28);
+        rg.addColorStop(0,`rgba(122,58,12,${.34*bloom})`);rg.addColorStop(1,'rgba(122,58,12,0)');
+        bx.fillStyle=rg;bx.fillRect(cx-cupW/2,surfaceY,cupW,cupH);}
+      // swirling leaves
+      for(const l of leaves2){l.a+=l.va;l.rot+=l.vr;
+        const lx2=cx+Math.cos(l.a)*cupW*l.r,ly2=surfaceY+(cupY+cupH/2-surfaceY)*l.d+Math.sin(l.a*2)*3;
+        bx.save();bx.translate(lx2,ly2);bx.rotate(l.rot);bx.globalAlpha=.5*bloom;
+        bx.fillStyle='#8a5a20';bx.beginPath();bx.moveTo(0,-l.s);
+        bx.quadraticCurveTo(l.s*.6,0,0,l.s);bx.quadraticCurveTo(-l.s*.6,0,0,-l.s);bx.fill();bx.restore();}
+    }
+    // gold shimmer on the surface
+    bx.globalAlpha=.28+.12*Math.sin(now*.004);bx.strokeStyle='#e8cd8f';bx.lineWidth=1.2;
+    bx.beginPath();bx.moveTo(cx-cupW/2+4,surfaceY);
+    for(let x=-cupW/2+4;x<=cupW/2-4;x+=6)bx.lineTo(cx+x,surfaceY+Math.sin(x*.1+now*.003)*1.5);
+    bx.stroke();bx.globalAlpha=1;
+    bx.restore();
+  }
+
+  // ---- ripples spreading on the surface ----
+  for(let i=ripples.length-1;i>=0;i--){const r=ripples[i];
+    r.r+=.8;r.op-=.012;
+    if(r.op<=0){ripples.splice(i,1);continue;}
+    bx.globalAlpha=r.op;bx.strokeStyle='#e8cd8f';bx.lineWidth=1;
+    bx.beginPath();bx.ellipse(r.x,r.y,r.r,r.r*.3,0,0,6.28);bx.stroke();bx.globalAlpha=1;}
+
+  // ---- steam: sinuous curls that widen as they rise ----
+  const steamRate=p<.4?0:p<.82?.5:.28;
+  if(Math.random()<steamRate&&steam.length<CAP.steam)steam.push(steamP(cx,surfaceY-4));
+  for(let i=steam.length-1;i>=0;i--){const s=steam[i];
+    s.y-=s.v;s.sway+=.045;s.x+=Math.sin(s.sway+s.y*.02)*.8;s.s+=s.grow;s.op-=.004;
+    if(s.op<=0){steam.splice(i,1);continue;}
+    bx.globalAlpha=s.op*Math.min(p*1.5,1)*.5;bx.fillStyle='#e8cd8f';
+    bx.beginPath();bx.arc(s.x,s.y,s.s,0,6.28);bx.fill();bx.globalAlpha=1;}
+
+  // ---- SERVE: ring pulse + star sparkles ----
+  if(p>.85){
+    if(now-lastRing>1300){lastRing=now;ripples.push({x:cx,y:cupY-cupH*.1,r:6,op:.45,serve:true});}
+    if(Math.random()<.12&&sparks.length<8)
+      sparks.push({x:cx+(Math.random()-.5)*cupW*1.5,y:cupY-cupH*(.2+Math.random()*.9),
+        s:0,max:2.5+Math.random()*2.5,op:1,phase:0});
+  }
+  for(let i=sparks.length-1;i>=0;i--){const k=sparks[i];
+    k.phase+=.06;const t=Math.sin(Math.min(k.phase,3.14));k.s=k.max*t;
+    if(k.phase>=3.14){sparks.splice(i,1);continue;}
+    bx.globalAlpha=t;bx.strokeStyle='#e8cd8f';bx.lineWidth=1;
+    bx.beginPath();bx.moveTo(k.x-k.s,k.y);bx.lineTo(k.x+k.s,k.y);
+    bx.moveTo(k.x,k.y-k.s);bx.lineTo(k.x,k.y+k.s);bx.stroke();bx.globalAlpha=1;}
+
+  // cup shadow
   bx.beginPath();bx.ellipse(cx,cupY+cupH/2+12,cupW*.78,BH*.016,0,0,6.28);
   bx.strokeStyle='#c9a961';bx.lineWidth=1.5;bx.stroke();
 
@@ -228,7 +338,8 @@ function drawBrew(p){
 }
 let brewProg=0;
 function loopB(){requestAnimationFrame(loopB);
-  if(!brewVisible||!pageVisible){return;}
+  if(!brewVisible||!pageVisible)return;
+  if(reduceMotion){drawBrew(brewP());return;}
   brewProg+=(brewP()-brewProg)*.12;
   drawBrew(brewProg);}
 loopB();

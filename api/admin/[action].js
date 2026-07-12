@@ -103,18 +103,32 @@ async function orders(req, res) {
   requireAdmin(req);
   await ensureSchema();
   const q = sql();
-  const [rows, stats] = await Promise.all([
+  const [rows, stats, daily, products] = await Promise.all([
     q`SELECT public_id, email, items, total_pence, status, created_at
       FROM orders ORDER BY created_at DESC LIMIT 200`,
     q`SELECT
         count(*)::int AS orders,
+        count(*) FILTER (WHERE status IN ('paid','fulfilled'))::int AS paid_orders,
         coalesce(sum(total_pence) FILTER (WHERE status IN ('paid','fulfilled')), 0)::int AS revenue_pence,
+        coalesce(sum(total_pence) FILTER (WHERE status IN ('paid','fulfilled')
+          AND created_at > now() - interval '7 days'), 0)::int AS revenue_7d_pence,
         coalesce(sum(total_pence) FILTER (WHERE status IN ('reserved','pending_payment')), 0)::int AS awaiting_pence,
         count(*) FILTER (WHERE status IN ('reserved','pending_payment'))::int AS open_orders,
         count(DISTINCT email)::int AS customers
       FROM orders`,
+    q`SELECT to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') AS day,
+        coalesce(sum(total_pence) FILTER (WHERE status IN ('paid','fulfilled')), 0)::int AS revenue_pence,
+        count(*)::int AS orders
+      FROM orders WHERE created_at > now() - interval '30 days'
+      GROUP BY 1 ORDER BY 1`,
+    q`SELECT l->>'name' AS name,
+        sum((l->>'qty')::int)::int AS qty,
+        sum((l->>'unitPence')::int * (l->>'qty')::int)::int AS revenue_pence
+      FROM orders, jsonb_array_elements(items) AS l
+      WHERE status IN ('paid','fulfilled')
+      GROUP BY 1 ORDER BY 3 DESC LIMIT 6`,
   ]);
-  res.json({ orders: rows, stats: stats[0] });
+  res.json({ orders: rows, stats: stats[0], daily, products });
 }
 
 async function orderStatus(req, res) {
@@ -125,8 +139,15 @@ async function orderStatus(req, res) {
   if (!/^MP-[A-Z2-9]{6}$/.test(publicId)) throw bad('Bad order number.');
   if (!ORDER_STATUSES.includes(status)) throw bad('Bad status.');
   const rows = await sql()`UPDATE orders SET status = ${status}, updated_at = now()
-    WHERE public_id = ${publicId} RETURNING public_id`;
-  if (!rows.length) throw bad('Order not found.', 404);
+    WHERE public_id = ${publicId} AND status <> ${status}
+    RETURNING public_id, email, items, total_pence`;
+  if (!rows.length) {
+    const exists = await sql()`SELECT 1 FROM orders WHERE public_id = ${publicId}`;
+    if (!exists.length) throw bad('Order not found.', 404);
+    return res.json({ ok: true, unchanged: true });
+  }
+  // customers hear about meaningful transitions only
+  if (['paid', 'fulfilled', 'cancelled'].includes(status)) await sendOrderEmail(rows[0], status);
   res.json({ ok: true });
 }
 

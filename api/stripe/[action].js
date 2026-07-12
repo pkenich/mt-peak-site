@@ -1,5 +1,6 @@
 import { sql, ensureSchema } from '../_lib/db.js';
 import { requireCustomer } from '../_lib/session.js';
+import { sendOrderEmail } from '../_lib/email.js';
 import { dispatch, bad } from '../_lib/util.js';
 
 /* Shared: the session id is only ever a hint — payment status is re-fetched
@@ -10,8 +11,12 @@ async function markPaidIfSettled(sessionId) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const session = await stripe.checkout.sessions.retrieve(sessionId);
   if (session.payment_status === 'paid') {
-    await sql()`UPDATE orders SET status = 'paid', updated_at = now()
-      WHERE stripe_session_id = ${session.id} AND status = 'pending_payment'`;
+    // RETURNING only yields a row on the actual transition, so the
+    // confirmation email can't double-send when webhook + confirm both fire.
+    const rows = await sql()`UPDATE orders SET status = 'paid', updated_at = now()
+      WHERE stripe_session_id = ${session.id} AND status = 'pending_payment'
+      RETURNING public_id, email, items, total_pence`;
+    if (rows.length) await sendOrderEmail(rows[0], 'paid');
     return true;
   }
   return false;

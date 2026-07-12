@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { sql, ensureSchema } from './_lib/db.js';
 import { requireCustomer } from './_lib/session.js';
+import { sendOrderEmail } from './_lib/email.js';
 import { handler, bad, publicOrderId } from './_lib/util.js';
 
 const PRODUCTS = JSON.parse(readFileSync(join(process.cwd(), 'content/products.json'), 'utf8'));
@@ -32,6 +33,7 @@ export default handler(['POST'], async (req, res) => {
   if (!stripeKey) {
     await q`INSERT INTO orders (public_id, user_id, email, items, total_pence, status)
       VALUES (${publicId}, ${user.uid}, ${user.email}, ${JSON.stringify(lines)}, ${totalPence}, 'reserved')`;
+    await sendOrderEmail({ public_id: publicId, email: user.email, items: lines, total_pence: totalPence }, 'reserved');
     return res.status(201).json({ ok: true, mode: 'reservation', orderId: publicId });
   }
 

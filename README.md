@@ -39,6 +39,8 @@ api/**            ──▶ /api/*                 (Vercel serverless functions)
    | `GITHUB_TOKEN` | fine-grained PAT, repo `mt-peak-site`, **Contents: Read & write** — lets the CMS commit |
    | `SITE_URL` | `https://mt-peak-site.vercel.app` |
    | `STRIPE_SECRET_KEY` | *(optional, later)* enables real payments |
+   | `RESEND_API_KEY` | *(optional)* enables order emails — free key from resend.com |
+   | `EMAIL_FROM` | *(optional)* e.g. `Mt. Peak <orders@yourdomain.com>` — requires verifying the domain in Resend; without it Resend's sandbox sender only delivers to your own inbox |
 4. Redeploy once after setting the variables.
 
 ## Local development
