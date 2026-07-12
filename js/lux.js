@@ -4,6 +4,20 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = matchMedia('(pointer: fine)').matches;
 
+  /* ---- scroll-progress line (all pages) ---- */
+  const bar = document.createElement('div');
+  bar.className = 'scroll-progress';
+  document.body.appendChild(bar);
+  let barRaf = 0;
+  const updateBar = () => {
+    barRaf = 0;
+    const h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${h > 0 ? Math.min(scrollY / h, 1) : 0})`;
+  };
+  addEventListener('scroll', () => { if (!barRaf) barRaf = requestAnimationFrame(updateBar); }, { passive: true });
+  addEventListener('resize', updateBar, { passive: true });
+  updateBar();
+
   /* ---- magnetic buttons ---- */
   if (fine && !reduce) {
     for (const el of document.querySelectorAll('.closer-btn, .product-add, .btn-add, .cart-checkout')) {

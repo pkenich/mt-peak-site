@@ -86,6 +86,85 @@ document.addEventListener('visibilitychange',()=>pageVisible=!document.hidden);
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isSmall=window.matchMedia('(max-width:900px)').matches;
 
+/* ===== CINEMATIC HERO SCENE — parallax mountains, dawn sun, stars, mist, gold dust ===== */
+(function heroScene(){
+  const cv=document.getElementById('heroScene'); if(!cv) return;
+  const cx=cv.getContext('2d');
+  let W=0,H=0,layers=[],stars=[],dust=[],mx=0,my=0,tx=0,ty=0,t=0;
+  const D=()=>Math.min(devicePixelRatio||1,2);
+
+  // jagged ridgeline as points spanning -pad..W+pad (slack for parallax shift)
+  function makeRidge(baseFrac,amp,step,seed){
+    const pad=48,pts=[]; let s=seed;
+    const rnd=()=>{ s=(s*9301+49297)%233280; return s/233280; };
+    const baseY=H*baseFrac;
+    for(let x=-pad;x<=W+pad;x+=step){
+      const h=rnd()*0.55+(rnd()*rnd())*0.85; // ridged: sharp peaks, soft valleys
+      pts.push({x,y:baseY-h*amp});
+    }
+    return {pts};
+  }
+  function build(){
+    layers=[
+      {r:makeRidge(0.70,58,74,11),fill:'rgba(31,74,58,0.55)', rim:'rgba(201,169,97,0.12)',par:8},
+      {r:makeRidge(0.80,92,56,29),fill:'rgba(18,44,34,0.92)', rim:'rgba(201,169,97,0.18)',par:16},
+      {r:makeRidge(0.93,124,44,53),fill:'#09110d',            rim:'rgba(201,169,97,0.30)',par:28},
+    ];
+    const SN=isSmall?24:52,DN=isSmall?12:24;
+    stars=Array.from({length:SN},()=>({x:Math.random(),y:Math.random()*0.5,s:Math.random()*1.1+0.3,tw:Math.random()*6.28}));
+    dust=Array.from({length:DN},()=>({x:Math.random(),y:Math.random(),s:Math.random()*1.5+0.5,
+      v:0.0002+Math.random()*0.0004,tw:Math.random()*6.28,drift:(Math.random()-.5)*0.0003}));
+  }
+  function size(){ const d=D();W=cv.clientWidth;H=cv.clientHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);build(); }
+  size(); addEventListener('resize',size);
+  addEventListener('pointermove',e=>{ tx=(e.clientX/innerWidth-0.5)*2; ty=(e.clientY/innerHeight-0.5)*2; },{passive:true});
+
+  function ridge(l,ox,oy){
+    const p=l.r.pts; cx.save(); cx.translate(ox,oy);
+    cx.beginPath(); cx.moveTo(p[0].x,H+48);
+    for(const q of p) cx.lineTo(q.x,q.y);
+    cx.lineTo(p[p.length-1].x,H+48); cx.closePath(); cx.fillStyle=l.fill; cx.fill();
+    cx.beginPath(); cx.moveTo(p[0].x,p[0].y);
+    for(const q of p) cx.lineTo(q.x,q.y);
+    cx.strokeStyle=l.rim; cx.lineWidth=1.2; cx.stroke(); cx.restore();
+  }
+  function frame(){
+    mx+=(tx-mx)*0.06; my+=(ty-my)*0.06; t++;
+    cx.clearRect(0,0,W,H);
+    const sp=Math.min(scrollY/Math.max(innerHeight,1),1);
+    if(sp>=1) return; // hero offscreen
+    const a=1-sp*0.9, lift=sp*64;
+
+    const sunX=W*0.5+mx*4, sunY=H*0.42-lift*0.4+Math.sin(t*0.004)*4;
+    let g=cx.createRadialGradient(sunX,sunY,0,sunX,sunY,Math.max(W,H)*0.42);
+    g.addColorStop(0,`rgba(232,205,143,${0.22*a})`);
+    g.addColorStop(0.4,`rgba(201,169,97,${0.06*a})`);
+    g.addColorStop(1,'rgba(201,169,97,0)');
+    cx.fillStyle=g; cx.fillRect(0,0,W,H);
+
+    for(const st of stars){ st.tw+=0.03;
+      const px=st.x*W+mx*3, py=st.y*H-lift*0.2;
+      const dist=Math.hypot(px-sunX,py-sunY)/(W*0.5), fade=Math.min(Math.max(dist-0.3,0),1);
+      cx.globalAlpha=(0.35+0.4*Math.sin(st.tw))*fade*a; cx.fillStyle='#f4efe6';
+      cx.beginPath(); cx.arc(px,py,st.s,0,6.28); cx.fill(); }
+    cx.globalAlpha=1;
+
+    ridge(layers[0],mx*layers[0].par,lift*0.3);
+    let m=cx.createLinearGradient(0,H*0.72,0,H*0.9); m.addColorStop(0,'rgba(214,222,216,0)');
+    m.addColorStop(0.5,`rgba(214,222,216,${0.05*a})`); m.addColorStop(1,'rgba(214,222,216,0)');
+    cx.fillStyle=m; cx.fillRect(0,H*0.7-lift*0.2,W,H*0.22);
+    ridge(layers[1],mx*layers[1].par,lift*0.5);
+    ridge(layers[2],mx*layers[2].par,lift*0.7);
+
+    for(const d of dust){ d.y-=d.v; d.x+=d.drift; d.tw+=0.04; if(d.y<-0.02){d.y=1.02;d.x=Math.random();}
+      cx.globalAlpha=(0.3+0.4*Math.sin(d.tw))*a; cx.fillStyle='#e8cd8f';
+      cx.beginPath(); cx.arc(d.x*W+mx*10,d.y*H,d.s,0,6.28); cx.fill(); }
+    cx.globalAlpha=1;
+  }
+  if(reduceMotion){ frame(); return; }
+  (function loop(){ requestAnimationFrame(loop); if(!pageVisible) return; frame(); })();
+})();
+
 /* ===== FALLING LEAVES ===== */
 const lc=document.getElementById('leaves'),lx=lc.getContext('2d');
 let LW,LH,leafArr=[];

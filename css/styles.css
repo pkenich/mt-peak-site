@@ -125,4 +125,9 @@ footer{background:var(--ink);padding:5rem 3.5rem 2.5rem;border-top:1px solid rgb
   font-family:'Jost',sans-serif;font-weight:500;}
 .cart-checkout:hover{background:var(--gold-bright);}
 
+/* scroll-progress line */
+.scroll-progress{position:fixed;top:0;left:0;right:0;height:2px;transform:scaleX(0);transform-origin:0 50%;
+  background:linear-gradient(90deg,var(--gold-deep),var(--gold),var(--gold-bright));
+  z-index:1500;pointer-events:none;will-change:transform;}
+
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
