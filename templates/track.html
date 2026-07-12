@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/account.css">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+{{> nav}}
+
+<div class="page-wrap narrow">
+  <div class="page-eyebrow">Order Tracking</div>
+  <h1 class="page-h">Track an order</h1>
+
+  <div class="form-msg" id="formMsg"></div>
+
+  <form class="form" id="trackForm">
+    <div class="field"><label for="tkOrder">Order number (e.g. MP-A1B2C3)</label>
+      <input id="tkOrder" type="text" required maxlength="20" placeholder="MP-______"></div>
+    <div class="field"><label for="tkEmail">Email used at checkout</label>
+      <input id="tkEmail" type="email" required></div>
+    <button class="btn-gold" type="submit">Find my order</button>
+  </form>
+
+  <div class="orders" id="trackResult" hidden style="margin-top:2.5rem;">
+    <div id="trackBody"></div>
+  </div>
+
+  <p class="form-note">Have an account? <a href="/account">See all your orders</a></p>
+</div>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/track.js"></script>
+</body>
+</html>

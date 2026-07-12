@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+<canvas id="leaves"></canvas>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <img class="loader-logo" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
+  <div class="loader-bar"></div>
+  <div class="loader-text">{{site.loaderText}}</div>
+</div>
+
+{{> nav}}
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-mist"></div>
+
+  <!-- Giant faint emblem as the mountain backdrop -->
+  <img class="hero-backdrop" id="heroBackdrop" src="/assets/mtpeak-emblem.webp" alt="">
+
+  <div class="hero-center">
+    <p class="hero-eyebrow" id="heroEyebrow">{{site.heroEyebrow}}</p>
+    <img class="hero-mark" id="heroMark" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
+    <h1 class="hero-title">
+      <span class="line"><span class="big">{{site.heroTitle}}</span></span>
+    </h1>
+    <p class="hero-sub" id="heroSub">{{site.heroSub}}</p>
+  </div>
+
+  <div class="hero-altitude" id="heroAltitude">
+    <span class="num">{{site.altitude}}</span>
+    {{site.altitudeLabel}}
+  </div>
+  <div class="hero-scroll" id="heroScroll">
+    <span>Begin the descent</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</header>
+
+<!-- MANIFESTO -->
+<section class="manifesto">
+  <div class="manifesto-inner">
+    <div class="manifesto-label r-up">{{site.manifestoLabel}}</div>
+    <p class="manifesto-text" id="manifestoText">
+      {{#each site.manifestoLines}}<span class="m-line">{{{this}}}</span>
+      {{/each}}
+    </p>
+  </div>
+</section>
+
+<!-- ORIGIN -->
+<section class="origin" id="origin">
+  <div class="origin-visual">
+    <canvas id="originCanvas"></canvas>
+    <img class="origin-emblem" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
+  </div>
+  <div class="origin-content">
+    {{#each site.originBlocks}}
+    <div class="origin-block r-up">
+      <div class="num">{{num}}</div>
+      <h3>{{h}}</h3>
+      <p>{{p}}</p>
+    </div>
+    {{/each}}
+  </div>
+</section>
+
+<!-- RITUAL -->
+<section class="ritual" id="ritual">
+  <div class="ritual-sticky">
+    <div class="ritual-bg-glow" id="ritualGlow"></div>
+    <div class="ritual-label">The Ritual</div>
+    <h2 class="ritual-title">{{{site.ritualTitle}}}</h2>
+    <div class="ritual-stage"><canvas id="brewCanvas"></canvas></div>
+    <div class="ritual-status" id="brewStatus">Scroll to begin the pour</div>
+    <div class="ritual-steps">
+      <div class="ritual-step" data-step="0"><span class="dot"></span>Warm</div>
+      <div class="ritual-step" data-step="1"><span class="dot"></span>Pour</div>
+      <div class="ritual-step" data-step="2"><span class="dot"></span>Steep</div>
+      <div class="ritual-step" data-step="3"><span class="dot"></span>Serve</div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION -->
+<section class="collection" id="collection">
+  <div class="collection-head r-up">
+    <div class="collection-eyebrow">{{site.collectionEyebrow}}</div>
+    <h2 class="collection-title">{{site.collectionTitle}}</h2>
+  </div>
+  <div class="collection-grid">
+    {{#each products}}
+    <div class="product r-up">
+      <a class="product-visual" href="/{{slug}}" aria-label="View {{name}}">
+        <div class="product-glow"></div>
+        <span class="product-tag">{{tag}}</span>
+        <img class="product-shot" src="{{heroImage}}" alt="{{heroAlt}}">
+      </a>
+      <div class="product-info">
+        <div class="product-rank">№ {{num}} · {{name}}</div>
+        <a class="product-name" href="/{{slug}}">{{name}}</a>
+        <div class="product-notes">{{#each notes}}<span class="product-note">{{this}}</span>{{/each}}</div>
+        <p class="product-desc">{{homeDesc}}</p>
+        <a class="product-view" href="/{{slug}}">View the tea →</a>
+        <div class="product-foot">
+          <div class="product-price">£{{price}} <small>{{unitShort}}</small></div>
+          <button class="product-add" data-slug="{{slug}}" data-name="{{cartName}}" data-price="{{price}}"><span>Add</span></button>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</section>
+
+<!-- PROVENANCE -->
+<section class="provenance">
+  <div class="provenance-grid">
+    {{#each site.provenance}}<div class="prov-item r-up"><div class="prov-num">{{num}}</div><div class="prov-label">{{label}}</div></div>
+    {{/each}}
+  </div>
+</section>
+
+<!-- CLOSER -->
+<section class="closer">
+  <img class="closer-mark r-fade" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
+  <h2 class="r-up">{{{site.closerH}}}</h2>
+  <p class="r-up">{{site.closerP}}</p>
+  <button class="closer-btn" onclick="scrollToId('collection')">{{site.closerBtn}}</button>
+</section>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/home.js"></script>
+</body>
+</html>

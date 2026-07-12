@@ -1,0 +1,13 @@
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<aside class="cart-panel" id="cartPanel">
+  <div class="cart-top">
+    <h2>Your Reserve</h2>
+    <button class="cart-close" onclick="closeCart()" aria-label="Close cart">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>Total</span><span>£<span id="cartTotal">0</span></span></div>
+    <button class="cart-checkout" id="cartCheckout" onclick="checkout()">Proceed to Checkout</button>
+    <p class="cart-note">{{site.cartNote}}</p>
+  </div>
+</aside>

@@ -1,0 +1,13 @@
+{
+  "name": "mt-peak-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "bcryptjs": "^2.4.3",
+    "stripe": "^17.7.0"
+  }
+}

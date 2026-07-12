@@ -1,25 +1,63 @@
-# CODING AGENTS: READ THIS FIRST
+# MT. PEAK — D2C storefront
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+Production site for MT. PEAK, single-origin Himalayan tea. Static storefront
+rendered at build time from JSON content, with serverless APIs for customer
+accounts, orders, and a git-backed admin CMS.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+**Live:** https://mt-peak-site.vercel.app · **Admin:** https://mt-peak-site.vercel.app/admin
 
-## What you should do — IMPORTANT
+## How it works
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+```
+content/*.json ──build.js──▶ public/*.html   (static storefront)
+templates/*.html ─┘
+api/**            ──▶ /api/*                 (Vercel serverless functions)
+```
 
-**Read `project/site/golden-harvest.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+- **Content** lives in `content/products.json` + `content/site.json`. `build.js`
+  renders it through `templates/` into `public/` on every deploy. No framework.
+- **Admin CMS** (`/admin`, password-gated): edits commit straight back to this
+  repo via the GitHub API, which triggers a redeploy. Content history = git history.
+- **Customers**: register/sign in (bcrypt + HMAC-signed cookies), see order
+  history at `/account`; anyone can track an order at `/track` with order no. + email.
+- **Checkout**: server-priced from the catalogue. With `STRIPE_SECRET_KEY` set it
+  goes through Stripe Checkout; without it, orders are recorded as reservations.
+- **Database**: Neon Postgres (users, orders, throttle). Schema bootstraps itself
+  on first use — no migration step.
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+## One-time setup (Vercel dashboard)
 
-## About the design files
+1. **Connect the repo**: Project → Settings → Git → connect `pkenich/mt-peak-site`.
+   Every push to `main` then auto-deploys. (Only after this, make the repo private.)
+2. **Database**: Project → Storage → Create → **Neon** (free tier). This injects
+   `DATABASE_URL` automatically.
+3. **Environment variables** (Project → Settings → Environment Variables):
+   | Name | Value |
+   |---|---|
+   | `AUTH_SECRET` | long random string (32+ chars) — sign-in cookies |
+   | `ADMIN_PASSWORD` | 12+ chars — the `/admin` password |
+   | `GITHUB_TOKEN` | fine-grained PAT, repo `mt-peak-site`, **Contents: Read & write** — lets the CMS commit |
+   | `SITE_URL` | `https://mt-peak-site.vercel.app` |
+   | `STRIPE_SECRET_KEY` | *(optional, later)* enables real payments |
+4. Redeploy once after setting the variables.
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+## Local development
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+```bash
+npm install
+npm run build          # renders public/
+npx serve public       # static preview (APIs need `vercel dev` + env vars)
+```
 
-## Bundle contents
+## Repo map
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `# MT. PEAK D2C Site Build` project files (HTML prototypes, assets, components)
+| Path | What |
+|---|---|
+| `templates/` | HTML templates (`pdp.html` renders all three teas) + partials |
+| `content/` | Editable content — what the admin panel writes |
+| `assets/` `css/` `js/` | Static files, copied into the build |
+| `api/` | Serverless functions (auth, orders, checkout, admin CMS) |
+| `build.js` | 100-line template renderer, zero dependencies |
+
+The original Claude Design handoff bundle is preserved on the
+[`design-archive`](../../tree/design-archive) branch.

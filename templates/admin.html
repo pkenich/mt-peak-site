@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/account.css">
+<link rel="stylesheet" href="/css/admin.css">
+<meta name="robots" content="noindex,nofollow">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<nav id="nav">
+  <a class="nav-brand" href="/">
+    <img class="nav-logo" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
+    <div class="nav-name">{{site.brand}} · Admin</div>
+  </a>
+  <div class="nav-links">
+    <a href="/" target="_blank" rel="noopener">View site</a>
+    <button class="nav-cart" id="btnAdminLogout" hidden>Sign out</button>
+  </div>
+</nav>
+
+<!-- LOGIN GATE -->
+<div class="page-wrap narrow" id="adminGate" hidden>
+  <div class="page-eyebrow">The Back Office</div>
+  <h1 class="page-h">Admin sign in</h1>
+  <div class="form-msg" id="gateMsg"></div>
+  <form class="form" id="gateForm">
+    <div class="field"><label for="adPass">Admin password</label>
+      <input id="adPass" type="password" autocomplete="current-password" required></div>
+    <button class="btn-gold" type="submit">Enter</button>
+  </form>
+</div>
+
+<!-- PANEL -->
+<div class="admin-wrap" id="adminPanel" hidden>
+  <div class="admin-bar">
+    <div>
+      <div class="page-eyebrow">The Back Office</div>
+      <h1 class="page-h" style="margin-bottom:0;">Site editor</h1>
+    </div>
+    <p class="admin-note">Every save commits to GitHub and republishes the site.<br>Changes go live in about a minute.</p>
+  </div>
+
+  <div class="admin-tabs" id="productTabs"></div>
+
+  <div id="productEditor"></div>
+
+  <div class="admin-card" id="siteEditor">
+    <h3>Site copy</h3>
+    <div class="admin-grid">
+      <div class="field"><label>Hero eyebrow</label><input data-site="heroEyebrow"></div>
+      <div class="field"><label>Hero subtitle</label><input data-site="heroSub"></div>
+      <div class="field wide"><label>Manifesto (one line per line; &lt;em&gt; allowed)</label>
+        <textarea data-site-lines="manifestoLines"></textarea></div>
+      <div class="field wide"><label>Footer blurb</label><textarea data-site="footerBlurb"></textarea></div>
+      <div class="field"><label>Cart note</label><input data-site="cartNote"></div>
+      <div class="field"><label>Footer legal line</label><input data-site="footerLegal"></div>
+    </div>
+    <details style="margin-top:1.4rem;">
+      <summary class="admin-note" style="cursor:pointer;">Advanced: full site JSON</summary>
+      <div class="field" style="margin-top:1rem;"><textarea class="mono" id="siteJson"></textarea></div>
+    </details>
+    <div class="admin-actions">
+      <button class="btn-gold" style="width:auto;padding:0 2.4rem;" id="saveSite">Save site copy</button>
+    </div>
+  </div>
+</div>
+
+<div class="save-banner" id="saveBanner"></div>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/account.css">
+<meta name="robots" content="noindex">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+{{> nav}}
+
+<div class="page-wrap">
+  <div class="account-head">
+    <div>
+      <div class="page-eyebrow">Your Reserve</div>
+      <h1 class="page-h" id="accountTitle">Your orders</h1>
+    </div>
+    <button class="btn-quiet" id="btnLogout">Sign out</button>
+  </div>
+
+  <div class="form-msg" id="accountMsg"></div>
+
+  <div class="orders" id="ordersWrap">
+    <div class="order-row head">
+      <div>Order</div><div>Placed</div><div>Items</div><div>Total</div><div>Status</div>
+    </div>
+    <div id="ordersBody"><div class="empty-state">Loading your orders…</div></div>
+  </div>
+</div>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/account.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/account.css">
+<meta name="robots" content="noindex">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+{{> nav}}
+
+<div class="page-wrap narrow">
+  <div class="page-eyebrow">Your Reserve</div>
+  <h1 class="page-h">Sign in</h1>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tabLogin">Sign in</button>
+    <button class="auth-tab" id="tabRegister">Create account</button>
+  </div>
+
+  <div class="form-msg" id="formMsg"></div>
+
+  <form class="form" id="loginForm">
+    <div class="field"><label for="liEmail">Email</label>
+      <input id="liEmail" type="email" autocomplete="email" required></div>
+    <div class="field"><label for="liPass">Password</label>
+      <input id="liPass" type="password" autocomplete="current-password" required minlength="8"></div>
+    <button class="btn-gold" type="submit">Sign in</button>
+  </form>
+
+  <form class="form" id="registerForm" hidden>
+    <div class="field"><label for="rgName">Name</label>
+      <input id="rgName" type="text" autocomplete="name" required maxlength="80"></div>
+    <div class="field"><label for="rgEmail">Email</label>
+      <input id="rgEmail" type="email" autocomplete="email" required></div>
+    <div class="field"><label for="rgPass">Password (8+ characters)</label>
+      <input id="rgPass" type="password" autocomplete="new-password" required minlength="8"></div>
+    <button class="btn-gold" type="submit">Create account</button>
+  </form>
+
+  <p class="form-note">Just tracking a gift? <a href="/track">Track an order without an account</a></p>
+</div>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/pdp.css">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+{{> nav}}
+
+<div class="crumb"><a href="/">{{site.brand}}</a> &nbsp;·&nbsp; <a href="/#collection">The Reserve</a> &nbsp;·&nbsp; {{p.name}}</div>
+
+<!-- PDP HERO -->
+<section class="pdp">
+  <div class="gallery">
+    <div class="gal-main" id="galMain">
+      <img src="{{p.heroImage}}" alt="{{p.heroAlt}}">
+    </div>
+    <div class="gal-thumbs" id="galThumbs">
+      {{#each p.gallery}}
+      {{#if isImg}}<button class="gal-thumb{{#if active}} active{{/if}}" data-type="img" data-src="{{src}}" data-alt="{{alt}}"><img src="{{src}}" alt="{{alt}}"></button>{{/if}}
+      {{#if isPh}}<button class="gal-thumb" data-type="ph" data-label="{{label}}" data-sub="{{sub}}"><span class="tph">{{{thumb}}}</span></button>{{/if}}
+      {{/each}}
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="info-eyebrow">{{p.eyebrow}}</div>
+    <h1 class="info-title">{{p.name}}</h1>
+    <div class="info-tagline">{{p.tagline}}</div>
+    <p class="info-desc">{{p.desc}}</p>
+
+    <div class="info-price"><span class="amt">£{{p.price}}</span><span class="unit">{{p.unitLong}}</span></div>
+    <div class="info-stock"><span class="pip"></span>{{p.stock}}</div>
+
+    <div class="buy-row">
+      <div class="qty">
+        <button id="qMinus" aria-label="Decrease quantity">−</button>
+        <input id="qVal" type="number" value="1" min="1" max="20" inputmode="numeric" aria-label="Quantity">
+        <button id="qPlus" aria-label="Increase quantity">+</button>
+      </div>
+      <button class="btn-add" id="btnAdd" data-slug="{{p.slug}}" data-name="{{p.cartName}}" data-price="{{p.price}}">Add to Reserve — £{{p.price}}</button>
+    </div>
+
+    <div class="info-meta">
+      {{#each p.meta}}<div><span class="k">{{k}}</span> {{v}}</div>
+      {{/each}}
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TASTING -->
+<section class="sec tasting">
+  <div class="sec-label">Tasting Notes</div>
+  <h2 class="sec-h">{{p.tastingH}}</h2>
+  <div class="taste-grid">
+    {{#each p.tasting}}<div class="taste-cell"><div class="tk">{{k}}</div><div class="tv">{{v}}</div></div>
+    {{/each}}
+  </div>
+  <div class="taste-foot">
+    {{#each p.tasteFoot}}<div><span class="fk">{{k}}</span><span class="fv">{{v}}</span></div>
+    {{/each}}
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- BREWING -->
+<section class="sec" id="brewing">
+  <div class="sec-label">Brewing Guide</div>
+  <h2 class="sec-h">How to draw it out</h2>
+  <div class="brew-grid">
+    {{#each p.brew}}<div class="brew-cell"><div class="bn">{{n}}<small>{{u}}</small></div><div class="bl">{{label}}</div></div>
+    {{/each}}
+  </div>
+  <div class="brew-method">
+    {{#each p.brewSteps}}<div class="brew-step"><div class="bs-n">{{@num}}</div><p>{{this}}</p></div>
+    {{/each}}
+  </div>
+</section>
+
+<!-- MANUFACTURE -->
+<section class="make">
+  <div class="make-wrap">
+    <div class="sec-label">How It's Made</div>
+    <h2 class="sec-h">{{p.makeH}}</h2>
+    <div class="make-grid">
+      {{#each p.make}}<div class="make-cell"><div class="mn">{{@num}}</div><div class="mt">{{t}}</div><div class="md">{{d}}</div></div>
+      {{/each}}
+    </div>
+  </div>
+</section>
+
+<!-- ORIGIN STORY -->
+<section class="origin-story">
+  <div class="os-visual"><img src="/assets/mtpeak-emblem.webp" alt="{{site.brand}} emblem"></div>
+  <div class="os-content">
+    <div class="sec-label">The Origin</div>
+    <p class="lead">{{p.originLead}}</p>
+    {{#each p.originPs}}<p>{{this}}</p>
+    {{/each}}
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SPECIFICATION -->
+<section class="sec">
+  <div class="sec-label">Specification</div>
+  <h2 class="sec-h">Every detail, on the record</h2>
+  <div class="spec-table">
+    {{#each p.spec}}<div class="spec-row"><div class="sk">{{k}}</div><div class="sv">{{v}}</div></div>
+    {{/each}}
+  </div>
+</section>
+
+<!-- CLOSER -->
+<section class="pdp-closer">
+  <img src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
+  <h2>{{{p.closerH}}}</h2>
+  <p>{{p.closerP}}</p>
+  <a class="cbtn" id="btnAdd2" href="#" data-slug="{{p.slug}}" data-name="{{p.cartName}}" data-price="{{p.price}}">Add to Reserve</a>
+</section>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/pdp.js"></script>
+</body>
+</html>
