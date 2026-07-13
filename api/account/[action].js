@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { sql, ensureSchema } from '../_lib/db.js';
 import { requireCustomer, issueCustomer } from '../_lib/session.js';
-import { sendBrandEmail } from '../_lib/email.js';
+import { sendBrandEmail, sendOrderEmail } from '../_lib/email.js';
 import { dispatch, bad } from '../_lib/util.js';
 
 /* Loads an order that must belong to the signed-in user. */
@@ -52,6 +52,20 @@ async function refund(req, res) {
     ctaLabel: 'VIEW YOUR ORDERS', ctaUrl: `${process.env.SITE_URL || 'https://mt-peak-site.vercel.app'}/account`,
   });
   res.status(201).json({ ok: true });
+}
+
+/* ---- self-service cancel of an unpaid order ---- */
+async function cancel(req, res) {
+  await ensureSchema();
+  const user = requireCustomer(req);
+  const order = await ownedOrder(req.body?.orderId, user.uid);
+  if (!['reserved', 'pending_payment'].includes(order.status)) {
+    throw bad('This order can no longer be cancelled here — request a refund instead.');
+  }
+  await sql()`UPDATE orders SET status = 'cancelled', updated_at = now() WHERE id = ${order.id}`;
+  await sendOrderEmail({ public_id: order.public_id, email: user.email, items: order.items,
+    total_pence: order.total_pence, gift_note: null }, 'cancelled');
+  res.json({ ok: true });
 }
 
 /* ---- reorder: returns the order's items so the client can rebuild the cart ---- */
@@ -108,6 +122,7 @@ async function profile(req, res) {
 export default dispatch({
   review: { methods: ['POST'], fn: review },
   refund: { methods: ['POST'], fn: refund },
+  cancel: { methods: ['POST'], fn: cancel },
   reorder: { methods: ['POST'], fn: reorder },
   addresses: { methods: ['GET', 'PUT'], fn: addresses },
   profile: { methods: ['PUT'], fn: profile },

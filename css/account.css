@@ -169,3 +169,5 @@ nav{padding:1.6rem 3.5rem;
 
 @keyframes pageIn{from{opacity:0;}to{opacity:1;}}
 body{animation:pageIn .7s ease both;}
+
+.link-btn.danger{color:#e8a0a0;}

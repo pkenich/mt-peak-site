@@ -139,10 +139,12 @@ async function orders(req, res) {
       ORDER BY (rf.status = 'requested') DESC, rf.created_at DESC LIMIT 100`,
     q`SELECT round(avg(rating), 1) AS avg_rating, count(*)::int AS n,
         round(avg(shipping_rating), 1) AS avg_ship FROM reviews`,
+    q`SELECT slug, count(*)::int AS n, array_agg(email ORDER BY created_at DESC) AS emails
+      FROM stock_notify GROUP BY slug ORDER BY n DESC`,
   ]);
   res.json({ orders: rows, stats: stats[0], daily, products,
     subscribers: { count: subs[0].n, emails: subs[0].emails },
-    refunds, ratings: ratingStat[0] });
+    refunds, ratings: ratingStat[0], stockNotify: waitlist });
 }
 
 async function orderStatus(req, res) {

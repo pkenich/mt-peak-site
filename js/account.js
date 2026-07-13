@@ -116,7 +116,8 @@
 
   function orderCard(o) {
     const canRate = ['paid', 'fulfilled', 'reserved'].includes(o.status);
-    const canRefund = !['cancelled'].includes(o.status) && o.refund_status !== 'requested';
+    const canCancel = ['reserved', 'pending_payment'].includes(o.status);
+    const canRefund = !['cancelled'].includes(o.status) && !canCancel && o.refund_status !== 'requested';
     return `<div class="ord" data-id="${esc(o.public_id)}">
       <div class="ord-top">
         <div>
@@ -136,6 +137,7 @@
         <button class="link-btn" data-act="reorder">Reorder</button>
         ${canRate ? `<button class="link-btn" data-act="rate">${o.rating ? 'Edit rating' : 'Rate this order'}</button>` : ''}
         ${canRefund ? `<button class="link-btn" data-act="refund">Request refund</button>` : ''}
+        ${canCancel ? `<button class="link-btn danger" data-act="cancel">Cancel order</button>` : ''}
       </div>
       <div class="ord-panel" data-panel="detail" hidden>
         <div><span class="odk">Delivered to</span>${o.shipping ? esc([o.shipping.name, o.shipping.line1, o.shipping.line2, o.shipping.city, o.shipping.postcode, o.shipping.country].filter(Boolean).join(', ')) : '—'}</div>
@@ -190,6 +192,15 @@
     if (rateBtn) rateBtn.addEventListener('click', () => togglePanel('rate'));
     const refundBtn = card.querySelector('[data-act="refund"]');
     if (refundBtn) refundBtn.addEventListener('click', () => togglePanel('refund'));
+
+    const cancelBtn = card.querySelector('[data-act="cancel"]');
+    if (cancelBtn) cancelBtn.addEventListener('click', async () => {
+      if (!confirm('Cancel this order? This can’t be undone.')) return;
+      try {
+        await api('/api/account/cancel', { method: 'POST', body: JSON.stringify({ orderId: id }) });
+        msg('Order cancelled.', 'ok'); loadOrders();
+      } catch (e) { msg(e.message, 'err'); }
+    });
 
     // star inputs
     for (const si of card.querySelectorAll('.star-input')) {

@@ -85,6 +85,12 @@ export function ensureSchema() {
         updated_at timestamptz NOT NULL DEFAULT now()
       )`;
       await q`CREATE INDEX IF NOT EXISTS refunds_order_idx ON refunds(order_id)`;
+      await q`CREATE TABLE IF NOT EXISTS stock_notify (
+        slug text NOT NULL,
+        email text NOT NULL,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (slug, email)
+      )`;
     })().catch(e => { _ready = null; throw e; });
   }
   return _ready;

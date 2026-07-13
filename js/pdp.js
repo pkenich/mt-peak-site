@@ -46,6 +46,61 @@ if (btnAdd && !btnAdd.disabled) {
   }
 }
 
+/* ===== SOCIAL PROOF — reviews from verified orders ===== */
+(async () => {
+  const rEl = document.getElementById('pdpRating');
+  if (!rEl) return;
+  const slug = rEl.dataset.slug;
+  const escR = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const starRow = n => '<span class="rstars">' + '★★★★★'.slice(0, Math.round(n)).padEnd(5, '☆') + '</span>';
+  try {
+    const res = await fetch(`/api/shop/reviews?slug=${encodeURIComponent(slug)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.count) return;
+    // compact rating badge under the buy row
+    rEl.innerHTML = `${starRow(data.average)} <b>${data.average}</b> · ${data.count} verified ${data.count === 1 ? 'review' : 'reviews'}`;
+    rEl.hidden = false;
+    // full reviews section
+    if (data.reviews.length) {
+      const grid = document.getElementById('reviewsGrid');
+      document.getElementById('reviewsHead').textContent = `${data.average}★ from ${data.count} verified ${data.count === 1 ? 'cup' : 'cups'}`;
+      grid.innerHTML = data.reviews.map(r => `<figure class="review">
+        <div class="review-stars">${starRow(r.rating)}</div>
+        <blockquote>${escR(r.body)}</blockquote>
+        <figcaption>${escR(r.name || 'A drinker')} · ${new Date(r.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}</figcaption>
+      </figure>`).join('');
+      const sec = document.getElementById('reviews');
+      sec.hidden = false;
+      [...sec.querySelectorAll('.sec-label,.sec-h,.review')].forEach(el => { el.classList.add('rv'); rio.observe(el); });
+    }
+  } catch { /* reviews are enhancement-only */ }
+})();
+
+/* ===== BACK-IN-STOCK NOTIFY (sold-out only) ===== */
+(() => {
+  const form = document.getElementById('notifyForm');
+  if (!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const m = document.getElementById('notifyMsg');
+    const btn = form.querySelector('button');
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/shop/notify-stock', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: form.dataset.slug, email: document.getElementById('notifyEmail').value }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Please try again.');
+      m.textContent = 'We’ll email you the moment it returns. ⛰';
+      m.className = 'notify-msg ok';
+      form.querySelector('input').value = '';
+    } catch (err) { m.textContent = err.message; m.className = 'notify-msg err'; }
+    btn.disabled = false;
+  });
+})();
+
 /* ===== SCROLL REVEALS ===== */
 const rvEls = [...document.querySelectorAll('.info,.sec-label,.sec-h,.taste-grid,.taste-foot,.brew-grid,.brew-method,.make-grid,.os-content,.spec-table,.pdp-closer h2,.pdp-closer p,.pdp-closer .cbtn')];
 rvEls.forEach(el => el.classList.add('rv'));

@@ -38,59 +38,108 @@
   <div class="admin-bar">
     <div>
       <div class="page-eyebrow">The Back Office</div>
-      <h1 class="page-h" style="margin-bottom:0;">Site editor</h1>
+      <h1 class="page-h" style="margin-bottom:0;">Dashboard</h1>
     </div>
     <p class="admin-note">Every save commits to GitHub and republishes the site.<br>Changes go live in about a minute.</p>
   </div>
 
-  <div class="admin-card" id="salesCard">
-    <h3>Sales</h3>
-    <div class="stat-row" id="statRow"><div class="admin-note">Loading orders…</div></div>
+  <div class="admin-nav" id="adminNav">
+    <button class="admin-navtab active" data-view="overview">Overview</button>
+    <button class="admin-navtab" data-view="orders">Orders</button>
+    <button class="admin-navtab" data-view="products">Products</button>
+    <button class="admin-navtab" data-view="promos">Promo codes</button>
+    <button class="admin-navtab" data-view="marketing">Marketing</button>
+    <button class="admin-navtab" data-view="site">Site copy</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="admin-view" id="view-overview">
+    <div class="stat-row" id="statRow"><div class="admin-note">Loading…</div></div>
     <div id="salesViz"></div>
     <div id="refundQueue"></div>
+  </section>
+
+  <!-- ORDERS -->
+  <section class="admin-view" id="view-orders" hidden>
+    <div class="admin-bar" style="margin-bottom:1.2rem;">
+      <div class="admin-filters">
+        <select id="ordFilter">
+          <option value="">All orders</option>
+          <option value="reserved">Reserved</option>
+          <option value="pending_payment">Awaiting payment</option>
+          <option value="paid">Paid</option>
+          <option value="fulfilled">Shipped</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <input id="ordSearch" placeholder="Search order # or email…">
+      </div>
+      <button class="btn-quiet" id="csvBtn">Export CSV</button>
+    </div>
     <div class="orders-admin" id="adminOrders"></div>
-  </div>
+  </section>
 
-  <div class="admin-card" id="promoCard">
-    <h3>Promo codes</h3>
-    <div class="promo-create">
-      <div class="field"><label>Code <span class="opt">(blank = auto)</span></label>
-        <input id="pcCode" maxlength="24" placeholder="MP-XXXXXX" style="text-transform:uppercase;"></div>
-      <div class="field"><label>Type</label>
-        <select id="pcKind"><option value="percent">% off</option><option value="fixed">£ off</option></select></div>
-      <div class="field"><label>Value</label><input id="pcValue" type="number" min="1" placeholder="10"></div>
-      <div class="field"><label>Uses <span class="opt">(blank = universal)</span></label>
-        <input id="pcUses" type="number" min="1" placeholder="∞"></div>
-      <button class="btn-gold" id="pcCreate" style="width:auto;padding:0 1.8rem;">Create</button>
+  <!-- PRODUCTS -->
+  <section class="admin-view" id="view-products" hidden>
+    <div class="admin-tabs" id="productTabs"></div>
+    <div id="productEditor"></div>
+  </section>
+
+  <!-- PROMOS -->
+  <section class="admin-view" id="view-promos" hidden>
+    <div class="admin-card">
+      <h3>Create a code</h3>
+      <div class="promo-create">
+        <div class="field"><label>Code <span class="opt">(blank = auto)</span></label>
+          <input id="pcCode" maxlength="24" placeholder="MP-XXXXXX" style="text-transform:uppercase;"></div>
+        <div class="field"><label>Type</label>
+          <select id="pcKind"><option value="percent">% off</option><option value="fixed">£ off</option></select></div>
+        <div class="field"><label>Value</label><input id="pcValue" type="number" min="1" placeholder="10"></div>
+        <div class="field"><label>Uses <span class="opt">(blank = universal)</span></label>
+          <input id="pcUses" type="number" min="1" placeholder="∞"></div>
+        <button class="btn-gold" id="pcCreate" style="width:auto;padding:0 1.8rem;">Create</button>
+      </div>
+      <p class="admin-note" style="margin:.6rem 0 1.4rem;">Universal = leave uses blank (anyone, any number of times).
+        Single-use gift code = uses 1. A batch of N issuable codes = uses N.</p>
+      <div id="promoList"><p class="admin-note">Loading codes…</p></div>
     </div>
-    <p class="admin-note" style="margin:.6rem 0 1.4rem;">Universal = leave uses blank (anyone, any number of times).
-      Single-use gift code = uses 1. A batch of N issuable codes = uses N.</p>
-    <div id="promoList"><p class="admin-note">Loading codes…</p></div>
-  </div>
+  </section>
 
-  <div class="admin-tabs" id="productTabs"></div>
-
-  <div id="productEditor"></div>
-
-  <div class="admin-card" id="siteEditor">
-    <h3>Site copy</h3>
-    <div class="admin-grid">
-      <div class="field"><label>Hero eyebrow</label><input data-site="heroEyebrow"></div>
-      <div class="field"><label>Hero subtitle</label><input data-site="heroSub"></div>
-      <div class="field wide"><label>Manifesto (one line per line; &lt;em&gt; allowed)</label>
-        <textarea data-site-lines="manifestoLines"></textarea></div>
-      <div class="field wide"><label>Footer blurb</label><textarea data-site="footerBlurb"></textarea></div>
-      <div class="field"><label>Cart note</label><input data-site="cartNote"></div>
-      <div class="field"><label>Footer legal line</label><input data-site="footerLegal"></div>
+  <!-- MARKETING -->
+  <section class="admin-view" id="view-marketing" hidden>
+    <div class="admin-card">
+      <h3>Newsletter</h3>
+      <div class="stat-row" id="mktStats"></div>
+      <button class="btn-quiet" id="copySubs">Copy subscriber emails</button>
     </div>
-    <details style="margin-top:1.4rem;">
-      <summary class="admin-note" style="cursor:pointer;">Advanced: full site JSON</summary>
-      <div class="field" style="margin-top:1rem;"><textarea class="mono" id="siteJson"></textarea></div>
-    </details>
-    <div class="admin-actions">
-      <button class="btn-gold" style="width:auto;padding:0 2.4rem;" id="saveSite">Save site copy</button>
+    <div class="admin-card">
+      <h3>Back-in-stock waitlist</h3>
+      <p class="admin-note" style="margin-bottom:1rem;">People waiting to hear when a sold-out tea returns.</p>
+      <div id="waitlist"><p class="admin-note">No one waiting yet.</p></div>
     </div>
-  </div>
+  </section>
+
+  <!-- SITE COPY -->
+  <section class="admin-view" id="view-site" hidden>
+    <div class="admin-card" id="siteEditor">
+      <h3>Site copy</h3>
+      <div class="admin-grid">
+        <div class="field"><label>Hero eyebrow</label><input data-site="heroEyebrow"></div>
+        <div class="field"><label>Hero subtitle</label><input data-site="heroSub"></div>
+        <div class="field wide"><label>Manifesto (one line per line; &lt;em&gt; allowed)</label>
+          <textarea data-site-lines="manifestoLines"></textarea></div>
+        <div class="field wide"><label>Footer blurb</label><textarea data-site="footerBlurb"></textarea></div>
+        <div class="field"><label>Cart note</label><input data-site="cartNote"></div>
+        <div class="field"><label>Footer legal line</label><input data-site="footerLegal"></div>
+      </div>
+      <details style="margin-top:1.4rem;">
+        <summary class="admin-note" style="cursor:pointer;">Advanced: full site JSON</summary>
+        <div class="field" style="margin-top:1rem;"><textarea class="mono" id="siteJson"></textarea></div>
+      </details>
+      <div class="admin-actions">
+        <button class="btn-gold" style="width:auto;padding:0 2.4rem;" id="saveSite">Save site copy</button>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="save-banner" id="saveBanner"></div>

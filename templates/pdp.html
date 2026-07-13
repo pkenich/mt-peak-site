@@ -47,7 +47,17 @@
     {{/if}}
     {{#if p.soldOut}}
     <div class="buy-row"><button class="btn-add" disabled>Sold out — the next harvest is coming</button></div>
+    <form class="notify-form" id="notifyForm" data-slug="{{p.slug}}">
+      <label for="notifyEmail">Tell me when it’s back</label>
+      <div class="notify-row">
+        <input id="notifyEmail" type="email" placeholder="Your email" required>
+        <button type="submit">Notify me</button>
+      </div>
+      <div class="notify-msg" id="notifyMsg"></div>
+    </form>
     {{/if}}
+
+    <div class="pdp-rating" id="pdpRating" data-slug="{{p.slug}}" hidden></div>
 
     <div class="info-meta">
       {{#each p.meta}}<div><span class="k">{{k}}</span> {{v}}</div>
@@ -121,6 +131,13 @@
     {{#each p.spec}}<div class="spec-row"><div class="sk">{{k}}</div><div class="sv">{{v}}</div></div>
     {{/each}}
   </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="sec reviews" id="reviews" hidden>
+  <div class="sec-label">From the Reserve</div>
+  <h2 class="sec-h" id="reviewsHead">What drinkers say</h2>
+  <div class="reviews-grid" id="reviewsGrid"></div>
 </section>
 
 <!-- CLOSER -->
