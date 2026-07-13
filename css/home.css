@@ -145,10 +145,12 @@ nav.scrolled{padding:1.1rem 3.5rem;background:rgba(10,20,16,.8);backdrop-filter:
   margin-bottom:1.5rem;}
 .collection-title{font-family:'Cormorant Garamond',serif;font-weight:300;
   font-size:clamp(2.5rem,6vw,5rem);letter-spacing:.02em;}
-.collection-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;max-width:1500px;margin:0 auto;
-  background:rgba(201,169,97,.1);border:1px solid rgba(201,169,97,.1);}
+/* Hairlines via per-card borders (not gap-reveal), so a partial last row —
+   e.g. a 4th tea added in the admin — never leaves empty gold cells. */
+.collection-grid{display:grid;grid-template-columns:repeat(3,1fr);max-width:1500px;margin:0 auto;
+  border-top:1px solid rgba(201,169,97,.1);border-left:1px solid rgba(201,169,97,.1);}
 .product{background:var(--bg);padding:0;position:relative;overflow:hidden;transition:background .6s,transform .6s cubic-bezier(.16,1,.3,1);
-  display:flex;flex-direction:column;}
+  display:flex;flex-direction:column;border-right:1px solid rgba(201,169,97,.1);border-bottom:1px solid rgba(201,169,97,.1);}
 .product:hover{background:var(--bg2);transform:translateY(-4px);}
 .product-visual{display:block;height:420px;position:relative;overflow:hidden;
   background:radial-gradient(circle at center,var(--green) 0%,var(--ink) 95%);}
