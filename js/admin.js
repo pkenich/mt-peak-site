@@ -86,7 +86,10 @@
       // marketing
       $('#mktStats').innerHTML = `<div class="stat"><div class="sv">${SUBSCRIBERS.count}</div><div class="sl">Subscribers</div></div>`;
       renderWaitlist(d.stockNotify || []);
-    } catch (err) { $('#statRow').innerHTML = `<div class="admin-note">${esc(err.message)}</div>`; }
+    } catch (err) {
+      const m = `<p class="admin-note">Couldn’t load dashboard data: ${esc(err.message)}</p>`;
+      $('#statRow').innerHTML = m; $('#adminOrders').innerHTML = m;
+    }
   }
 
   /* ---------- overview: chart ---------- */

@@ -105,7 +105,7 @@ async function orders(req, res) {
   requireAdmin(req);
   await ensureSchema();
   const q = sql();
-  const [rows, stats, daily, products, subs, refunds, ratingStat] = await Promise.all([
+  const [rows, stats, daily, products, subs, refunds, ratingStat, waitlist] = await Promise.all([
     q`SELECT o.public_id, o.email, o.items, o.total_pence, o.status, o.created_at,
         o.shipping, o.billing, o.promo_code, o.discount_pence, o.gift_note,
         r.rating, r.shipping_rating, r.body AS review_body
