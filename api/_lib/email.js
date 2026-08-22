@@ -30,7 +30,7 @@ const STATUS_COPY = {
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const gbp = (pence) => '£' + (pence / 100).toLocaleString('en-GB', { maximumFractionDigits: 0 });
 
-function orderEmailHtml({ heading, message, order, siteUrl }) {
+export function orderEmailHtml({ heading, message, order, siteUrl }) {
   const rows = order.items.map(l => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid ${BORDER};color:${CREAM};font-size:14px;">${esc(l.name)}</td>
