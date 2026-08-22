@@ -30,7 +30,10 @@ async function gh(path, opts = {}) {
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => '');
-    const e = new Error(`GitHub API ${res.status}: ${detail.slice(0, 200)}`);
+    let msg = `GitHub API ${res.status}: ${detail.slice(0, 200)}`;
+    if (res.status === 401) msg = 'GitHub token is invalid or expired. Generate a fresh fine-grained token (Contents: Read & write on this repo), update GITHUB_TOKEN in Vercel → Settings → Environment Variables, and redeploy.';
+    else if (res.status === 403 || res.status === 404) msg = 'GitHub token lacks access to this repo. Give the token Contents: Read & write on ' + (process.env.GITHUB_REPO || 'the repo') + ', then redeploy.';
+    const e = new Error(msg);
     e.statusCode = res.status === 401 || res.status === 403 ? 502 : res.status;
     throw e;
   }

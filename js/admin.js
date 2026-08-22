@@ -52,14 +52,26 @@
   for (const b of document.querySelectorAll('.admin-navtab')) b.addEventListener('click', () => switchView(b.dataset.view));
 
   async function openPanel() {
-    const [p, s] = await Promise.all([api('/api/admin/content?file=products'), api('/api/admin/content?file=site')]);
-    products = p.data; site = s.data;
+    // Panel opens on successful password auth. Orders/promos/marketing are
+    // database-backed and load independently; product & site editing needs a
+    // valid GITHUB_TOKEN and degrades gracefully if it's missing/expired.
     gate.hidden = true; panel.hidden = false; $('#btnAdminLogout').hidden = false;
-    renderProductTabs();
-    selectProduct(Object.keys(products)[0]);
-    fillSiteForm();
     loadDashboard();
     loadPromos();
+    try {
+      const [p, s] = await Promise.all([api('/api/admin/content?file=products'), api('/api/admin/content?file=site')]);
+      products = p.data; site = s.data;
+      renderProductTabs();
+      selectProduct(Object.keys(products)[0]);
+      fillSiteForm();
+    } catch (err) {
+      const notice = `<div class="admin-card"><h3>Content editing unavailable</h3>
+        <p class="admin-note">${esc(err.message)}</p>
+        <p class="admin-note" style="margin-top:.8rem;">Orders, promo codes and marketing (below and in their tabs) still work — they don’t use GitHub.</p></div>`;
+      $('#productTabs').innerHTML = '';
+      $('#productEditor').innerHTML = notice;
+      const se = $('#siteEditor'); if (se) se.innerHTML = notice;
+    }
   }
 
   /* ---------- dashboard data (overview + orders + marketing) ---------- */
