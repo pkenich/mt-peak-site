@@ -30,12 +30,18 @@ export default handler(['POST'], async (req, res) => {
 
   const items = Array.isArray(body.items) ? body.items : [];
   if (!items.length || items.length > 20) throw bad('Your reserve is empty.');
-  const lines = items.map(({ slug, q }) => {
+  const lines = items.map(({ slug, variantId, q }) => {
     const p = PRODUCTS[slug];
     const qty = Math.floor(Number(q));
     if (!p || !Number.isFinite(qty) || qty < 1 || qty > 20) throw bad('Your reserve contains an unknown item — please refresh and retry.');
     if (p.soldOut) throw bad(`${p.name} is sold out — remove it from your reserve to continue.`);
-    return { slug, name: p.cartName, qty, unitPence: p.price * 100 };
+    // price/name always from the server catalogue; a size variant, if any, wins
+    if (Array.isArray(p.variants) && p.variants.length) {
+      const v = p.variants.find(x => x.id === variantId) || p.variants.find(x => x.default) || p.variants[0];
+      if (v.soldOut) throw bad(`${p.name} (${v.label}) is sold out — remove it to continue.`);
+      return { slug, variantId: v.id, name: `${p.name} · ${v.label}`, qty, unitPence: Math.round(v.price * 100) };
+    }
+    return { slug, variantId: null, name: p.cartName, qty, unitPence: p.price * 100 };
   });
   const subtotal = lines.reduce((s, l) => s + l.unitPence * l.qty, 0);
 

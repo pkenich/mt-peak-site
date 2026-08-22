@@ -202,3 +202,10 @@ body{animation:pageIn .7s ease both;}
 .review blockquote{margin:0 0 1.2rem;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.15rem;
   line-height:1.6;color:var(--cream);}
 .review figcaption{font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream-dim);}
+
+/* size / variant selector */
+.size-select{display:flex;flex-wrap:wrap;gap:.6rem;margin:0 0 1.6rem;}
+.size-opt{background:none;border:1px solid rgba(201,169,97,.3);color:var(--cream);padding:.7rem 1.2rem;
+  font-family:'Jost',sans-serif;font-size:.8rem;letter-spacing:1px;transition:all .3s;min-height:44px;}
+.size-opt:hover{border-color:var(--gold);}
+.size-opt.active{background:var(--gold);color:var(--ink);border-color:var(--gold);}

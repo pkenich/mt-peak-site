@@ -11,9 +11,10 @@ function save() {
   window.dispatchEvent(new CustomEvent('mtpeak:cart')); // checkout page resyncs
 }
 
-function addToCart(slug, name, price, q = 1) {
-  const e = cart.find(i => i.s === slug);
-  if (e) e.q += q; else cart.push({ s: slug, n: name, p: price, q });
+function addToCart(slug, name, price, q = 1, variantId = null) {
+  const v = variantId || null;
+  const e = cart.find(i => i.s === slug && (i.v || null) === v);
+  if (e) e.q += q; else cart.push({ s: slug, v, n: name, p: price, q });
   save(); render(); openCart();
 }
 

@@ -32,17 +32,34 @@ if (qVal) {
   document.getElementById('qPlus').onclick = () => { qVal.value = Math.min(20, (parseInt(qVal.value) || 1) + 1); };
   qVal.addEventListener('change', clampQ);
 }
+/* size variants (only present when a product defines 2+ sizes) */
+const sizeSelect = document.getElementById('sizeSelect');
+const baseName = btnAdd ? btnAdd.dataset.name : '';
+const sel = { id: btnAdd ? (btnAdd.dataset.variant || null) : null, label: '', price: btnAdd ? Number(btnAdd.dataset.price) : 0 };
+function setLabel() {
+  if (btnAdd && !btnAdd.classList.contains('added')) btnAdd.textContent = 'Add to Reserve — £' + sel.price;
+  const amt = document.getElementById('infoAmt'); if (amt) amt.textContent = '£' + sel.price;
+}
+if (sizeSelect) {
+  const opts = [...sizeSelect.querySelectorAll('.size-opt')];
+  const active = sizeSelect.querySelector('.size-opt.active') || opts[0];
+  const apply = (o) => { opts.forEach(x => { x.classList.toggle('active', x === o); x.setAttribute('aria-checked', x === o); });
+    sel.id = o.dataset.id; sel.label = o.dataset.label; sel.price = Number(o.dataset.price); setLabel(); };
+  opts.forEach(o => o.addEventListener('click', () => apply(o)));
+  if (active) apply(active);
+}
+
 if (btnAdd && !btnAdd.disabled) {
-  const P = { slug: btnAdd.dataset.slug, name: btnAdd.dataset.name, price: Number(btnAdd.dataset.price) };
-  const addLabel = 'Add to Reserve — £' + P.price;
+  const slug = btnAdd.dataset.slug;
+  const nameFor = () => sel.label ? `${baseName.replace(/ · .*$/, '')} · ${sel.label}` : baseName;
   btnAdd.addEventListener('click', () => {
-    addToCart(P.slug, P.name, P.price, clampQ());
+    addToCart(slug, nameFor(), sel.price, clampQ(), sel.id);
     btnAdd.classList.add('added'); btnAdd.textContent = 'Added to Reserve ✓';
-    setTimeout(() => { btnAdd.classList.remove('added'); btnAdd.textContent = addLabel; }, 1600);
+    setTimeout(() => { btnAdd.classList.remove('added'); setLabel(); }, 1600);
   });
   const btnAdd2 = document.getElementById('btnAdd2');
   if (btnAdd2) {
-    btnAdd2.addEventListener('click', e => { e.preventDefault(); addToCart(P.slug, P.name, P.price, 1); });
+    btnAdd2.addEventListener('click', e => { e.preventDefault(); addToCart(slug, nameFor(), sel.price, 1, sel.id); });
   }
 }
 

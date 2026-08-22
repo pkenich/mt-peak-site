@@ -256,7 +256,7 @@
       const res = await fetch('/api/checkout', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: items.map(i => ({ slug: i.s, q: i.q })),
+          items: items.map(i => ({ slug: i.s, variantId: i.v || null, q: i.q })),
           shipping: addr('sh'),
           billingSameAsShipping: same,
           ...(same ? {} : { billing: addr('bi') }),

@@ -60,6 +60,17 @@ async function content(req, res) {
       if (typeof p.name !== 'string' || !p.name.trim()) throw bad(`Product "${slug}": name is required.`);
       if (!Number.isInteger(p.price) || p.price < 1 || p.price > 10000) throw bad(`Product "${slug}": price must be a whole number of pounds.`);
       if (!Array.isArray(p.gallery)) throw bad(`Product "${slug}": gallery must be a list.`);
+      if (p.variants !== undefined) {
+        if (!Array.isArray(p.variants)) throw bad(`Product "${slug}": variants must be a list.`);
+        const ids = new Set();
+        for (const v of p.variants) {
+          if (!v || typeof v.label !== 'string' || !v.label.trim()) throw bad(`Product "${slug}": each size needs a label.`);
+          if (!v.id || !/^[a-z0-9-]{1,20}$/.test(v.id)) throw bad(`Product "${slug}": size "${v.label}" has an invalid id.`);
+          if (ids.has(v.id)) throw bad(`Product "${slug}": duplicate size "${v.label}".`);
+          ids.add(v.id);
+          if (!Number.isInteger(v.price) || v.price < 1 || v.price > 10000) throw bad(`Product "${slug}": size "${v.label}" price must be a whole number of pounds.`);
+        }
+      }
     }
   }
 

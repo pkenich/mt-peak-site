@@ -106,6 +106,19 @@ const productsMap = JSON.parse(readFileSync(join(ROOT, 'content/products.json'),
 const products = Object.values(productsMap).sort((a, b) => a.num.localeCompare(b.num));
 for (const p of products) {
   p.available = !p.soldOut;
+  // Optional size variants. None defined → single-size product (unchanged).
+  // Two or more → a size selector renders and the default drives card/schema price.
+  if (Array.isArray(p.variants) && p.variants.length) {
+    p.variants = p.variants.map((v, i) => ({ ...v, default: !!v.default || i === 0 }));
+    const def = p.variants.find(v => v.default) || p.variants[0];
+    p.price = def.price;
+    p.defaultVariantId = def.id;
+    p.hasVariants = p.variants.length > 1;
+  } else {
+    p.variants = [];
+    p.hasVariants = false;
+    p.defaultVariantId = '';
+  }
   p.gallery = p.gallery.map((g, i) => ({ ...g, active: i === 0, isImg: g.type === 'img', isPh: g.type === 'ph' }));
   p.url = `${site.siteUrl}/${p.slug}`;
   p.ogImage = `${site.siteUrl}${p.heroImage}`;

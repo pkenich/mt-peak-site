@@ -334,6 +334,12 @@
         </div>
       </div>
       <div class="admin-card">
+        <h3>Sizes &amp; prices <span class="admin-note" style="text-transform:none;letter-spacing:.5px;">optional</span></h3>
+        <p class="admin-note" style="margin-bottom:1rem;">Leave empty for a single size (uses the price above). Add two or more (e.g. 50g / 100g) and a size selector appears on the product page — each size has its own price. The one marked ● is the default shown first.</p>
+        <div id="variantRows"></div>
+        <button class="btn-quiet" id="variantAdd" style="margin-top:.6rem;">＋ Add size</button>
+      </div>
+      <div class="admin-card">
         <h3>Photography</h3>
         <p class="admin-note" style="margin-bottom:1rem;">First slot is the main shot (also used on the home page). Uploads convert to WebP in your browser.</p>
         <div class="gal-editor" id="galEditor"></div>
@@ -353,8 +359,32 @@
       'brew', 'brewSteps', 'makeH', 'make', 'originLead', 'originPs', 'spec', 'closerH', 'closerP']) advanced[k] = p[k];
     $('#productJson').value = JSON.stringify(advanced, null, 2);
     renderGallery(p);
+    renderVariants(p);
+    $('#variantAdd').onclick = () => { collectVariants(p); (p.variants = p.variants || []).push({ id: '', label: '', price: p.price || 1, default: !p.variants.length }); renderVariants(p); };
     $('#saveProduct').onclick = saveProducts;
     $('#deleteProduct').onclick = () => deleteProduct(slug);
+  }
+
+  const vslug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 20);
+  function renderVariants(p) {
+    const wrap = $('#variantRows'); const vs = p.variants || [];
+    wrap.innerHTML = vs.length ? vs.map((v, i) => `
+      <div class="variant-row" data-i="${i}">
+        <input class="v-label" placeholder="Label (e.g. 100g)" value="${esc(v.label || '')}" maxlength="20">
+        <div class="v-price"><span>£</span><input type="number" min="1" class="v-amt" value="${esc(v.price ?? '')}"></div>
+        <label class="v-def"><input type="radio" name="vdef" ${v.default ? 'checked' : ''}> default</label>
+        <button class="v-del" title="Remove">✕</button>
+      </div>`).join('') : '<p class="admin-note">No sizes — this tea sells as a single size at the price above.</p>';
+    wrap.querySelectorAll('.v-del').forEach((b, i) => b.onclick = () => { collectVariants(p); p.variants.splice(i, 1); if (p.variants.length && !p.variants.some(v => v.default)) p.variants[0].default = true; renderVariants(p); });
+  }
+  function collectVariants(p) {
+    const rows = [...$('#variantRows').querySelectorAll('.variant-row')];
+    if (!rows.length) { if (p.variants) p.variants = []; return; }
+    p.variants = rows.map(r => {
+      const label = r.querySelector('.v-label').value.trim();
+      return { id: vslug(label), label, price: parseInt(r.querySelector('.v-amt').value, 10), default: r.querySelector('.v-def input').checked };
+    });
+    if (!p.variants.some(v => v.default) && p.variants.length) p.variants[0].default = true;
   }
 
   function renderGallery(p) {
@@ -403,6 +433,17 @@
       else p[k] = input.value;
     }
     Object.assign(p, JSON.parse($('#productJson').value));
+    collectVariants(p);
+    if (p.variants && p.variants.length) {
+      const ids = new Set();
+      for (const v of p.variants) {
+        if (!v.label) throw new Error('Each size needs a label.');
+        if (!v.id) throw new Error(`Size “${v.label}” needs letters or numbers in its label.`);
+        if (ids.has(v.id)) throw new Error(`Two sizes resolve to the same id (“${v.label}”). Make labels distinct.`);
+        ids.add(v.id);
+        if (!Number.isInteger(v.price) || v.price < 1) throw new Error(`Size “${v.label}” needs a whole-number price.`);
+      }
+    } else { delete p.variants; }
   }
   async function persistProducts() {
     const { commit } = await api('/api/admin/content', { method: 'PUT', body: JSON.stringify({ file: 'products', data: products }) });
