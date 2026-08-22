@@ -2,3 +2,6 @@ node_modules/
 public/
 .vercel
 .env*
+
+# local preview/scratch files (not part of the build)
+scratchpad/
