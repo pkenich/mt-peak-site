@@ -60,7 +60,7 @@
 <section class="origin" id="origin">
   <div class="origin-visual">
     <canvas id="originCanvas"></canvas>
-    <img class="origin-emblem" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
+    <img class="origin-emblem" loading="lazy" decoding="async" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
   </div>
   <div class="origin-content">
     {{#each site.originBlocks}}
@@ -109,7 +109,7 @@
       <a class="product-visual" href="/{{slug}}" aria-label="View {{name}}">
         <div class="product-glow"></div>
         <span class="product-tag">{{tag}}</span>
-        <img class="product-shot" src="{{heroImage}}" alt="{{heroAlt}}">
+        <img class="product-shot" loading="lazy" decoding="async" width="760" height="950" src="{{heroImage}}" alt="{{heroAlt}}">
       </a>
       <div class="product-info">
         <div class="product-rank">№ {{num}} · {{name}}</div>
@@ -138,7 +138,7 @@
 
 <!-- CLOSER -->
 <section class="closer">
-  <img class="closer-mark r-fade" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
+  <img class="closer-mark r-fade" loading="lazy" decoding="async" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
   <h2 class="r-up">{{{site.closerH}}}</h2>
   <p class="r-up">{{site.closerP}}</p>
   <button class="closer-btn" onclick="scrollToId('collection')">{{site.closerBtn}}</button>

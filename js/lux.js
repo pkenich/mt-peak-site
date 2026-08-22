@@ -4,6 +4,17 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = matchMedia('(pointer: fine)').matches;
 
+  /* ---- skip link + main landmark (accessibility) ---- */
+  const main = document.querySelector('main, .page-wrap, header.hero, .pdp, .nf-wrap') || document.querySelector('section');
+  if (main && !document.querySelector('.skip-link')) {
+    if (!main.id) main.id = 'main';
+    if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
+    const skip = document.createElement('a');
+    skip.className = 'skip-link'; skip.href = '#' + main.id; skip.textContent = 'Skip to content';
+    skip.addEventListener('click', () => { setTimeout(() => main.focus(), 0); });
+    document.body.insertBefore(skip, document.body.firstChild);
+  }
+
   /* ---- scroll-progress line (all pages) ---- */
   const bar = document.createElement('div');
   bar.className = 'scroll-progress';

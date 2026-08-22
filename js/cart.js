@@ -15,7 +15,24 @@ function addToCart(slug, name, price, q = 1, variantId = null) {
   const v = variantId || null;
   const e = cart.find(i => i.s === slug && (i.v || null) === v);
   if (e) e.q += q; else cart.push({ s: slug, v, n: name, p: price, q });
-  save(); render(); openCart();
+  save(); render(); toastAdded(name);
+}
+
+/* Refined confirmation: a quiet toast + a pulse on the cart count, rather than
+   forcing the cart open every time — the shop stays browsable. */
+function toastAdded(name) {
+  let t = document.getElementById('cartToast');
+  if (!t) {
+    t = document.createElement('div'); t.id = 'cartToast'; t.className = 'cart-toast';
+    t.setAttribute('role', 'status'); t.setAttribute('aria-live', 'polite');
+    t.innerHTML = '<span class="ct-msg"></span><button class="ct-view" type="button">View bag</button>';
+    document.body.appendChild(t);
+    t.querySelector('.ct-view').addEventListener('click', openCart);
+  }
+  t.querySelector('.ct-msg').textContent = 'Added to your reserve · ' + name;
+  t.classList.add('show');
+  if (navCart) { navCart.classList.remove('pulse'); void navCart.offsetWidth; navCart.classList.add('pulse'); }
+  clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 3400);
 }
 
 function render() {
@@ -36,8 +53,21 @@ function chg(x, d) {
   save(); render();
 }
 function rm(x) { cart.splice(x, 1); save(); render(); }
-function openCart() { document.getElementById('cartOverlay').classList.add('open'); document.getElementById('cartPanel').classList.add('open'); }
-function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartPanel').classList.remove('open'); }
+let cartReturnFocus = null;
+function openCart() {
+  cartReturnFocus = document.activeElement;
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('cartPanel').classList.add('open');
+  const c = document.querySelector('.cart-close'); if (c) c.focus();
+}
+function closeCart() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('cartPanel').classList.remove('open');
+  if (cartReturnFocus && cartReturnFocus.focus) cartReturnFocus.focus();
+}
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('cartPanel').classList.contains('open')) closeCart();
+});
 
 function checkout() {
   if (!cart.length) return;

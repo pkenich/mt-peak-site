@@ -20,7 +20,7 @@
     </div>
     <div class="gal-thumbs" id="galThumbs">
       {{#each p.gallery}}
-      {{#if isImg}}<button class="gal-thumb{{#if active}} active{{/if}}" data-type="img" data-src="{{src}}" data-alt="{{alt}}"><img src="{{src}}" alt="{{alt}}"></button>{{/if}}
+      {{#if isImg}}<button class="gal-thumb{{#if active}} active{{/if}}" data-type="img" data-src="{{src}}" data-alt="{{alt}}"><img loading="lazy" decoding="async" src="{{src}}" alt="{{alt}}"></button>{{/if}}
       {{#if isPh}}<button class="gal-thumb" data-type="ph" data-label="{{label}}" data-sub="{{sub}}"><span class="tph">{{{thumb}}}</span></button>{{/if}}
       {{/each}}
     </div>
@@ -120,7 +120,7 @@
 
 <!-- ORIGIN STORY -->
 <section class="origin-story">
-  <div class="os-visual"><img src="/assets/mtpeak-emblem.webp" alt="{{site.brand}} emblem"></div>
+  <div class="os-visual"><img loading="lazy" decoding="async" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}} emblem"></div>
   <div class="os-content">
     <div class="sec-label">The Origin</div>
     <p class="lead">{{p.originLead}}</p>
@@ -150,7 +150,7 @@
 
 <!-- CLOSER -->
 <section class="pdp-closer">
-  <img src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
+  <img loading="lazy" decoding="async" src="/assets/mtpeak-emblem.webp" alt="{{site.brand}}">
   <h2>{{{p.closerH}}}</h2>
   <p>{{p.closerP}}</p>
   {{#if p.available}}<a class="cbtn" id="btnAdd2" href="#" data-slug="{{p.slug}}" data-name="{{p.cartName}}" data-price="{{p.price}}">Add to Reserve</a>{{/if}}

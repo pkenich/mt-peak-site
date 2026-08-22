@@ -13,15 +13,78 @@ function swapMain(html) {
     requestAnimationFrame(() => requestAnimationFrame(() => { el.style.opacity = '1'; }));
   }, 220);
 }
-thumbs.forEach(t => t.addEventListener('click', () => {
-  if (t.classList.contains('active')) return;
+function selectThumb(t) {
+  if (!t) return;
   thumbs.forEach(x => x.classList.remove('active')); t.classList.add('active');
   if (t.dataset.type === 'img') {
     swapMain(`<img src="${t.dataset.src}" alt="${t.dataset.alt}">`);
   } else {
     swapMain(`<div class="gal-ph"><div class="ph-mark">${t.dataset.label}</div><div class="ph-sub">${t.dataset.sub}</div></div>`);
   }
-}));
+}
+thumbs.forEach(t => t.addEventListener('click', () => { if (!t.classList.contains('active')) selectThumb(t); }));
+
+/* step to the previous/next thumb (wraps) — used by swipe & lightbox arrows */
+function stepThumb(dir) {
+  const i = thumbs.findIndex(t => t.classList.contains('active'));
+  if (i < 0) return;
+  selectThumb(thumbs[(i + dir + thumbs.length) % thumbs.length]);
+}
+
+/* ===== IMAGE ZOOM / LIGHTBOX (real photos only) ===== */
+const imageThumbs = thumbs.filter(t => t.dataset.type === 'img');
+if (galMain && imageThumbs.length) {
+  galMain.classList.add('zoomable');
+  let lb, lbImg;
+  const imgList = () => imageThumbs.map(t => ({ src: t.dataset.src, alt: t.dataset.alt }));
+  let lbIndex = 0;
+  const showLb = (i) => {
+    const list = imgList(); lbIndex = (i + list.length) % list.length;
+    lbImg.src = list[lbIndex].src; lbImg.alt = list[lbIndex].alt || '';
+  };
+  const openLb = () => {
+    const cur = galMain.querySelector('img'); if (!cur) return; // placeholder showing → no lightbox
+    if (!lb) {
+      lb = document.createElement('div'); lb.className = 'lightbox'; lb.setAttribute('role', 'dialog');
+      lb.setAttribute('aria-modal', 'true'); lb.setAttribute('aria-label', 'Product image viewer');
+      lb.innerHTML = `<button class="lb-close" aria-label="Close">✕</button>
+        <button class="lb-nav lb-prev" aria-label="Previous image">‹</button>
+        <img class="lb-img" alt="">
+        <button class="lb-nav lb-next" aria-label="Next image">›</button>`;
+      document.body.appendChild(lb);
+      lbImg = lb.querySelector('.lb-img');
+      lb.querySelector('.lb-close').addEventListener('click', closeLb);
+      lb.querySelector('.lb-prev').addEventListener('click', (e) => { e.stopPropagation(); showLb(lbIndex - 1); });
+      lb.querySelector('.lb-next').addEventListener('click', (e) => { e.stopPropagation(); showLb(lbIndex + 1); });
+      lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
+    }
+    const curSrc = cur.getAttribute('src');
+    const start = Math.max(0, imgList().findIndex(x => x.src === curSrc));
+    showLb(start);
+    lb.classList.add('open'); document.body.style.overflow = 'hidden';
+    lb.querySelector('.lb-close').focus();
+  };
+  function closeLb() { if (lb) { lb.classList.remove('open'); document.body.style.overflow = ''; galMain.focus(); } }
+  galMain.addEventListener('click', openLb);
+  galMain.setAttribute('tabindex', '0');
+  galMain.setAttribute('role', 'button');
+  galMain.setAttribute('aria-label', 'Enlarge image');
+  galMain.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(); } });
+  addEventListener('keydown', (e) => {
+    if (!lb || !lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLb();
+    else if (e.key === 'ArrowLeft') showLb(lbIndex - 1);
+    else if (e.key === 'ArrowRight') showLb(lbIndex + 1);
+  });
+
+  /* swipe on the main image (mobile) */
+  let tx = 0, ty = 0;
+  galMain.addEventListener('touchstart', (e) => { tx = e.changedTouches[0].clientX; ty = e.changedTouches[0].clientY; }, { passive: true });
+  galMain.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) stepThumb(dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
 
 /* ===== QUANTITY + ADD TO CART (absent when the tea is sold out) ===== */
 const qVal = document.getElementById('qVal');

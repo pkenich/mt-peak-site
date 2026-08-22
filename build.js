@@ -129,13 +129,34 @@ mkdirSync(OUT, { recursive: true });
 
 const emit = (file, html) => { writeFileSync(join(OUT, file), html); console.log('built', file); };
 
+/* JSON-LD structured data. Emitted verbatim into <head> via {{{pageSchema}}}. */
+const jsonLd = (obj) => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
+const orgSchema = {
+  '@context': 'https://schema.org', '@type': 'Organization',
+  name: site.brand, url: site.siteUrl, logo: `${site.siteUrl}/assets/mtpeak-emblem.webp`,
+  description: site.metaDesc,
+};
+const orgLd = jsonLd(orgSchema);
+
 emit('index.html', render(page('index.html'), [{ site, products,
-  pageTitle: site.title, pageDesc: site.metaDesc, pageUrl: site.siteUrl, ogImage: `${site.siteUrl}/assets/tea-giftset.webp` }]));
+  pageTitle: site.title, pageDesc: site.metaDesc, pageUrl: site.siteUrl, ogImage: `${site.siteUrl}/assets/tea-giftset.webp`,
+  pageSchema: jsonLd({ '@context': 'https://schema.org', '@type': 'WebSite', name: site.brand, url: site.siteUrl }) + orgLd }]));
 
 const pdpTpl = page('pdp.html');
 for (const p of products) {
+  const offers = p.variants.length
+    ? p.variants.map(v => ({ '@type': 'Offer', name: v.label, price: v.price, priceCurrency: site.currency || 'GBP',
+        availability: `https://schema.org/${p.soldOut ? 'OutOfStock' : 'InStock'}`, url: p.url }))
+    : [{ '@type': 'Offer', price: p.price, priceCurrency: site.currency || 'GBP',
+        availability: `https://schema.org/${p.soldOut ? 'OutOfStock' : 'InStock'}`, url: p.url }];
+  const productLd = jsonLd({
+    '@context': 'https://schema.org', '@type': 'Product', name: p.name, description: p.metaDesc || p.desc,
+    image: p.ogImage, brand: { '@type': 'Brand', name: site.brand },
+    category: p.tag, offers: offers.length === 1 ? offers[0] : offers,
+  });
   emit(`${p.slug}.html`, render(pdpTpl, [{ site, p,
-    pageTitle: p.title, pageDesc: p.metaDesc, pageUrl: p.url, ogImage: p.ogImage }]));
+    pageTitle: p.title, pageDesc: p.metaDesc, pageUrl: p.url, ogImage: p.ogImage,
+    pageSchema: productLd + orgLd }]));
 }
 
 for (const name of ['login', 'account', 'track', 'checkout', 'reset', 'admin', '404']) {
