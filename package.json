@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
+    "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^2.4.3",
     "stripe": "^17.7.0"
   }
