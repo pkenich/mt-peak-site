@@ -73,5 +73,24 @@ if (newsForm) {
   });
 }
 
+/* mobile menu drawer */
+const navToggle = document.getElementById('navToggle');
+if (navToggle) {
+  const drawer = document.getElementById('navDrawer');
+  const scrim = document.getElementById('navScrim');
+  const setMenu = (open) => {
+    drawer.classList.toggle('open', open);
+    scrim.classList.toggle('open', open);
+    navToggle.classList.toggle('is-open', open);
+    navToggle.setAttribute('aria-expanded', open);
+    drawer.setAttribute('aria-hidden', !open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  };
+  navToggle.addEventListener('click', () => setMenu(!drawer.classList.contains('open')));
+  scrim.addEventListener('click', () => setMenu(false));
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+}
+
 navCart.addEventListener('click', openCart);
 render();

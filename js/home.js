@@ -264,6 +264,12 @@ function drawBrew(p){
   const surfaceFill=Math.min(Math.max((p-.18)/.6,0),1);
   const surfaceY=cupY+cupH/2-cupH*surfaceFill;
   const pouring=p>.2&&p<.82;
+  // interior of the cup — everything that is liquid *in* the cup clips to this
+  // so splashes, ripples and the surface can never render outside the walls.
+  const cupPath=()=>{ bx.beginPath();
+    bx.moveTo(cx-cupW/2+2,cupY-cupH/2); bx.lineTo(cx-cupW/2+5,cupY+cupH/2);
+    bx.quadraticCurveTo(cx,cupY+cupH/2+5,cx+cupW/2-5,cupY+cupH/2);
+    bx.lineTo(cx+cupW/2-2,cupY-cupH/2); bx.closePath(); };
 
   // ---- WARM: embers rising around the pot ----
   if(p>.03&&p<.3&&embers.length<CAP.embers&&Math.random()<.3)
@@ -304,15 +310,17 @@ function drawBrew(p){
       drops.push({x:tipX+(Math.random()-.5)*2.5,y:tipY+Math.random()*3,
         vx:-.55-Math.random()*.4,vy:.4+Math.random()*.6,s:1.1+Math.random()*1.5,op:.75+Math.random()*.25});
   }
-  const targetX=cx-cupW*.13;
+  const targetX=cx; // pour into the centre of the cup
   for(let i=drops.length-1;i>=0;i--){const d=drops[i];
-    d.vy+=.34;d.x+=d.vx;d.vx+=(targetX-d.x)*.0016;d.y+=d.vy;
+    d.vy+=.34;d.x+=d.vx;d.vx+=(targetX-d.x)*.0022;d.y+=d.vy;
     if(d.y>=surfaceY-1&&surfaceFill>.01){
       drops.splice(i,1);
+      // spawn splash/ripple only well inside the rim, never at the edge
+      const lx=Math.max(cx-cupW*.34,Math.min(cx+cupW*.34,d.x));
       if(splashes.length<CAP.splash)for(let k=0;k<2;k++)
-        splashes.push({x:d.x,y:surfaceY,vx:(Math.random()-.5)*1.6,vy:-1-Math.random()*1.4,
+        splashes.push({x:lx,y:surfaceY,vx:(Math.random()-.5)*1.1,vy:-.8-Math.random()*1.1,
           s:.8+Math.random()*1,op:.7});
-      if(ripples.length<6&&Math.random()<.3)ripples.push({x:d.x,y:surfaceY,r:2,op:.5});
+      if(ripples.length<6&&Math.random()<.3)ripples.push({x:lx,y:surfaceY,r:2,op:.5});
       continue;}
     if(d.y>cupY+cupH){drops.splice(i,1);continue;}
     bx.globalAlpha=d.op;bx.fillStyle='#c98a3e';
@@ -325,11 +333,13 @@ function drawBrew(p){
     bx.beginPath();bx.moveTo(tipX,tipY);
     bx.quadraticCurveTo(tipX-BW*.02,(tipY+surfaceY)/2,targetX,surfaceY);bx.stroke();}
 
+  bx.save();cupPath();bx.clip(); // splashes stay inside the cup
   for(let i=splashes.length-1;i>=0;i--){const s=splashes[i];
     s.vy+=.22;s.x+=s.vx;s.y+=s.vy;s.op-=.03;
     if(s.op<=0||s.y>surfaceY+8){splashes.splice(i,1);continue;}
     bx.globalAlpha=s.op;bx.fillStyle='#e8cd8f';
     bx.beginPath();bx.arc(s.x,s.y,s.s,0,6.28);bx.fill();bx.globalAlpha=1;}
+  bx.restore();
 
   // ---- CUP ----
   bx.strokeStyle='#c9a961';bx.lineWidth=2;
@@ -375,12 +385,19 @@ function drawBrew(p){
     bx.restore();
   }
 
-  // ---- ripples spreading on the surface ----
+  // ---- ripples ----  update, then draw pour rings clipped inside the cup
+  // and the serve halo (r.serve) as an unclipped gold flourish at the rim.
   for(let i=ripples.length-1;i>=0;i--){const r=ripples[i];
-    r.r+=.8;r.op-=.012;
-    if(r.op<=0){ripples.splice(i,1);continue;}
+    r.r+=r.serve?1.4:.8;r.op-=.012;
+    if(r.op<=0||(!r.serve&&r.r>cupW*.48)){ripples.splice(i,1);}}
+  bx.save();cupPath();bx.clip();
+  for(const r of ripples){ if(r.serve)continue;
     bx.globalAlpha=r.op;bx.strokeStyle='#e8cd8f';bx.lineWidth=1;
     bx.beginPath();bx.ellipse(r.x,r.y,r.r,r.r*.3,0,0,6.28);bx.stroke();bx.globalAlpha=1;}
+  bx.restore();
+  for(const r of ripples){ if(!r.serve)continue;
+    bx.globalAlpha=r.op*.6;bx.strokeStyle='#e8cd8f';bx.lineWidth=1;
+    bx.beginPath();bx.ellipse(cx,cupY-cupH*.1,r.r,r.r*.3,0,0,6.28);bx.stroke();bx.globalAlpha=1;}
 
   // ---- steam: sinuous curls that widen as they rise ----
   const steamRate=p<.4?0:p<.82?.5:.28;
