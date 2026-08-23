@@ -1,8 +1,11 @@
 /* Transactional email via Resend's REST API (no SDK). Unconfigured → silent
    no-op so email can never break an order flow; failures are logged, not thrown. */
 
-const GOLD = '#c9a961', CREAM = '#f4efe6', DIM = 'rgba(244,239,230,.55)',
-  BG = '#0a1410', CARD = '#0f1d17', BORDER = 'rgba(201,169,97,.25)';
+/* Light, cream palette — matches the gold-on-cream MT. PEAK mark and reads far
+   warmer than the old dark-green shell. INK = primary text, MUTE = secondary,
+   BG = outer sand, CARD = cream panel, LINE = hairline rule, GOLD = accent/CTA. */
+const GOLD = '#a97e37', INK = '#2b3a30', MUTE = '#7a7062',
+  BG = '#efe7d7', CARD = '#fbf8f1', LINE = '#e6dcc8';
 
 const STATUS_COPY = {
   reserved: {
@@ -58,9 +61,9 @@ async function sendViaResend({ to, subject, html }) {
 export function orderEmailHtml({ heading, message, order, siteUrl }) {
   const rows = (order.items || []).map(l => `
     <tr>
-      <td style="padding:10px 0;border-bottom:1px solid ${BORDER};color:${CREAM};font-size:14px;">${esc(l.name)}</td>
-      <td style="padding:10px 0;border-bottom:1px solid ${BORDER};color:${DIM};font-size:14px;text-align:center;">× ${l.qty}</td>
-      <td style="padding:10px 0;border-bottom:1px solid ${BORDER};color:${GOLD};font-size:14px;text-align:right;">${gbp(l.unitPence * l.qty)}</td>
+      <td style="padding:10px 0;border-bottom:1px solid ${LINE};color:${INK};font-size:14px;">${esc(l.name)}</td>
+      <td style="padding:10px 0;border-bottom:1px solid ${LINE};color:${MUTE};font-size:14px;text-align:center;">× ${l.qty}</td>
+      <td style="padding:10px 0;border-bottom:1px solid ${LINE};color:${GOLD};font-size:14px;text-align:right;">${gbp(l.unitPence * l.qty)}</td>
     </tr>`).join('');
 
   return `<!DOCTYPE html>
@@ -72,35 +75,35 @@ export function orderEmailHtml({ heading, message, order, siteUrl }) {
     <tr><td align="center" style="padding:8px 0 28px;">
       <img src="${siteUrl}/assets/mtpeak-emblem.webp" width="72" alt="Mt. Peak" style="display:block;">
       <div style="font-family:Georgia,'Times New Roman',serif;color:${GOLD};font-size:20px;letter-spacing:6px;padding-top:14px;">MT. PEAK</div>
-      <div style="font-family:Georgia,serif;color:${DIM};font-size:11px;letter-spacing:3px;padding-top:6px;">SOURCED AT ALTITUDE</div>
+      <div style="font-family:Georgia,serif;color:${MUTE};font-size:11px;letter-spacing:3px;padding-top:6px;">SOURCED AT ALTITUDE</div>
     </td></tr>
-    <tr><td style="background:${CARD};border:1px solid ${BORDER};padding:36px 32px;">
-      <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${CREAM};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
-      <p style="margin:0 0 26px;font-family:Helvetica,Arial,sans-serif;color:${DIM};font-size:14px;line-height:1.7;">${esc(message)}</p>
-      <div style="border:1px solid ${BORDER};padding:6px 18px 2px;margin-bottom:26px;">
+    <tr><td style="background:${CARD};border:1px solid ${LINE};padding:36px 32px;">
+      <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${INK};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
+      <p style="margin:0 0 26px;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:14px;line-height:1.7;">${esc(message)}</p>
+      <div style="border:1px solid ${LINE};padding:6px 18px 2px;margin-bottom:26px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="padding:12px 0;color:${DIM};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">ORDER</td>
+            <td style="padding:12px 0;color:${MUTE};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">ORDER</td>
             <td style="padding:12px 0;text-align:right;font-family:Georgia,serif;color:${GOLD};font-size:16px;letter-spacing:1px;">${esc(order.public_id)}</td>
           </tr>
           ${rows}
           ${order.discount_pence ? `<tr>
-            <td style="padding:12px 0;color:${DIM};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">DISCOUNT</td>
-            <td colspan="2" style="padding:12px 0;text-align:right;font-family:Georgia,serif;color:${CREAM};font-size:14px;">−${gbp(order.discount_pence)}</td>
+            <td style="padding:12px 0;color:${MUTE};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">DISCOUNT</td>
+            <td colspan="2" style="padding:12px 0;text-align:right;font-family:Georgia,serif;color:${INK};font-size:14px;">−${gbp(order.discount_pence)}</td>
           </tr>` : ''}
           <tr>
-            <td style="padding:14px 0;color:${DIM};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">TOTAL</td>
+            <td style="padding:14px 0;color:${MUTE};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">TOTAL</td>
             <td colspan="2" style="padding:14px 0;text-align:right;font-family:Georgia,serif;color:${GOLD};font-size:22px;">${gbp(order.total_pence)}</td>
           </tr>
         </table>
       </div>
-      ${order.gift_note ? `<div style="border:1px solid ${BORDER};padding:16px 18px;margin-bottom:26px;">
-        <div style="color:${DIM};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;padding-bottom:8px;">YOUR GIFT MESSAGE</div>
-        <div style="font-family:Georgia,serif;font-style:italic;color:${CREAM};font-size:14px;line-height:1.7;">${esc(order.gift_note)}</div>
+      ${order.gift_note ? `<div style="border:1px solid ${LINE};padding:16px 18px;margin-bottom:26px;">
+        <div style="color:${MUTE};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;padding-bottom:8px;">YOUR GIFT MESSAGE</div>
+        <div style="font-family:Georgia,serif;font-style:italic;color:${INK};font-size:14px;line-height:1.7;">${esc(order.gift_note)}</div>
       </div>` : ''}
-      ${order.shipping ? `<div style="border:1px solid ${BORDER};padding:16px 18px;margin-bottom:26px;">
-        <div style="color:${DIM};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;padding-bottom:8px;">DELIVERING TO</div>
-        <div style="font-family:Helvetica,Arial,sans-serif;color:${CREAM};font-size:13px;line-height:1.7;">
+      ${order.shipping ? `<div style="border:1px solid ${LINE};padding:16px 18px;margin-bottom:26px;">
+        <div style="color:${MUTE};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;padding-bottom:8px;">DELIVERING TO</div>
+        <div style="font-family:Helvetica,Arial,sans-serif;color:${INK};font-size:13px;line-height:1.7;">
           ${esc(order.shipping.name)}<br>${esc(order.shipping.line1)}${order.shipping.line2 ? '<br>' + esc(order.shipping.line2) : ''}<br>
           ${esc(order.shipping.city)}, ${esc(order.shipping.postcode)}<br>${esc(order.shipping.country)}
         </div>
@@ -110,12 +113,12 @@ export function orderEmailHtml({ heading, message, order, siteUrl }) {
           <a href="${siteUrl}/track" style="display:inline-block;padding:14px 34px;font-family:Helvetica,Arial,sans-serif;font-size:12px;letter-spacing:3px;color:#070d0a;text-decoration:none;">TRACK YOUR ORDER</a>
         </td></tr>
       </table>
-      <p style="margin:22px 0 0;text-align:center;font-family:Helvetica,Arial,sans-serif;color:${DIM};font-size:12px;">
+      <p style="margin:22px 0 0;text-align:center;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:12px;">
         Use order <span style="color:${GOLD};">${esc(order.public_id)}</span> and this email address at
         <a href="${siteUrl}/track" style="color:${GOLD};">${siteUrl.replace('https://', '')}/track</a>
       </p>
     </td></tr>
-    <tr><td align="center" style="padding:26px 8px;font-family:Helvetica,Arial,sans-serif;color:${DIM};font-size:11px;letter-spacing:1px;line-height:1.8;">
+    <tr><td align="center" style="padding:26px 8px;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:11px;letter-spacing:1px;line-height:1.8;">
       Single-origin Himalayan tea · Grown at 2,500m · Eastern Nepal<br>
       © Mt. Peak — The mountain is patient. So are we.
     </td></tr>
@@ -140,16 +143,16 @@ export async function sendBrandEmail({ to, subject, heading, message, ctaLabel, 
       <img src="${siteUrl}/assets/mtpeak-emblem.webp" width="72" alt="Mt. Peak" style="display:block;">
       <div style="font-family:Georgia,'Times New Roman',serif;color:${GOLD};font-size:20px;letter-spacing:6px;padding-top:14px;">MT. PEAK</div>
     </td></tr>
-    <tr><td style="background:${CARD};border:1px solid ${BORDER};padding:36px 32px;">
-      <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${CREAM};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
-      <p style="margin:0 0 26px;font-family:Helvetica,Arial,sans-serif;color:${DIM};font-size:14px;line-height:1.7;">${esc(message)}</p>
+    <tr><td style="background:${CARD};border:1px solid ${LINE};padding:36px 32px;">
+      <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${INK};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
+      <p style="margin:0 0 26px;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:14px;line-height:1.7;">${esc(message)}</p>
       ${ctaUrl ? `<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;">
         <tr><td style="background:${GOLD};">
           <a href="${ctaUrl}" style="display:inline-block;padding:14px 34px;font-family:Helvetica,Arial,sans-serif;font-size:12px;letter-spacing:3px;color:#070d0a;text-decoration:none;">${esc(ctaLabel || 'CONTINUE')}</a>
         </td></tr>
       </table>` : ''}
     </td></tr>
-    <tr><td align="center" style="padding:26px 8px;font-family:Helvetica,Arial,sans-serif;color:${DIM};font-size:11px;letter-spacing:1px;line-height:1.8;">
+    <tr><td align="center" style="padding:26px 8px;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:11px;letter-spacing:1px;line-height:1.8;">
       © Mt. Peak — The mountain is patient. So are we.
     </td></tr>
   </table>
@@ -190,9 +193,9 @@ const CART_COPY = {
 function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl }) {
   const rows = (cart.items || []).map(l => `
     <tr>
-      <td style="padding:10px 0;border-bottom:1px solid ${BORDER};color:${CREAM};font-size:14px;">${esc(l.n || l.name)}</td>
-      <td style="padding:10px 0;border-bottom:1px solid ${BORDER};color:${DIM};font-size:14px;text-align:center;">× ${l.q || l.qty || 1}</td>
-      <td style="padding:10px 0;border-bottom:1px solid ${BORDER};color:${GOLD};font-size:14px;text-align:right;">${gbp((l.p != null ? l.p * 100 : l.unitPence) * (l.q || l.qty || 1))}</td>
+      <td style="padding:10px 0;border-bottom:1px solid ${LINE};color:${INK};font-size:14px;">${esc(l.n || l.name)}</td>
+      <td style="padding:10px 0;border-bottom:1px solid ${LINE};color:${MUTE};font-size:14px;text-align:center;">× ${l.q || l.qty || 1}</td>
+      <td style="padding:10px 0;border-bottom:1px solid ${LINE};color:${GOLD};font-size:14px;text-align:right;">${gbp((l.p != null ? l.p * 100 : l.unitPence) * (l.q || l.qty || 1))}</td>
     </tr>`).join('');
   return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
@@ -203,15 +206,15 @@ function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl }) {
     <tr><td align="center" style="padding:8px 0 28px;">
       <img src="${siteUrl}/assets/mtpeak-emblem.webp" width="72" alt="Mt. Peak" style="display:block;">
       <div style="font-family:Georgia,'Times New Roman',serif;color:${GOLD};font-size:20px;letter-spacing:6px;padding-top:14px;">MT. PEAK</div>
-      <div style="font-family:Georgia,serif;color:${DIM};font-size:11px;letter-spacing:3px;padding-top:6px;">SOURCED AT ALTITUDE</div>
+      <div style="font-family:Georgia,serif;color:${MUTE};font-size:11px;letter-spacing:3px;padding-top:6px;">SOURCED AT ALTITUDE</div>
     </td></tr>
-    <tr><td style="background:${CARD};border:1px solid ${BORDER};padding:36px 32px;">
-      <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${CREAM};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
-      <p style="margin:0 0 26px;font-family:Helvetica,Arial,sans-serif;color:${DIM};font-size:14px;line-height:1.7;">${esc(message)}</p>
-      <div style="border:1px solid ${BORDER};padding:6px 18px 2px;margin-bottom:26px;">
+    <tr><td style="background:${CARD};border:1px solid ${LINE};padding:36px 32px;">
+      <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${INK};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
+      <p style="margin:0 0 26px;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:14px;line-height:1.7;">${esc(message)}</p>
+      <div style="border:1px solid ${LINE};padding:6px 18px 2px;margin-bottom:26px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="padding:12px 0;color:${DIM};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">YOUR RESERVE</td>
+            <td style="padding:12px 0;color:${MUTE};font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:2px;">YOUR RESERVE</td>
             <td colspan="2" style="padding:12px 0;text-align:right;font-family:Georgia,serif;color:${GOLD};font-size:16px;">${gbp(cart.subtotal_pence || 0)}</td>
           </tr>
           ${rows}
@@ -223,7 +226,7 @@ function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl }) {
         </td></tr>
       </table>
     </td></tr>
-    <tr><td align="center" style="padding:26px 8px;font-family:Helvetica,Arial,sans-serif;color:${DIM};font-size:11px;letter-spacing:1px;line-height:1.8;">
+    <tr><td align="center" style="padding:26px 8px;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:11px;letter-spacing:1px;line-height:1.8;">
       Single-origin Himalayan tea · Grown at 2,500m · Eastern Nepal<br>
       © Mt. Peak — The mountain is patient. So are we.
     </td></tr>
