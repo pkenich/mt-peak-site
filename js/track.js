@@ -15,6 +15,15 @@
     cancelled: 'This order was cancelled.',
   };
 
+  // arriving straight from a guest checkout: /track?placed=MP-XXXXXX
+  const placed = new URLSearchParams(location.search).get('placed');
+  if (placed && /^MP-[A-Z0-9]{4,8}$/i.test(placed)) {
+    $('#tkOrder').value = placed.toUpperCase();
+    msg.textContent = `Order ${placed.toUpperCase()} is placed — a confirmation email is on its way. Enter the email you used to track it.`;
+    msg.className = 'form-msg ok';
+    setTimeout(() => $('#tkEmail').focus(), 150);
+  }
+
   $('#trackForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     msg.className = 'form-msg';

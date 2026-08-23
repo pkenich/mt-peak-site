@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { sql, ensureSchema } from './_lib/db.js';
-import { requireCustomer } from './_lib/session.js';
+import { readCustomer } from './_lib/session.js';
 import { sendOrderEmail } from './_lib/email.js';
 import { normCode, isCode, redeemPromo, releasePromo, discountFor } from './_lib/promo.js';
-import { handler, bad, publicOrderId } from './_lib/util.js';
+import { handler, bad, publicOrderId, normEmail, isEmail } from './_lib/util.js';
 
 const PRODUCTS = JSON.parse(readFileSync(join(process.cwd(), 'content/products.json'), 'utf8'));
 
@@ -25,8 +25,14 @@ function cleanAddress(raw, label) {
    without it, the order is recorded as a reservation. */
 export default handler(['POST'], async (req, res) => {
   await ensureSchema();
-  const user = requireCustomer(req);
   const body = req.body || {};
+
+  // Signed-in customer → email/id from the session cookie (trusted).
+  // Guest → email from the form, validated; no account attached (user_id null).
+  const session = readCustomer(req);
+  const email = session ? session.email : normEmail(body.email);
+  const userId = session ? session.uid : null;
+  if (!isEmail(email)) throw bad('Please enter a valid email address for your order confirmation.');
 
   const items = Array.isArray(body.items) ? body.items : [];
   if (!items.length || items.length > 20) throw bad('Your reserve is empty.');
@@ -67,10 +73,10 @@ export default handler(['POST'], async (req, res) => {
     if (!stripeKey) {
       await q`INSERT INTO orders (public_id, user_id, email, items, total_pence, status,
           shipping, billing, promo_code, discount_pence, gift_note)
-        VALUES (${publicId}, ${user.uid}, ${user.email}, ${JSON.stringify(lines)}, ${total}, 'reserved',
+        VALUES (${publicId}, ${userId}, ${email}, ${JSON.stringify(lines)}, ${total}, 'reserved',
           ${JSON.stringify(shipping)}, ${JSON.stringify(billing)}, ${promo?.code ?? null}, ${discount}, ${giftNote})`;
-      await q`UPDATE carts SET recovered_at = now() WHERE email = ${user.email} AND recovered_at IS NULL`;
-      await sendOrderEmail({ public_id: publicId, email: user.email, items: lines,
+      await q`UPDATE carts SET recovered_at = now() WHERE email = ${email} AND recovered_at IS NULL`;
+      await sendOrderEmail({ public_id: publicId, email, items: lines,
         total_pence: total, discount_pence: discount, shipping, gift_note: giftNote }, 'reserved');
       return res.status(201).json({ ok: true, mode: 'reservation', orderId: publicId });
     }
@@ -85,25 +91,25 @@ export default handler(['POST'], async (req, res) => {
       });
       discounts = [{ coupon: coupon.id }];
     }
-    const session = await stripe.checkout.sessions.create({
+    const stripeSession = await stripe.checkout.sessions.create({
       mode: 'payment',
-      customer_email: user.email,
+      customer_email: email,
       line_items: lines.map(l => ({
         quantity: l.qty,
         price_data: { currency: 'gbp', unit_amount: l.unitPence, product_data: { name: l.name } },
       })),
       ...(discounts ? { discounts } : {}),
       metadata: { public_id: publicId },
-      success_url: `${origin}/account?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/account?cancelled=1`,
+      success_url: session ? `${origin}/account?session_id={CHECKOUT_SESSION_ID}` : `${origin}/track?placed=${publicId}`,
+      cancel_url: session ? `${origin}/account?cancelled=1` : `${origin}/checkout?cancelled=1`,
     });
 
     await q`INSERT INTO orders (public_id, user_id, email, items, total_pence, status,
         stripe_session_id, shipping, billing, promo_code, discount_pence, gift_note)
-      VALUES (${publicId}, ${user.uid}, ${user.email}, ${JSON.stringify(lines)}, ${total}, 'pending_payment',
-        ${session.id}, ${JSON.stringify(shipping)}, ${JSON.stringify(billing)}, ${promo?.code ?? null}, ${discount}, ${giftNote})`;
-    await q`UPDATE carts SET recovered_at = now() WHERE email = ${user.email} AND recovered_at IS NULL`;
-    res.status(201).json({ ok: true, mode: 'stripe', orderId: publicId, url: session.url });
+      VALUES (${publicId}, ${userId}, ${email}, ${JSON.stringify(lines)}, ${total}, 'pending_payment',
+        ${stripeSession.id}, ${JSON.stringify(shipping)}, ${JSON.stringify(billing)}, ${promo?.code ?? null}, ${discount}, ${giftNote})`;
+    await q`UPDATE carts SET recovered_at = now() WHERE email = ${email} AND recovered_at IS NULL`;
+    res.status(201).json({ ok: true, mode: 'stripe', orderId: publicId, url: stripeSession.url });
   } catch (e) {
     if (promo) await releasePromo(promo.code);
     throw e;

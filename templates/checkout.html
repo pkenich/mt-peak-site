@@ -20,6 +20,15 @@
 
   <div class="co-grid" id="coGrid">
     <form class="co-forms" id="coForm">
+      <div class="co-card" id="contactCard">
+        <h3>Contact</h3>
+        <p class="co-guest-hint" id="guestHint" hidden>Checking out as a guest. <a class="text-link" href="/login?next=checkout">Sign in</a> for saved addresses and order history — or just carry on below.</p>
+        <div class="admin-grid">
+          <div class="field wide"><label for="coEmail">Email <span class="opt">— your order confirmation goes here</span></label>
+            <input id="coEmail" type="email" autocomplete="email" required></div>
+        </div>
+      </div>
+
       <div class="co-card">
         <h3>Delivery address</h3>
         <div class="saved-addr" id="savedAddr" hidden></div>

@@ -18,11 +18,18 @@
     return;
   }
 
-  // must be signed in to check out
+  // guest checkout: no sign-in required. Signed-in shoppers get their details
+  // prefilled and the email locked; guests type an email for their receipt.
+  let signedIn = false;
   fetch('/api/auth/me').then(r => r.json()).then(({ user }) => {
-    if (!user) location.replace('/login?next=checkout');
-    else if (!$('#shName').value) $('#shName').value = user.name || '';
-  }).catch(() => {});
+    if (user) {
+      signedIn = true;
+      if (!$('#shName').value) $('#shName').value = user.name || '';
+      const em = $('#coEmail'); em.value = user.email || ''; em.readOnly = true; em.classList.add('locked');
+    } else {
+      $('#guestHint').hidden = false;
+    }
+  }).catch(() => { $('#guestHint').hidden = false; });
 
   // saved addresses → one-tap fill
   fetch('/api/account/addresses').then(r => r.ok ? r.json() : null).then(data => {
@@ -256,6 +263,7 @@
       const res = await fetch('/api/checkout', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          email: $('#coEmail').value.trim(),
           items: items.map(i => ({ slug: i.s, variantId: i.v || null, q: i.q })),
           shipping: addr('sh'),
           billingSameAsShipping: same,
@@ -265,11 +273,12 @@
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.status === 401) { location.href = '/login?next=checkout'; return; }
       if (!res.ok) throw new Error(data.error || 'Checkout failed — please try again.');
       localStorage.removeItem('mtpeak_cart_v2');
       if (data.mode === 'stripe' && data.url) { location.href = data.url; return; }
-      location.href = `/account?placed=${encodeURIComponent(data.orderId)}`;
+      location.href = signedIn
+        ? `/account?placed=${encodeURIComponent(data.orderId)}`
+        : `/track?placed=${encodeURIComponent(data.orderId)}`;
     } catch (err) {
       msg.textContent = err.message;
       msg.className = 'form-msg err';

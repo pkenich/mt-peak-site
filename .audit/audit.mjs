@@ -115,6 +115,8 @@ await run('promo preview', '../api/promo.js', { method: 'POST', cookie: CUST, bo
 
 /* ---- checkout ---- */
 await run('checkout', '../api/checkout.js', { method: 'POST', cookie: CUST, body: { items: [{ slug: 'golden-harvest', q: 1 }], shipping: { name: 'S', line1: '1 St', city: 'London', postcode: 'N1', country: 'UK' }, billingSameAsShipping: true } }, ok);
+await run('checkout (guest w/ email)', '../api/checkout.js', { method: 'POST', body: { email: 'guest@b.co', items: [{ slug: 'golden-harvest', q: 1 }], shipping: { name: 'S', line1: '1 St', city: 'London', postcode: 'N1', country: 'UK' }, billingSameAsShipping: true } }, ok);
+await run('checkout (guest no email)', '../api/checkout.js', { method: 'POST', body: { items: [{ slug: 'golden-harvest', q: 1 }], shipping: { name: 'S', line1: '1 St', city: 'London', postcode: 'N1', country: 'UK' }, billingSameAsShipping: true } }, is(400));
 await run('checkout (empty)', '../api/checkout.js', { method: 'POST', cookie: CUST, body: { items: [] } }, is(400));
 await run('checkout (bad address)', '../api/checkout.js', { method: 'POST', cookie: CUST, body: { items: [{ slug: 'golden-harvest', q: 1 }], shipping: { name: 'S' }, billingSameAsShipping: true } }, is(400));
 

@@ -26,6 +26,8 @@ async function register(req, res) {
     RETURNING id, email, name`;
   if (!rows.length) throw bad('An account with that email already exists — sign in instead.', 409);
 
+  // adopt any orders this person placed as a guest with the same email
+  await sql()`UPDATE orders SET user_id = ${rows[0].id} WHERE email = ${email} AND user_id IS NULL`;
   issueCustomer(res, rows[0]);
   res.status(201).json({ ok: true, user: { email: rows[0].email, name: rows[0].name } });
 }
@@ -47,6 +49,8 @@ async function login(req, res) {
   }
 
   await clearThrottle(key);
+  // adopt any guest orders placed with this email before the account existed
+  await sql()`UPDATE orders SET user_id = ${rows[0].id} WHERE email = ${email} AND user_id IS NULL`;
   issueCustomer(res, rows[0]);
   res.json({ ok: true, user: { email: rows[0].email, name: rows[0].name } });
 }

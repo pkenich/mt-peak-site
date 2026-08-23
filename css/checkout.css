@@ -60,3 +60,7 @@
 .co-totals .grand span:first-child{text-transform:uppercase;font-size:.72rem;}
 .co-totals .grand span:last-child{font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:var(--gold);}
 .co-note{font-size:.7rem;color:var(--cream-dim);letter-spacing:.5px;line-height:1.7;margin-top:1.2rem;text-align:center;}
+
+/* guest checkout */
+.co-guest-hint{font-size:.72rem;color:var(--cream-dim);letter-spacing:.4px;line-height:1.65;margin:-.2rem 0 1.1rem;}
+#coEmail.locked{opacity:.75;cursor:not-allowed;}
