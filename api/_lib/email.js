@@ -33,6 +33,15 @@ const STATUS_COPY = {
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const gbp = (pence) => '£' + (pence / 100).toLocaleString('en-GB', { maximumFractionDigits: 0 });
 
+/* Where the email logo image is fetched from. Kept separate from SITE_URL
+   (which drives the customer-visible LINKS) because an <img> needs a host
+   that is actually serving right now — a brand-new custom domain often isn't
+   attached yet, which silently breaks the logo. Defaults to the always-live
+   Vercel URL; set EMAIL_ASSET_ORIGIN to the custom domain once it's attached.
+   The URL is never shown to recipients — they only see the rendered image. */
+const ASSET = (process.env.EMAIL_ASSET_ORIGIN || 'https://mt-peak-site.vercel.app').replace(/\/$/, '');
+const LOGO = `${ASSET}/assets/mt-peak-logo.png`;
+
 /* One place every email goes through. Returns { ok, status, error } so callers
    (and the admin "send test" tool) can surface Resend's real response instead
    of a silent boolean. Unconfigured key → ok:false with a clear reason. */
@@ -73,7 +82,7 @@ export function orderEmailHtml({ heading, message, order, siteUrl }) {
 <tr><td align="center">
   <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
     <tr><td align="center" style="padding:8px 0 28px;">
-      <img src="${siteUrl}/assets/mt-peak-logo.png" width="190" alt="Mt. Peak" style="display:block;margin:0 auto;">
+      <img src="${LOGO}" width="190" alt="Mt. Peak" style="display:block;margin:0 auto;">
       <div style="font-family:Georgia,serif;color:${MUTE};font-size:11px;letter-spacing:3px;padding-top:8px;">SOURCED AT ALTITUDE</div>
     </td></tr>
     <tr><td style="background:${CARD};border:1px solid ${LINE};padding:36px 32px;">
@@ -139,7 +148,7 @@ export async function sendBrandEmail({ to, subject, heading, message, ctaLabel, 
 <tr><td align="center">
   <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
     <tr><td align="center" style="padding:8px 0 28px;">
-      <img src="${siteUrl}/assets/mt-peak-logo.png" width="190" alt="Mt. Peak" style="display:block;margin:0 auto;">
+      <img src="${LOGO}" width="190" alt="Mt. Peak" style="display:block;margin:0 auto;">
     </td></tr>
     <tr><td style="background:${CARD};border:1px solid ${LINE};padding:36px 32px;">
       <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${INK};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
@@ -202,7 +211,7 @@ function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl }) {
 <tr><td align="center">
   <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
     <tr><td align="center" style="padding:8px 0 28px;">
-      <img src="${siteUrl}/assets/mt-peak-logo.png" width="190" alt="Mt. Peak" style="display:block;margin:0 auto;">
+      <img src="${LOGO}" width="190" alt="Mt. Peak" style="display:block;margin:0 auto;">
       <div style="font-family:Georgia,serif;color:${MUTE};font-size:11px;letter-spacing:3px;padding-top:8px;">SOURCED AT ALTITUDE</div>
     </td></tr>
     <tr><td style="background:${CARD};border:1px solid ${LINE};padding:36px 32px;">
