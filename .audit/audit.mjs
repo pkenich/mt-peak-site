@@ -22,7 +22,7 @@ globalThis.__MOCK_SQL__ = (strings, ...vals) => {
   return Promise.resolve([proxyRow()]);
 };
 
-const { issueCustomer, issueAdmin } = await import('../api/_lib/session.js');
+const { issueCustomer, issueAdmin, signToken } = await import('../api/_lib/session.js');
 
 function cookieFrom(issuer) {
   let header;
@@ -98,6 +98,15 @@ await run('orders.track', '../api/orders/track.js', { method: 'POST', body: { or
 await run('shop.reviews', '../api/shop/[action].js', { query: { action: 'reviews', slug: 'golden-harvest' } }, ok);
 await run('shop.reviews (bad slug)', '../api/shop/[action].js', { query: { action: 'reviews', slug: 'BAD SLUG!' } }, is(400));
 await run('shop.notify-stock', '../api/shop/[action].js', { method: 'POST', query: { action: 'notify-stock' }, body: { slug: 'golden-harvest', email: 'a@b.co' } }, ok);
+await run('shop.save-cart (session)', '../api/shop/[action].js', { method: 'POST', query: { action: 'save-cart' }, cookie: CUST, body: { items: [{ s: 'golden-harvest', q: 2 }] } }, ok);
+await run('shop.save-cart (empty→clear)', '../api/shop/[action].js', { method: 'POST', query: { action: 'save-cart' }, cookie: CUST, body: { items: [] } }, ok);
+await run('shop.save-cart (anon no-op)', '../api/shop/[action].js', { method: 'POST', query: { action: 'save-cart' }, body: { items: [{ s: 'golden-harvest', q: 1 }] } }, ok);
+await run('shop.restore-cart', '../api/shop/[action].js', { query: { action: 'restore-cart', token: signToken({ cart: 'a@b.co' }, 3600) } }, ok);
+await run('shop.restore-cart (bad token)', '../api/shop/[action].js', { query: { action: 'restore-cart', token: 'nope' } }, is(400));
+
+/* ---- cron: abandoned-cart reminders ---- */
+await run('cron.reminders', '../api/cron/reminders.js', { query: {} }, ok);
+await run('cron.reminders (bad secret)', '../api/cron/reminders.js', { query: {}, cookie: '' }, ok);
 
 /* ---- subscribe / promo ---- */
 await run('subscribe', '../api/subscribe.js', { method: 'POST', body: { email: 'a@b.co' } }, ok);
@@ -121,6 +130,10 @@ await run('admin.order-status', '../api/admin/[action].js', { method: 'PUT', que
 await run('admin.order-status (bad)', '../api/admin/[action].js', { method: 'PUT', query: { action: 'order-status' }, cookie: ADMIN, body: { publicId: 'MP-ABC234', status: 'nonsense' } }, is(400));
 await run('admin.refund-resolve', '../api/admin/[action].js', { method: 'PUT', query: { action: 'refund-resolve' }, cookie: ADMIN, body: { id: 1, decision: 'approved' } }, c => ok(c) || c === 409);
 await run('admin.content GET', '../api/admin/[action].js', { method: 'GET', query: { action: 'content', file: 'site' }, cookie: ADMIN }, c => ok(c) || c === 502 || c === 503);
+await run('admin.email-test GET', '../api/admin/[action].js', { method: 'GET', query: { action: 'email-test' }, cookie: ADMIN }, ok);
+await run('admin.email-test POST', '../api/admin/[action].js', { method: 'POST', query: { action: 'email-test' }, cookie: ADMIN, body: { to: 'a@b.co' } }, ok);
+await run('admin.email-test (bad email)', '../api/admin/[action].js', { method: 'POST', query: { action: 'email-test' }, cookie: ADMIN, body: { to: 'nope' } }, is(400));
+await run('admin.email-test (anon)', '../api/admin/[action].js', { method: 'GET', query: { action: 'email-test' } }, is(401));
 
 console.log(fails ? `\n${fails} FAILURE(S)` : '\nALL HANDLERS OK');
 process.exit(fails ? 1 : 0);

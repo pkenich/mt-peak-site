@@ -69,6 +69,7 @@ export default handler(['POST'], async (req, res) => {
           shipping, billing, promo_code, discount_pence, gift_note)
         VALUES (${publicId}, ${user.uid}, ${user.email}, ${JSON.stringify(lines)}, ${total}, 'reserved',
           ${JSON.stringify(shipping)}, ${JSON.stringify(billing)}, ${promo?.code ?? null}, ${discount}, ${giftNote})`;
+      await q`UPDATE carts SET recovered_at = now() WHERE email = ${user.email} AND recovered_at IS NULL`;
       await sendOrderEmail({ public_id: publicId, email: user.email, items: lines,
         total_pence: total, discount_pence: discount, shipping, gift_note: giftNote }, 'reserved');
       return res.status(201).json({ ok: true, mode: 'reservation', orderId: publicId });
@@ -101,6 +102,7 @@ export default handler(['POST'], async (req, res) => {
         stripe_session_id, shipping, billing, promo_code, discount_pence, gift_note)
       VALUES (${publicId}, ${user.uid}, ${user.email}, ${JSON.stringify(lines)}, ${total}, 'pending_payment',
         ${session.id}, ${JSON.stringify(shipping)}, ${JSON.stringify(billing)}, ${promo?.code ?? null}, ${discount}, ${giftNote})`;
+    await q`UPDATE carts SET recovered_at = now() WHERE email = ${user.email} AND recovered_at IS NULL`;
     res.status(201).json({ ok: true, mode: 'stripe', orderId: publicId, url: session.url });
   } catch (e) {
     if (promo) await releasePromo(promo.code);

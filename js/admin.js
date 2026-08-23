@@ -58,6 +58,7 @@
     gate.hidden = true; panel.hidden = false; $('#btnAdminLogout').hidden = false;
     loadDashboard();
     loadPromos();
+    loadEmailStatus();
     try {
       const [p, s] = await Promise.all([api('/api/admin/content?file=products'), api('/api/admin/content?file=site')]);
       products = p.data; site = s.data;
@@ -239,6 +240,35 @@
     for (const b of wrap.querySelectorAll('button[data-emails]')) b.addEventListener('click', () =>
       navigator.clipboard.writeText(b.dataset.emails.split(',').join('\n')).then(() => notify('Waitlist emails copied.')));
   }
+
+  /* ---------- email delivery ---------- */
+  async function loadEmailStatus() {
+    const el = $('#emailStatus'); if (!el) return;
+    try {
+      const s = await api('/api/admin/email-test');
+      if (!s.configured) {
+        el.innerHTML = '⚠️ <b>Not configured.</b> Add <code>RESEND_API_KEY</code> in Vercel → Settings → Environment Variables (scope: Production), then redeploy.';
+      } else if (s.usingSandbox) {
+        el.innerHTML = `✅ Key set, but sending from the <b>Resend sandbox</b> (<code>${esc(s.from)}</code>) — it only delivers to your own verified address. Verify your domain in Resend and set <code>EMAIL_FROM</code> to send to customers.`;
+      } else {
+        el.innerHTML = `✅ <b>Live.</b> Sending from <code>${esc(s.from)}</code>.`;
+      }
+      if (!$('#emailTestTo').value) $('#emailTestTo').value = '';
+    } catch (err) { el.textContent = err.message; }
+  }
+  if ($('#emailTestBtn')) $('#emailTestBtn').addEventListener('click', async () => {
+    const to = $('#emailTestTo').value.trim();
+    const msg = $('#emailTestMsg'); const btn = $('#emailTestBtn');
+    msg.className = 'admin-note'; msg.textContent = '';
+    if (!to) { msg.textContent = 'Enter an address to send the test to.'; return; }
+    btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      const r = await api('/api/admin/email-test', { method: 'POST', body: JSON.stringify({ to }) });
+      if (r.ok) { msg.innerHTML = `✅ Sent to <b>${esc(to)}</b>. Check the inbox (and spam on first send).`; }
+      else { msg.innerHTML = `❌ Resend refused it${r.status ? ` (${r.status})` : ''}: ${esc(r.error || 'unknown error')}`; }
+    } catch (err) { msg.textContent = err.message; }
+    btn.disabled = false; btn.textContent = 'Send test';
+  });
 
   /* ---------- promo codes ---------- */
   async function loadPromos() {

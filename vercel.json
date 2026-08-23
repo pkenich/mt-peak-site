@@ -5,6 +5,9 @@
   "outputDirectory": "public",
   "cleanUrls": true,
   "trailingSlash": false,
+  "crons": [
+    { "path": "/api/cron/reminders", "schedule": "0 9 * * *" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

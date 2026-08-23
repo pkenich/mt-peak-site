@@ -4,7 +4,7 @@ import { issueAdmin, readAdmin, clearAdmin, requireAdmin } from '../_lib/session
 import { readRepoFile, writeRepoFile } from '../_lib/github.js';
 import { normCode, isCode } from '../_lib/promo.js';
 import { sendOrderEmail, sendBrandEmail } from '../_lib/email.js';
-import { dispatch, bad } from '../_lib/util.js';
+import { dispatch, bad, isEmail } from '../_lib/util.js';
 
 /* ---------- session ---------- */
 
@@ -256,8 +256,38 @@ async function refundResolve(req, res) {
   res.json({ ok: true });
 }
 
+/* ---------- email delivery: status + live test ---------- */
+async function emailTest(req, res) {
+  requireAdmin(req);
+  const configured = !!process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM || 'Mt. Peak <onboarding@resend.dev>';
+  const siteUrl = process.env.SITE_URL || 'https://mt-peak-site.vercel.app';
+
+  if (req.method === 'GET') {
+    return res.json({ configured, from, siteUrl,
+      usingSandbox: /@resend\.dev>?$/.test(from) });
+  }
+
+  // POST → actually send a test and report Resend's real response
+  const to = String(req.body?.to || '').trim();
+  if (!isEmail(to)) throw bad('Enter a valid email address to send the test to.');
+  if (!configured) {
+    return res.status(200).json({ ok: false, configured: false,
+      error: 'RESEND_API_KEY is not set in this deployment. Add it in Vercel → Settings → Environment Variables (scope: Production), then Redeploy.' });
+  }
+  const r = await sendBrandEmail({
+    to,
+    subject: 'Mt. Peak — email delivery test',
+    heading: 'Delivery is working',
+    message: `This is a test from your admin panel. If you're reading it, transactional email is configured correctly and your order, reset and reminder emails will send. Sent from ${from}.`,
+    ctaLabel: 'VISIT THE SITE', ctaUrl: siteUrl,
+  });
+  res.status(200).json({ ok: r.ok, configured: true, from, status: r.status, error: r.error || null });
+}
+
 export default dispatch({
   login: { methods: ['POST'], fn: login },
+  'email-test': { methods: ['GET', 'POST'], fn: emailTest },
   logout: { methods: ['POST'], fn: async (req, res) => { clearAdmin(res); res.json({ ok: true }); } },
   me: { methods: ['GET'], fn: async (req, res) => { res.json({ admin: !!readAdmin(req) }); } },
   content: { methods: ['GET', 'PUT'], fn: content },

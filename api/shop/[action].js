@@ -1,7 +1,68 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { sql, ensureSchema, checkThrottle, recordFailure } from '../_lib/db.js';
+import { readCustomer, verifyToken } from '../_lib/session.js';
 import { dispatch, bad, normEmail, isEmail } from '../_lib/util.js';
 
 const slugRe = /^[a-z0-9-]{1,60}$/;
+const PRODUCTS = JSON.parse(readFileSync(join(process.cwd(), 'content/products.json'), 'utf8'));
+
+/* Reprice a client cart against the server catalogue → normalized lines in the
+   localStorage shape {s,v,n,p,q} plus a trustworthy subtotal. Unknown/sold-out
+   items are dropped rather than rejected — a reminder shouldn't 400. */
+function normalizeCart(rawItems) {
+  const out = [];
+  for (const it of Array.isArray(rawItems) ? rawItems.slice(0, 20) : []) {
+    const slug = String(it.s ?? it.slug ?? '');
+    const p = PRODUCTS[slug];
+    if (!p || p.soldOut) continue;
+    let q = Math.floor(Number(it.q ?? it.qty));
+    if (!Number.isFinite(q) || q < 1) continue;
+    q = Math.min(q, 20);
+    const variantId = it.v ?? it.variantId ?? null;
+    if (Array.isArray(p.variants) && p.variants.length) {
+      const v = p.variants.find(x => x.id === variantId) || p.variants.find(x => x.default) || p.variants[0];
+      if (v.soldOut) continue;
+      out.push({ s: slug, v: v.id, n: `${p.name} · ${v.label}`, p: v.price, q });
+    } else {
+      out.push({ s: slug, v: null, n: p.cartName, p: p.price, q });
+    }
+  }
+  const subtotalPence = out.reduce((s, l) => s + l.p * 100 * l.q, 0);
+  return { items: out, subtotalPence };
+}
+
+/* POST { items } — persists the signed-in customer's cart so we can send an
+   abandoned-cart reminder later. Email always comes from the session cookie,
+   never the client. Guests (no session) are a silent no-op. Any change resets
+   the reminder clocks so a fresh abandonment cycle begins. */
+async function saveCart(req, res) {
+  const s = readCustomer(req);
+  if (!s) return res.json({ ok: true, saved: false }); // nobody to remind
+  await ensureSchema();
+  const { items, subtotalPence } = normalizeCart(req.body?.items);
+  if (!items.length) {
+    await sql()`DELETE FROM carts WHERE email = ${s.email}`;
+    return res.json({ ok: true, saved: false });
+  }
+  await sql()`INSERT INTO carts (email, user_id, items, subtotal_pence, updated_at,
+      reminded_24h, reminded_1mo, recovered_at)
+    VALUES (${s.email}, ${s.uid}, ${JSON.stringify(items)}, ${subtotalPence}, now(), NULL, NULL, NULL)
+    ON CONFLICT (email) DO UPDATE SET items = EXCLUDED.items, subtotal_pence = EXCLUDED.subtotal_pence,
+      user_id = EXCLUDED.user_id, updated_at = now(),
+      reminded_24h = NULL, reminded_1mo = NULL, recovered_at = NULL`;
+  res.json({ ok: true, saved: true });
+}
+
+/* GET ?token=... — restores a cart into the browser from a reminder link.
+   The token is our own signed, namespaced token carrying the cart's email. */
+async function restoreCart(req, res) {
+  const payload = verifyToken(req.query.token);
+  if (!payload?.cart) throw bad('That link has expired — your reserve may have moved on.', 400);
+  await ensureSchema();
+  const rows = await sql()`SELECT items FROM carts WHERE email = ${payload.cart}`;
+  res.json({ items: rows.length ? rows[0].items : [] });
+}
 
 /* Public product reviews (social proof on the PDP): aggregate rating + a few
    recent notes for a tea, drawn from verified order reviews. First names only. */
@@ -41,4 +102,6 @@ async function notifyStock(req, res) {
 export default dispatch({
   reviews: { methods: ['GET'], fn: reviews },
   'notify-stock': { methods: ['POST'], fn: notifyStock },
+  'save-cart': { methods: ['POST'], fn: saveCart },
+  'restore-cart': { methods: ['GET'], fn: restoreCart },
 });

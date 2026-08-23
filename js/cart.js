@@ -9,6 +9,22 @@ const navCart = document.getElementById('navCart');
 function save() {
   try { localStorage.setItem(STORE, JSON.stringify(cart)); } catch (e) {}
   window.dispatchEvent(new CustomEvent('mtpeak:cart')); // checkout page resyncs
+  syncServerCart(); // persist for abandoned-cart reminders (signed-in only)
+}
+
+/* Debounced push of the cart to the server so we can send a reminder later.
+   The server only stores it when a session cookie is present, and always
+   reprices from its own catalogue — this body is just the item list. */
+let _syncTimer = null;
+function syncServerCart() {
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(() => {
+    fetch('/api/shop/save-cart', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cart.map(i => ({ s: i.s, v: i.v || null, q: i.q })) }),
+      keepalive: true,
+    }).catch(() => {});
+  }, 900);
 }
 
 function addToCart(slug, name, price, q = 1, variantId = null) {
@@ -125,3 +141,30 @@ if (navToggle) {
 
 navCart.addEventListener('click', openCart);
 render();
+
+/* Return-from-reminder: /?restore=<token> repopulates the cart on this device
+   and opens the drawer. Merges with anything already here (by slug+variant). */
+(() => {
+  const params = new URLSearchParams(location.search);
+  const token = params.get('restore');
+  if (!token) return;
+  fetch('/api/shop/restore-cart?token=' + encodeURIComponent(token))
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data || !Array.isArray(data.items) || !data.items.length) return;
+      for (const it of data.items) {
+        if (!it || !it.s) continue;
+        const v = it.v || null;
+        const e = cart.find(i => i.s === it.s && (i.v || null) === v);
+        if (e) e.q = Math.min(20, e.q + (Number(it.q) || 1));
+        else cart.push({ s: it.s, v, n: it.n, p: Number(it.p) || 0, q: Math.min(20, Number(it.q) || 1) });
+      }
+      save(); render(); openCart();
+    })
+    .catch(() => {})
+    .finally(() => {
+      params.delete('restore');
+      const qs = params.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
+    });
+})();

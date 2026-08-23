@@ -91,6 +91,19 @@ export function ensureSchema() {
         created_at timestamptz NOT NULL DEFAULT now(),
         PRIMARY KEY (slug, email)
       )`;
+      // Saved carts for abandoned-cart reminders. One live cart per email;
+      // any change resets the reminder clocks (reminded_* / recovered_at).
+      await q`CREATE TABLE IF NOT EXISTS carts (
+        email text PRIMARY KEY,
+        user_id bigint,
+        items jsonb NOT NULL,
+        subtotal_pence int NOT NULL DEFAULT 0,
+        updated_at timestamptz NOT NULL DEFAULT now(),
+        reminded_24h timestamptz,
+        reminded_1mo timestamptz,
+        recovered_at timestamptz
+      )`;
+      await q`CREATE INDEX IF NOT EXISTS carts_sweep_idx ON carts(updated_at) WHERE recovered_at IS NULL`;
     })().catch(e => { _ready = null; throw e; });
   }
   return _ready;
