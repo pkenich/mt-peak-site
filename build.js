@@ -133,7 +133,7 @@ const emit = (file, html) => { writeFileSync(join(OUT, file), html); console.log
 const jsonLd = (obj) => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
 const orgSchema = {
   '@context': 'https://schema.org', '@type': 'Organization',
-  name: site.brand, url: site.siteUrl, logo: `${site.siteUrl}/assets/mtpeak-emblem.webp`,
+  name: site.brand, url: site.siteUrl, logo: `${site.siteUrl}/assets/mt-peak-logo.png`,
   description: site.metaDesc,
 };
 const orgLd = jsonLd(orgSchema);

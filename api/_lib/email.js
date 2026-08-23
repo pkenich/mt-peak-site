@@ -1,11 +1,11 @@
 /* Transactional email via Resend's REST API (no SDK). Unconfigured → silent
    no-op so email can never break an order flow; failures are logged, not thrown. */
 
-/* Light, cream palette — matches the gold-on-cream MT. PEAK mark and reads far
-   warmer than the old dark-green shell. INK = primary text, MUTE = secondary,
-   BG = outer sand, CARD = cream panel, LINE = hairline rule, GOLD = accent/CTA. */
-const GOLD = '#a97e37', INK = '#2b3a30', MUTE = '#7a7062',
-  BG = '#efe7d7', CARD = '#fbf8f1', LINE = '#e6dcc8';
+/* Packaging palette — deep pine green + gold, matched to the MT. PEAK mark
+   (#c6a06a). INK = primary text (cream), MUTE = secondary, BG = outer pine,
+   CARD = green panel, LINE = gold hairline, GOLD = accent/CTA. */
+const GOLD = '#c6a06a', INK = '#f3ecdd', MUTE = 'rgba(243,236,221,.62)',
+  BG = '#0e201a', CARD = '#143128', LINE = 'rgba(198,160,106,.28)';
 
 const STATUS_COPY = {
   reserved: {
@@ -73,9 +73,8 @@ export function orderEmailHtml({ heading, message, order, siteUrl }) {
 <tr><td align="center">
   <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
     <tr><td align="center" style="padding:8px 0 28px;">
-      <img src="${siteUrl}/assets/mtpeak-emblem.webp" width="72" alt="Mt. Peak" style="display:block;">
-      <div style="font-family:Georgia,'Times New Roman',serif;color:${GOLD};font-size:20px;letter-spacing:6px;padding-top:14px;">MT. PEAK</div>
-      <div style="font-family:Georgia,serif;color:${MUTE};font-size:11px;letter-spacing:3px;padding-top:6px;">SOURCED AT ALTITUDE</div>
+      <img src="${siteUrl}/assets/mt-peak-logo.png" width="190" alt="Mt. Peak" style="display:block;margin:0 auto;">
+      <div style="font-family:Georgia,serif;color:${MUTE};font-size:11px;letter-spacing:3px;padding-top:8px;">SOURCED AT ALTITUDE</div>
     </td></tr>
     <tr><td style="background:${CARD};border:1px solid ${LINE};padding:36px 32px;">
       <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${INK};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
@@ -132,7 +131,7 @@ export function orderEmailHtml({ heading, message, order, siteUrl }) {
    Returns { ok, status, error } — callers that only care about success can
    still use it truthily via `.ok`. */
 export async function sendBrandEmail({ to, subject, heading, message, ctaLabel, ctaUrl }) {
-  const siteUrl = process.env.SITE_URL || 'https://mt-peak-site.vercel.app';
+  const siteUrl = process.env.SITE_URL || 'https://mtpeakofficial.com';
   const html = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
 <body style="margin:0;padding:0;background:${BG};">
@@ -140,8 +139,7 @@ export async function sendBrandEmail({ to, subject, heading, message, ctaLabel, 
 <tr><td align="center">
   <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
     <tr><td align="center" style="padding:8px 0 28px;">
-      <img src="${siteUrl}/assets/mtpeak-emblem.webp" width="72" alt="Mt. Peak" style="display:block;">
-      <div style="font-family:Georgia,'Times New Roman',serif;color:${GOLD};font-size:20px;letter-spacing:6px;padding-top:14px;">MT. PEAK</div>
+      <img src="${siteUrl}/assets/mt-peak-logo.png" width="190" alt="Mt. Peak" style="display:block;margin:0 auto;">
     </td></tr>
     <tr><td style="background:${CARD};border:1px solid ${LINE};padding:36px 32px;">
       <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${INK};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
@@ -168,7 +166,7 @@ export async function sendBrandEmail({ to, subject, heading, message, ctaLabel, 
 export async function sendOrderEmail(order, status) {
   const copy = STATUS_COPY[status];
   if (!copy) return { ok: false, status: 0, error: 'unknown status' };
-  const siteUrl = process.env.SITE_URL || 'https://mt-peak-site.vercel.app';
+  const siteUrl = process.env.SITE_URL || 'https://mtpeakofficial.com';
   return sendViaResend({
     to: order.email,
     subject: copy.subject(order),
@@ -204,9 +202,8 @@ function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl }) {
 <tr><td align="center">
   <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
     <tr><td align="center" style="padding:8px 0 28px;">
-      <img src="${siteUrl}/assets/mtpeak-emblem.webp" width="72" alt="Mt. Peak" style="display:block;">
-      <div style="font-family:Georgia,'Times New Roman',serif;color:${GOLD};font-size:20px;letter-spacing:6px;padding-top:14px;">MT. PEAK</div>
-      <div style="font-family:Georgia,serif;color:${MUTE};font-size:11px;letter-spacing:3px;padding-top:6px;">SOURCED AT ALTITUDE</div>
+      <img src="${siteUrl}/assets/mt-peak-logo.png" width="190" alt="Mt. Peak" style="display:block;margin:0 auto;">
+      <div style="font-family:Georgia,serif;color:${MUTE};font-size:11px;letter-spacing:3px;padding-top:8px;">SOURCED AT ALTITUDE</div>
     </td></tr>
     <tr><td style="background:${CARD};border:1px solid ${LINE};padding:36px 32px;">
       <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;color:${INK};font-size:26px;line-height:1.25;">${esc(heading)}</h1>
@@ -241,7 +238,7 @@ function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl }) {
 export async function sendCartEmail(cart, which, restoreUrl) {
   const copy = CART_COPY[which];
   if (!copy) return { ok: false, status: 0, error: 'unknown reminder' };
-  const siteUrl = process.env.SITE_URL || 'https://mt-peak-site.vercel.app';
+  const siteUrl = process.env.SITE_URL || 'https://mtpeakofficial.com';
   return sendViaResend({
     to: cart.email,
     subject: copy.subject,

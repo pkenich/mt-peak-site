@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   await ensureSchema();
   const q = sql();
-  const siteUrl = process.env.SITE_URL || 'https://mt-peak-site.vercel.app';
+  const siteUrl = process.env.SITE_URL || 'https://mtpeakofficial.com';
   const restoreUrl = (email) => `${siteUrl}/?restore=${encodeURIComponent(signToken({ cart: email }, 25 * 24 * 3600))}`;
 
   const result = { '24h': { sent: 0, failed: 0 }, '1mo': { sent: 0, failed: 0 } };

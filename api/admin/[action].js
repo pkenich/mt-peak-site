@@ -261,7 +261,7 @@ async function emailTest(req, res) {
   requireAdmin(req);
   const configured = !!process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM || 'Mt. Peak <onboarding@resend.dev>';
-  const siteUrl = process.env.SITE_URL || 'https://mt-peak-site.vercel.app';
+  const siteUrl = process.env.SITE_URL || 'https://mtpeakofficial.com';
 
   if (req.method === 'GET') {
     return res.json({ configured, from, siteUrl,
