@@ -69,7 +69,7 @@ async function requestReset(req, res) {
   const rows = await sql()`SELECT id, pass_hash FROM users WHERE email = ${email}`;
   if (rows.length) {
     const token = signToken({ uid: rows[0].id, fp: passFingerprint(rows[0].pass_hash) }, 3600);
-    const siteUrl = process.env.SITE_URL || 'https://mtpeakofficial.com';
+    const siteUrl = process.env.SITE_URL || 'https://www.mtpeakofficial.com';
     await sendBrandEmail({
       to: email,
       subject: 'Reset your Mt. Peak password',

@@ -140,7 +140,7 @@ export function orderEmailHtml({ heading, message, order, siteUrl }) {
    Returns { ok, status, error } — callers that only care about success can
    still use it truthily via `.ok`. */
 export async function sendBrandEmail({ to, subject, heading, message, ctaLabel, ctaUrl }) {
-  const siteUrl = process.env.SITE_URL || 'https://mtpeakofficial.com';
+  const siteUrl = process.env.SITE_URL || 'https://www.mtpeakofficial.com';
   const html = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
 <body style="margin:0;padding:0;background:${BG};">
@@ -175,7 +175,7 @@ export async function sendBrandEmail({ to, subject, heading, message, ctaLabel, 
 export async function sendOrderEmail(order, status) {
   const copy = STATUS_COPY[status];
   if (!copy) return { ok: false, status: 0, error: 'unknown status' };
-  const siteUrl = process.env.SITE_URL || 'https://mtpeakofficial.com';
+  const siteUrl = process.env.SITE_URL || 'https://www.mtpeakofficial.com';
   return sendViaResend({
     to: order.email,
     subject: copy.subject(order),
@@ -247,7 +247,7 @@ function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl }) {
 export async function sendCartEmail(cart, which, restoreUrl) {
   const copy = CART_COPY[which];
   if (!copy) return { ok: false, status: 0, error: 'unknown reminder' };
-  const siteUrl = process.env.SITE_URL || 'https://mtpeakofficial.com';
+  const siteUrl = process.env.SITE_URL || 'https://www.mtpeakofficial.com';
   return sendViaResend({
     to: cart.email,
     subject: copy.subject,

@@ -49,7 +49,7 @@ async function refund(req, res) {
     subject: `We’ve received your refund request — ${order.public_id}`,
     heading: 'Refund request received',
     message: `Thank you — we’ve logged your request for order ${order.public_id} and a human will review it within two working days. We’ll be in touch by email.`,
-    ctaLabel: 'VIEW YOUR ORDERS', ctaUrl: `${process.env.SITE_URL || 'https://mtpeakofficial.com'}/account`,
+    ctaLabel: 'VIEW YOUR ORDERS', ctaUrl: `${process.env.SITE_URL || 'https://www.mtpeakofficial.com'}/account`,
   });
   res.status(201).json({ ok: true });
 }
