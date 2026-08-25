@@ -104,7 +104,7 @@ nav{padding:1.6rem 3.5rem;
 @media(max-width:780px){.taste-grid{grid-template-columns:1fr;}.taste-cell{padding:2rem 1.6rem;}}
 
 /* brewing */
-.brew-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:1rem;
+.brew-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:1rem;
   background:rgba(201,169,97,.12);border:1px solid rgba(201,169,97,.12);}
 .brew-cell{background:var(--bg2);padding:2.6rem 1.6rem;text-align:center;}
 .brew-cell .bn{font-family:'Cormorant Garamond',serif;font-size:2.8rem;color:var(--gold);line-height:1;margin-bottom:.6rem;}

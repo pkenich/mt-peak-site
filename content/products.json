@@ -4,16 +4,16 @@
     "num": "01",
     "name": "Light & Bright",
     "title": "Light & Bright — MT. PEAK · Himalayan Black Tea",
-    "metaDesc": "Light & Bright — a partially oxidised single-origin black tea from eastern Nepal. Floral, bright, golden cup. Certified organic, hand-plucked.",
-    "tag": "Black Tea",
-    "eyebrow": "№ 01 · Single-Origin Black Tea",
-    "tagline": "Floral · Bright · Golden Cup",
-    "desc": "A black tea of unusual restraint. Oxidised only partially, it keeps the brightness of the high spring garden — a golden cup with a floral lift and a clean, luminous finish that lingers like morning light on the ridge.",
-    "homeDesc": "A black tea of unusual restraint. Oxidised only partially, it keeps the brightness of the high spring garden — a clean, luminous finish that lingers like morning light on the ridge.",
+    "metaDesc": "Light & Bright — an unoxidised single-origin speciality tea (SFTGFOP-1 CL) from eastern Nepal. Greenish leaf with fine white tips, a light-orange cup, very floral with little astringency.",
+    "tag": "Speciality Tea",
+    "eyebrow": "№ 01 · Single-Origin Speciality Tea",
+    "tagline": "Floral · Fresh · Fine White Tips",
+    "desc": "A speciality tea graded SFTGFOP-1(CL): greenish leaf shot through with fine white tips. Left entirely unoxidised, it pours a light orange cup — very floral, with a fresh aroma and only the faintest astringency.",
+    "homeDesc": "Greenish leaf with fine white tips, left entirely unoxidised — a light-orange cup that is very floral and fresh, with only the faintest astringency.",
     "notes": [
       "Floral",
-      "Bright",
-      "Golden Cup"
+      "Fresh",
+      "White Tips"
     ],
     "price": 68,
     "unitShort": "/ 100g caddy",
@@ -72,88 +72,83 @@
         "v": "Complimentary UK · gift wrap available"
       }
     ],
-    "tastingH": "A golden cup, drawn bright",
+    "tastingH": "A light-orange cup, very floral",
     "tasting": [
       {
         "k": "Aroma",
-        "v": "Orchard blossom, apricot skin, a thread of mountain honey."
+        "v": "Fresh and floral, with a clean, high-grown lift."
       },
       {
         "k": "Palate",
-        "v": "Light-bodied and luminous — floral lift over a soft, golden sweetness."
+        "v": "Light and floral over fine white tips — bright, with only a whisper of astringency."
       },
       {
         "k": "Finish",
-        "v": "Clean and lingering, like morning light holding on the ridge."
+        "v": "Clean and fresh, softly floral to the last."
       }
     ],
     "tasteFoot": [
       {
         "k": "Cup Colour",
-        "v": "Bright Gold"
+        "v": "Light Orange"
       },
       {
-        "k": "Body",
-        "v": "Light – Medium"
+        "k": "Leaf",
+        "v": "Greenish · fine white tips"
       },
       {
         "k": "Oxidation",
-        "v": "20 – 30%"
+        "v": "None — unoxidised"
       },
       {
-        "k": "Caffeine",
-        "v": "Moderate"
+        "k": "Grade",
+        "v": "SFTGFOP-1(CL)"
       }
     ],
     "brew": [
       {
         "n": "90",
         "u": "°C",
-        "label": "Water Temp"
+        "label": "Water"
       },
       {
-        "n": "3",
+        "n": "2",
         "u": "g",
-        "label": "Per 200ml"
+        "label": "Per 180ml"
       },
       {
-        "n": "3",
+        "n": "3–4",
         "u": "min",
-        "label": "First Steep"
-      },
-      {
-        "n": "3",
-        "u": "×",
-        "label": "Infusions"
+        "label": "Steep"
       }
     ],
     "brewSteps": [
-      "Warm a porcelain or glass pot with hot water, then discard — the vessel should be ready, not scalding.",
-      "Measure three grams of leaf per 200ml. This is a tea that rewards a generous, unhurried hand.",
-      "Pour water just off the boil, around 90°C — hot enough to open the leaf, cool enough to keep it bright.",
-      "Steep three minutes for the first cup. Re-infuse up to three times, adding thirty seconds each pour."
+      "Warm a porcelain or glass pot with hot water, then discard.",
+      "Measure 2 grams of leaf for every 180ml of water.",
+      "Pour water at about 90°C — just short of a rolling boil.",
+      "Steep 3 to 4 minutes, then pour off completely."
     ],
-    "makeH": "Five deliberate steps",
+    "makeH": "Withered, rolled, unoxidised",
     "make": [
       {
         "t": "Plucking",
-        "d": "Two leaves and a bud, taken by hand at first light."
+        "d": "Two or three leaves and a bud, taken by hand."
       },
       {
         "t": "Withering",
-        "d": "12–14 hours on bamboo trays, until the leaf turns supple."
+        "d": "12–16 hours on the trough, cool and warm air as needed, until the leaf turns supple."
       },
       {
         "t": "Rolling",
-        "d": "Gentle pressure, bruising the leaf only lightly."
+        "d": "10–20 minutes, breaking the cell walls to set an even shape and texture."
       },
       {
-        "t": "Oxidation",
-        "d": "Arrested early, at 20–30% — the secret to its brightness."
+        "t": "Unoxidised",
+        "d": "No fermentation step — which keeps the leaf greenish and high in natural polyphenols."
       },
       {
-        "t": "Firing",
-        "d": "Low and slow, locking the luminous character in."
+        "t": "Drying",
+        "d": "15–20 minutes at 110–120°C, finishing at 3–5% moisture so the leaf keeps."
       }
     ],
     "originLead": "High on the southern slopes of the Himalaya, above the cloud line, the garden grows slowly in thin, clean air.",
@@ -164,11 +159,15 @@
     "spec": [
       {
         "k": "Style",
-        "v": "Partially oxidised black tea"
+        "v": "Unoxidised speciality tea"
+      },
+      {
+        "k": "Grade",
+        "v": "SFTGFOP-1(CL)"
       },
       {
         "k": "Oxidation",
-        "v": "20 – 30%"
+        "v": "None"
       },
       {
         "k": "Origin",
@@ -179,28 +178,20 @@
         "v": "2,500 metres"
       },
       {
-        "k": "Cultivation",
-        "v": "100% certified organic"
-      },
-      {
         "k": "Plucking",
-        "v": "Two leaves and a bud · by hand"
+        "v": "Two or three leaves and a bud · by hand"
       },
       {
-        "k": "Harvest",
-        "v": "First & spring flush"
+        "k": "Brewing",
+        "v": "2g / 180ml · 90°C · 3–4 min"
       },
       {
         "k": "Format",
         "v": "100g loose leaf · resealable caddy"
-      },
-      {
-        "k": "Caffeine",
-        "v": "Moderate"
       }
     ],
     "closerH": "Take the ridge<br>home with <em>you</em>",
-    "closerP": "£68 for 100g of single-origin, hand-plucked Himalayan black tea — drawn bright, finished clean.",
+    "closerP": "£68 for 100g of single-origin, hand-plucked Himalayan speciality tea — greenish leaf, fine white tips, a light and floral cup.",
     "soldOut": false
   },
   "mountain-green": {
@@ -208,12 +199,12 @@
     "num": "02",
     "name": "Mountain Green",
     "title": "Mountain Green — MT. PEAK · Himalayan Green Tea",
-    "metaDesc": "Mountain Green — a pan-fired single-origin green tea from eastern Nepal. Fresh, vegetal, crisp, pale jade cup. Certified organic, hand-plucked.",
+    "metaDesc": "Mountain Green — a single-origin green tea from eastern Nepal, hot-air fixed to keep its colour. Fresh and vegetal with subtle grassy notes. Cultivars T-78, P-312 and Tinali.",
     "tag": "Green Tea",
     "eyebrow": "№ 02 · Single-Origin Green Tea",
     "tagline": "Fresh · Vegetal · Crisp",
-    "desc": "Pan-fired within hours of plucking, the leaf never oxidises. What reaches the cup is the mountain itself — fresh, vegetal, crisp as thin air, with a sweetness drawn from above the cloud line.",
-    "homeDesc": "Pan-fired within hours of plucking, the leaf never oxidises. What reaches the cup is the mountain itself — fresh, vegetal, crisp as thin air, with a sweetness drawn from above the cloud line.",
+    "desc": "A light, delicate green tea from the varieties T-78, P-312 and Tinali. Fixed with hot air within minutes of plucking so it never oxidises — fresh and vegetal, with subtle grassy notes and a sweetness that runs from smooth to gently astringent.",
+    "homeDesc": "Light and delicate, fixed with hot air so it never oxidises — fresh and vegetal, with subtle grassy notes and a clean, gently astringent sweetness.",
     "notes": [
       "Fresh",
       "Vegetal",
@@ -276,25 +267,25 @@
         "v": "Complimentary UK · gift wrap available"
       }
     ],
-    "tastingH": "A pale jade cup, crisp as altitude",
+    "tastingH": "A fresh, vegetal cup with grassy notes",
     "tasting": [
       {
         "k": "Aroma",
-        "v": "Fresh-cut grass, steamed edamame, a cool mineral note."
+        "v": "Fresh and green, with a subtle grassy note."
       },
       {
         "k": "Palate",
-        "v": "Crisp and vegetal, light-bodied, with a clean sweetness underneath."
+        "v": "Light and delicate, vegetal and grassy, sweet and smooth over a gentle astringency."
       },
       {
         "k": "Finish",
-        "v": "Short and refreshing — the taste of thin, cold mountain air."
+        "v": "Clean and refreshing."
       }
     ],
     "tasteFoot": [
       {
         "k": "Cup Colour",
-        "v": "Pale Jade"
+        "v": "Pale Green"
       },
       {
         "k": "Body",
@@ -302,69 +293,72 @@
       },
       {
         "k": "Oxidation",
-        "v": "None · pan-fired"
+        "v": "None — hot-air fixed"
       },
       {
-        "k": "Caffeine",
-        "v": "Moderate–Low"
+        "k": "Cultivar",
+        "v": "T-78 · P-312 · Tinali"
       }
     ],
     "brew": [
       {
-        "n": "75",
+        "n": "80–90",
         "u": "°C",
-        "label": "Water Temp"
+        "label": "Water"
       },
       {
         "n": "2",
         "u": "g",
-        "label": "Per 200ml"
+        "label": "Per 180ml"
       },
       {
-        "n": "2",
+        "n": "2–3",
         "u": "min",
-        "label": "First Steep"
-      },
-      {
-        "n": "2",
-        "u": "×",
-        "label": "Infusions"
+        "label": "Steep"
       }
     ],
     "brewSteps": [
-      "Warm the vessel briefly — green tea is unforgiving of heat, so keep it gentle throughout.",
-      "Measure two grams of leaf per 200ml. Less is more with a leaf this delicate.",
-      "Cool the water well below boiling, to around 75°C, to avoid scorching the leaf and turning it bitter.",
-      "Steep two minutes for the first cup. A second, shorter infusion is often the sweetest."
+      "Warm the vessel briefly — green tea is unforgiving of heat.",
+      "Measure 2 grams of leaf for every 180ml of water.",
+      "Cool the water to 80–90°C to keep the leaf from turning bitter.",
+      "Steep 2 to 3 minutes; a second, shorter infusion is often the sweetest."
     ],
-    "makeH": "Four deliberate steps",
+    "makeH": "Five deliberate steps",
     "make": [
       {
-        "t": "Plucking",
-        "d": "Two leaves and a bud, taken by hand at first light."
+        "t": "Refreshing",
+        "d": "One or two leaves and a bud, spread on the net in cool air for 15–30 minutes."
       },
       {
-        "t": "Withering",
-        "d": "A brief rest, just long enough to soften the leaf."
+        "t": "De-enzyme",
+        "d": "Hot air at 120–125°C for up to two minutes, halting the enzymes and holding the green."
       },
       {
-        "t": "Pan-Firing",
-        "d": "Fired within hours of plucking, halting oxidation entirely."
+        "t": "Cooling",
+        "d": "Cooled on the net in moving air to keep the natural colour and fresh aroma."
+      },
+      {
+        "t": "Rolling",
+        "d": "Lightly rolled by hand into a well-twisted leaf."
       },
       {
         "t": "Drying",
-        "d": "Low, slow heat locks in the fresh, vegetal character."
+        "d": "15 minutes at 115°C to finish."
       }
     ],
     "originLead": "Above the cloud line, where the air thins and the nights turn cold, the leaf grows slowly and stays green.",
     "originPs": [
-      "Mountain Green is fired within hours of plucking — no oxidation, no waiting. What reaches the cup is the closest thing to the living leaf: fresh, crisp, and faintly sweet, the way the garden tastes at first light.",
+      "Mountain Green is fixed with hot air within minutes of plucking — no oxidation, no waiting. What reaches the cup is the closest thing to the living leaf: fresh, vegetal and faintly sweet, the way the garden tastes at first light.",
       "Every leaf is certified organic, plucked by hands that have read these slopes for generations, and finished at our own factory. No middlemen. Only the mountain, the leaf, and the people who tend both."
     ],
     "spec": [
       {
         "k": "Style",
-        "v": "Pan-fired green tea"
+        "v": "Green tea · hot-air fixed"
+      },
+      {
+        "k": "Cultivar",
+        "v": "T-78 · P-312 · Tinali"
       },
       {
         "k": "Oxidation",
@@ -379,28 +373,20 @@
         "v": "2,500 metres"
       },
       {
-        "k": "Cultivation",
-        "v": "100% certified organic"
-      },
-      {
         "k": "Plucking",
-        "v": "Two leaves and a bud · by hand"
+        "v": "One or two leaves and a bud · by hand"
       },
       {
-        "k": "Harvest",
-        "v": "Spring flush"
+        "k": "Brewing",
+        "v": "2g / 180ml · 80–90°C · 2–3 min"
       },
       {
         "k": "Format",
         "v": "100g loose leaf · resealable caddy"
-      },
-      {
-        "k": "Caffeine",
-        "v": "Moderate–low"
       }
     ],
     "closerH": "Bring the altitude<br>home with <em>you</em>",
-    "closerP": "£74 for 100g of single-origin, hand-plucked, pan-fired Himalayan green tea — crisp, fresh, unmistakably alive.",
+    "closerP": "£74 for 100g of single-origin, hand-plucked, hot-air-fixed Himalayan green tea — fresh, vegetal, unmistakably alive.",
     "soldOut": false
   },
   "golden-harvest": {
@@ -408,16 +394,16 @@
     "num": "03",
     "name": "Golden Harvest",
     "title": "Golden Harvest — MT. PEAK · Himalayan Golden Tips Gift Box",
-    "metaDesc": "Golden Harvest — golden-tip Himalayan black tea, hand-finished gift box. Honey-sweet, round, fully oxidised. Single-origin, organic, from eastern Nepal.",
+    "metaDesc": "Golden Harvest — golden-tip Himalayan black tea from the Gumti and AV2 cultivars, hand-finished gift box. Fully oxidised, ripe and fruity with a honeyed sweetness. Single-origin, eastern Nepal.",
     "tag": "Golden Tea · Gift",
     "eyebrow": "№ 03 · Golden Tips · Gift Box",
-    "tagline": "Honey-Sweet · Golden Tips · Round",
-    "desc": "Golden tips, selected one by one and oxidised under close watch — round, honey-sweet, burnished with apricot and warm spice. Presented in the hand-finished gift box, made to be given.",
-    "homeDesc": "Golden tips, selected one by one and oxidised under close watch — round, honey-sweet, burnished with apricot and warm spice. Presented in the hand-finished gift box, made to be given.",
+    "tagline": "Honey · Ripe Fruit · Golden Tips",
+    "desc": "Fine, twisted tips of golden colour from the Gumti and AV2 varieties, fully oxidised under close watch. The cup is ripe and fruity, rounded by a mellow honeyed sweetness. Presented in the hand-finished gift box, made to be given.",
+    "homeDesc": "Fine twisted golden tips, fully oxidised under close watch — ripe and fruity, with a mellow honeyed sweetness. Presented in the hand-finished gift box.",
     "notes": [
-      "Honey-Sweet",
-      "Golden Tips",
-      "Round"
+      "Honey",
+      "Ripe Fruit",
+      "Golden Tips"
     ],
     "price": 115,
     "unitShort": "/ gift box",
@@ -476,88 +462,83 @@
         "v": "Complimentary UK · gift wrap available"
       }
     ],
-    "tastingH": "A deep amber cup, honeyed and round",
+    "tastingH": "A ripe, fruity cup with a honeyed edge",
     "tasting": [
       {
         "k": "Aroma",
-        "v": "Dried apricot, warm spice, a deep note of wildflower honey."
+        "v": "Ripe and fruity, with a warm note of mountain honey."
       },
       {
         "k": "Palate",
-        "v": "Full and round, honey-sweet, with a smooth, malty depth."
+        "v": "Round and fruity, mellow and honey-sweet over fine golden tips."
       },
       {
         "k": "Finish",
-        "v": "Long, warm and lingering — like the last light before dusk."
+        "v": "Smooth and lingering, gently honeyed."
       }
     ],
     "tasteFoot": [
       {
         "k": "Cup Colour",
-        "v": "Deep Amber"
+        "v": "Bright Amber"
       },
       {
         "k": "Body",
-        "v": "Full"
+        "v": "Medium – Full"
       },
       {
         "k": "Oxidation",
         "v": "Full"
       },
       {
-        "k": "Caffeine",
-        "v": "Moderate–High"
+        "k": "Cultivar",
+        "v": "Gumti · AV2"
       }
     ],
     "brew": [
       {
-        "n": "95",
+        "n": "100",
         "u": "°C",
-        "label": "Water Temp"
-      },
-      {
-        "n": "4",
-        "u": "g",
-        "label": "Per 200ml"
-      },
-      {
-        "n": "4",
-        "u": "min",
-        "label": "First Steep"
+        "label": "Water"
       },
       {
         "n": "2",
-        "u": "×",
-        "label": "Infusions"
+        "u": "g",
+        "label": "Per 180ml"
+      },
+      {
+        "n": "3–5",
+        "u": "min",
+        "label": "Steep"
       }
     ],
     "brewSteps": [
-      "Warm the pot properly — this leaf is dense and gives its best at full temperature.",
-      "Measure four grams of leaf per 200ml. A generous hand rewards you here.",
-      "Use water close to a full boil, around 95°C, to draw out the depth and sweetness fully.",
-      "Steep four minutes for the first cup. A second infusion, slightly longer, is rich and rewarding."
+      "Warm a porcelain or glass pot with hot water, then discard.",
+      "Measure 2 grams of leaf for every 180ml of water.",
+      "Pour water at a full boil, around 100°C.",
+      "Steep 3 to 5 minutes to draw out the honeyed, fruity character."
     ],
     "makeH": "Five deliberate steps",
     "make": [
       {
-        "t": "Selection",
-        "d": "Golden tips chosen one by one at peak season."
+        "t": "Plucking",
+        "d": "One tender leaf and a bud of the Gumti and AV2 varieties, taken by hand."
       },
       {
         "t": "Withering",
-        "d": "A full day on bamboo trays, until the leaf turns supple."
+        "d": "12 hours on the trough, cool and warm air as needed, until the leaf turns supple."
       },
       {
         "t": "Rolling",
-        "d": "Rolled fully, to open the leaf for complete oxidation."
+        "d": "30 minutes, breaking the cells to release flavour and aroma and set the twisted shape."
       },
       {
         "t": "Oxidation",
-        "d": "Carried through fully, under close watch, for depth and colour."
+        "d": "12–15 hours at room temperature, watched closely as the colour and aroma develop."
       },
       {
-        "t": "Firing",
-        "d": "Finished slowly, then hand-packed into the gift box."
+        "t": "Drying",
+        "d": "15 minutes at 115–120°C, arresting oxidation at 3–5% moisture."
       }
     ],
     "originLead": "At the peak of the season, when the tips turn gold, our pickers choose only the very best of the garden.",
@@ -569,6 +550,10 @@
       {
         "k": "Style",
         "v": "Fully oxidised black tea · golden tips"
+      },
+      {
+        "k": "Cultivar",
+        "v": "Gumti · AV2"
       },
       {
         "k": "Oxidation",
@@ -583,28 +568,20 @@
         "v": "2,500 metres"
       },
       {
-        "k": "Cultivation",
-        "v": "100% certified organic"
-      },
-      {
         "k": "Plucking",
-        "v": "Golden tips, selected by hand"
+        "v": "One leaf and a bud · by hand"
       },
       {
-        "k": "Harvest",
-        "v": "Peak season selection"
+        "k": "Brewing",
+        "v": "2g / 180ml · 100°C · 3–5 min"
       },
       {
         "k": "Format",
-        "v": "100g loose leaf · hand-finished gift box"
-      },
-      {
-        "k": "Caffeine",
-        "v": "Moderate–high"
+        "v": "Hand-finished gift box · loose leaf"
       }
     ],
     "closerH": "Give the mountain<br>as a <em>gift</em>",
-    "closerP": "£115 for the hand-finished gift box — 100g of golden-tip Himalayan black tea, honeyed and full.",
+    "closerP": "£115 — fine golden tips of single-origin Himalayan black tea, ripe and honey-sweet, in a hand-finished gift box.",
     "soldOut": false
   }
 }
