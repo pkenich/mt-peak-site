@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
 import bcrypt from 'bcryptjs';
-import { sql, ensureSchema, checkThrottle, recordFailure, clearThrottle } from '../_lib/db.js';
+import { sql, ensureSchema, checkThrottle, recordFailure, clearThrottle, rateLimit } from '../_lib/db.js';
 import { issueCustomer, readCustomer, clearCustomer, signToken, verifyToken } from '../_lib/session.js';
 import { sendBrandEmail } from '../_lib/email.js';
-import { dispatch, bad, normEmail, isEmail } from '../_lib/util.js';
+import { dispatch, bad, normEmail, isEmail, clientIp as ipOf } from '../_lib/util.js';
 
 const clientIp = (req) => String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
 
@@ -41,8 +41,14 @@ async function login(req, res) {
   const password = String(req.body?.password || '');
   if (!isEmail(email) || !password) throw bad('Enter your email and password.');
 
-  const key = `login:${email}`;
+  // Lockout is per email+IP so an attacker can't lock a customer out of their
+  // own account; separate caps stop password-spraying from one IP and slow
+  // distributed guessing against one account.
+  const ip = ipOf(req);
+  const key = `login:${email}:${ip}`;
   await checkThrottle(key);
+  await rateLimit(`login:ip:${ip}`, 30, 900);
+  await rateLimit(`login:em:${email}`, 40, 3600);
 
   const rows = await sql()`SELECT id, email, name, pass_hash FROM users WHERE email = ${email}`;
   const ok = rows.length && await bcrypt.compare(password, rows[0].pass_hash);
@@ -101,7 +107,7 @@ async function resetPassword(req, res) {
   }
   const hash = await bcrypt.hash(password, 11);
   await sql()`UPDATE users SET pass_hash = ${hash} WHERE id = ${payload.uid}`;
-  await clearThrottle(`login:${rows[0].email}`);
+  await clearThrottle(`login:${rows[0].email}:${ipOf(req)}`);
   issueCustomer(res, rows[0]);
   res.json({ ok: true });
 }

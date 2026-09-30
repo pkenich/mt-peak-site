@@ -59,8 +59,8 @@ function render() {
   navCart.textContent = 'Cart · ' + cart.reduce((s, i) => s + i.q, 0);
   if (!cart.length) { b.innerHTML = '<div class="cart-empty">Your reserve is empty</div>'; return; }
   b.innerHTML = cart.map((i, x) => `<div class="cart-line"><div><h3>${escC(i.n)}</h3>
-    <div class="cart-qty"><button onclick="chg(${x},-1)" aria-label="Decrease quantity of ${escC(i.n)}">−</button><span>${i.q}</span><button onclick="chg(${x},1)" aria-label="Increase quantity of ${escC(i.n)}">+</button></div></div>
-    <div class="right"><div class="price">£${i.p * i.q}</div><button class="cart-rm" onclick="rm(${x})" aria-label="Remove ${escC(i.n)}">Remove</button></div></div>`).join('');
+    <div class="cart-qty"><button data-chg="-1" data-x="${x}" aria-label="Decrease quantity of ${escC(i.n)}">−</button><span>${i.q}</span><button data-chg="1" data-x="${x}" aria-label="Increase quantity of ${escC(i.n)}">+</button></div></div>
+    <div class="right"><div class="price">£${i.p * i.q}</div><button class="cart-rm" data-rm="${x}" aria-label="Remove ${escC(i.n)}">Remove</button></div></div>`).join('');
 }
 
 function chg(x, d) {
@@ -157,6 +157,14 @@ if (navToggle) {
 }
 
 navCart.addEventListener('click', openCart);
+/* no inline handlers (lets the CSP forbid inline script entirely) */
+document.getElementById('cartOverlay').addEventListener('click', closeCart);
+document.querySelector('.cart-close').addEventListener('click', closeCart);
+document.getElementById('cartCheckout').addEventListener('click', checkout);
+document.getElementById('cartBody').addEventListener('click', (e) => {
+  const c = e.target.closest('[data-chg]'); if (c) return chg(Number(c.dataset.x), Number(c.dataset.chg));
+  const r = e.target.closest('[data-rm]'); if (r) rm(Number(r.dataset.rm));
+});
 render();
 
 /* Return-from-reminder: /?restore=<token> repopulates the cart on this device

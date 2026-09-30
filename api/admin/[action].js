@@ -4,7 +4,7 @@ import { issueAdmin, readAdmin, clearAdmin, requireAdmin } from '../_lib/session
 import { readRepoFile, writeRepoFile } from '../_lib/github.js';
 import { normCode, isCode } from '../_lib/promo.js';
 import { sendOrderEmail, sendBrandEmail } from '../_lib/email.js';
-import { dispatch, bad, isEmail } from '../_lib/util.js';
+import { dispatch, bad, isEmail, clientIp } from '../_lib/util.js';
 
 /* ---------- session ---------- */
 
@@ -15,19 +15,21 @@ async function login(req, res) {
   }
 
   // Throttle via the DB when it exists; don't let a missing DB lock out the CMS.
+  // per-IP, so a stranger failing logins can't lock YOU out of the back office
+  const tkey = `admin:login:${clientIp(req)}`;
   let throttled = false;
-  try { await ensureSchema(); await checkThrottle('admin:login'); throttled = true; }
+  try { await ensureSchema(); await checkThrottle(tkey); throttled = true; }
   catch (e) { if (e.statusCode === 429) throw e; }
 
   const given = String(req.body?.password || '');
   const a = createHash('sha256').update(given).digest();
   const b = createHash('sha256').update(expected).digest();
   if (!timingSafeEqual(a, b)) {
-    if (throttled) await recordFailure('admin:login');
+    if (throttled) await recordFailure(tkey);
     throw bad('Wrong password.', 401);
   }
 
-  if (throttled) await clearThrottle('admin:login');
+  if (throttled) await clearThrottle(tkey);
   issueAdmin(res);
   res.json({ ok: true });
 }

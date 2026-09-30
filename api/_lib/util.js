@@ -55,3 +55,9 @@ export function publicOrderId() {
   for (const b of bytes) s += alpha[b % alpha.length];
   return `MP-${s}`;
 }
+
+/* Client IP for rate limiting. Vercel sets x-real-ip / x-forwarded-for itself
+   at the edge (a client can't spoof them past Vercel's proxy). */
+export function clientIp(req) {
+  return String(req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+}

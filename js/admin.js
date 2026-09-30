@@ -217,7 +217,9 @@
   $('#ordFilter').addEventListener('change', renderOrdersTable);
   $('#ordSearch').addEventListener('input', renderOrdersTable);
   $('#csvBtn').addEventListener('click', () => {
-    const cs = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    // Quote every cell, and defuse spreadsheet formulas: a customer who types
+    // =HYPERLINK(...) as their name must not execute when you open the file.
+    const cs = v => { let t = String(v ?? ''); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return `"${t.replace(/"/g, '""')}"`; };
     const head = ['order', 'date', 'status', 'email', 'items', 'total_gbp', 'discount_gbp', 'promo', 'gift_note', 'ship_name', 'ship_line1', 'ship_line2', 'ship_city', 'ship_postcode', 'ship_country'];
     const rows = ORDERS.map(o => [o.public_id, new Date(o.created_at).toISOString(), o.status, o.email,
       o.items.map(l => `${l.name} x${l.qty}`).join('; '), (o.total_pence / 100).toFixed(2), ((o.discount_pence || 0) / 100).toFixed(2),

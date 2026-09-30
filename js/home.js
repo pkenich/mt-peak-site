@@ -443,3 +443,5 @@ loopB();
 /* ===== misc ===== */
 function scrollToId(id){const el=document.getElementById(id);
   window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-40,behavior:'smooth'});}
+
+document.querySelectorAll('[data-scroll]').forEach(b => b.addEventListener('click', () => scrollToId(b.dataset.scroll)));

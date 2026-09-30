@@ -17,6 +17,10 @@
 
   // arriving straight from a guest checkout: /track?placed=MP-XXXXXX
   const placed = new URLSearchParams(location.search).get('placed');
+  const sid = new URLSearchParams(location.search).get('session_id');
+  if (sid && /^cs_[A-Za-z0-9_]+$/.test(sid)) {
+    fetch('/api/stripe/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: sid }) }).catch(() => {});
+  }
   if (placed && /^MP-[A-Z0-9]{4,8}$/i.test(placed)) {
     $('#tkOrder').value = placed.toUpperCase();
     msg.textContent = `Order ${placed.toUpperCase()} is placed — a confirmation email is on its way. Enter the email you used to track it.`;

@@ -1,7 +1,6 @@
-import { sql, ensureSchema } from '../_lib/db.js';
-import { requireCustomer } from '../_lib/session.js';
+import { sql, ensureSchema, rateLimit } from '../_lib/db.js';
 import { sendOrderEmail } from '../_lib/email.js';
-import { dispatch, bad } from '../_lib/util.js';
+import { dispatch, bad, clientIp } from '../_lib/util.js';
 
 /* Shared: the session id is only ever a hint — payment status is re-fetched
    from Stripe's API before an order is marked paid, so forged ids and forged
@@ -22,10 +21,11 @@ async function markPaidIfSettled(sessionId) {
   return false;
 }
 
-/* Called by the account page after a Stripe redirect. Makes webhooks optional. */
+/* Called after a Stripe redirect (account page, or the track page for guests).
+   No login needed: payment status is verified with Stripe itself. */
 async function confirm(req, res) {
   await ensureSchema();
-  requireCustomer(req);
+  await rateLimit(`stripe:confirm:${clientIp(req)}`, 30, 900);
   const sessionId = String(req.body?.sessionId || '');
   if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) throw bad('Bad session id.');
   if (!process.env.STRIPE_SECRET_KEY) throw bad('Payments are not configured.', 503);

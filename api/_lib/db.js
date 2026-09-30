@@ -124,6 +124,12 @@ export function ensureSchema() {
       // account deletion keeps tax-required order/refund records but detaches the person
       await q`ALTER TABLE refunds ALTER COLUMN user_id DROP NOT NULL`;
       await q`ALTER TABLE throttle ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now()`;
+      // fixed-window rate limits (abuse control: checkout spam, credential spraying)
+      await q`CREATE TABLE IF NOT EXISTS rate (
+        key text PRIMARY KEY,
+        count int NOT NULL DEFAULT 0,
+        window_start timestamptz NOT NULL DEFAULT now()
+      )`;
     })().catch(e => { _ready = null; throw e; });
   }
   return _ready;
@@ -155,4 +161,20 @@ export async function recordFailure(key) {
 
 export async function clearThrottle(key) {
   await sql()`DELETE FROM throttle WHERE key = ${key}`;
+}
+
+/* Fixed-window rate limit: at most `max` calls per `windowSec` for `key`.
+   Unlike checkThrottle (which counts failures), this counts every call —
+   used where each call has a cost (emails sent, orders created). */
+export async function rateLimit(key, max, windowSec) {
+  const rows = await sql()`INSERT INTO rate (key, count, window_start) VALUES (${key}, 1, now())
+    ON CONFLICT (key) DO UPDATE SET
+      count = CASE WHEN rate.window_start < now() - make_interval(secs => ${windowSec}) THEN 1 ELSE rate.count + 1 END,
+      window_start = CASE WHEN rate.window_start < now() - make_interval(secs => ${windowSec}) THEN now() ELSE rate.window_start END
+    RETURNING count`;
+  if (Number(rows[0]?.count) > max) {
+    const err = new Error('Too many requests — please wait a little and try again.');
+    err.statusCode = 429;
+    throw err;
+  }
 }

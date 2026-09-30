@@ -32,8 +32,8 @@ function cookieFrom(issuer) {
 const CUST = cookieFrom(r => issueCustomer(r, { id: 1, email: 'a@b.co', name: 'Sam Rae' }));
 const ADMIN = cookieFrom(r => issueAdmin(r));
 
-function mockReq({ method = 'GET', query = {}, body = {}, cookie = '' } = {}) {
-  return { method, query, body, headers: { cookie, host: 'x.co', 'x-forwarded-for': '1.2.3.4' } };
+function mockReq({ method = 'GET', query = {}, body = {}, cookie = '', headers = {} } = {}) {
+  return { method, query, body, headers: { cookie, host: 'x.co', 'x-forwarded-for': '1.2.3.4', ...headers } };
 }
 function mockRes() {
   const r = { code: 200, body: null, headers: {} };
@@ -117,8 +117,12 @@ await run('shop.data-request', '../api/shop/[action].js', { method: 'POST', quer
 await run('shop.data-request (bad kind)', '../api/shop/[action].js', { method: 'POST', query: { action: 'data-request' }, body: { email: 'g@b.co', kind: 'nuke' } }, is(400));
 
 /* ---- cron: abandoned-cart reminders ---- */
-await run('cron.reminders', '../api/cron/reminders.js', { query: {} }, ok);
-await run('cron.reminders (bad secret)', '../api/cron/reminders.js', { query: {}, cookie: '' }, ok);
+await run('cron.reminders (no CRON_SECRET → fail closed)', '../api/cron/reminders.js', { query: {} }, is(503));
+process.env.CRON_SECRET = 'cron-secret-for-audit';
+await run('cron.reminders (wrong secret)', '../api/cron/reminders.js', { query: {}, headers: { authorization: 'Bearer nope' } }, is(401));
+await run('cron.reminders (valid secret)', '../api/cron/reminders.js', { query: {}, headers: { authorization: 'Bearer cron-secret-for-audit' } }, ok);
+delete process.env.CRON_SECRET;
+await run('stripe.confirm (guest, no key)', '../api/stripe/[action].js', { method: 'POST', query: { action: 'confirm' }, body: { sessionId: 'cs_test_123' } }, is(503));
 
 /* ---- subscribe / promo ---- */
 await run('subscribe', '../api/subscribe.js', { method: 'POST', body: { email: 'a@b.co' } }, ok);

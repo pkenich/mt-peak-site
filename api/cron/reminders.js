@@ -7,17 +7,13 @@ import { sendCartEmail } from '../_lib/email.js';
    after. Each send is recorded so it never repeats; any edit to the cart
    (see save-cart) clears these clocks and restarts the cycle.
 
-   Auth: Vercel sends `Authorization: Bearer $CRON_SECRET` when CRON_SECRET is
-   set. We require it so the endpoint can't be triggered by the public. */
+   Auth: requires CRON_SECRET (Vercel sends it as a Bearer token). */
 export default async function handler(req, res) {
+  // Fail closed: without CRON_SECRET anyone could trigger email sends/purges.
+  // Vercel automatically sends `Authorization: Bearer $CRON_SECRET` once it's set.
   const secret = process.env.CRON_SECRET;
-  const auth = req.headers.authorization || '';
-  if (secret) {
-    if (auth !== `Bearer ${secret}`) return res.status(401).json({ error: 'Unauthorized' });
-  } else if (req.query.key !== undefined || auth) {
-    // no secret configured: allow Vercel's own invocation but nudge to set one
-    console.warn('CRON_SECRET is not set — the reminder cron is unauthenticated.');
-  }
+  if (!secret) return res.status(503).json({ error: 'CRON_SECRET is not configured.' });
+  if ((req.headers.authorization || '') !== `Bearer ${secret}`) return res.status(401).json({ error: 'Unauthorized' });
 
   await ensureSchema();
   const q = sql();
@@ -58,6 +54,7 @@ export default async function handler(req, res) {
   // ---- retention (promised in /privacy) ----
   const purged = {};
   const purge = async (label, query) => { try { purged[label] = (await query).length; } catch (e) { console.error('purge', label, e); } };
+  await purge('rate', q`DELETE FROM rate WHERE window_start < now() - interval '24 hours' RETURNING key`);
   await purge('throttle', q`DELETE FROM throttle WHERE updated_at < now() - interval '24 hours'
     AND (locked_until IS NULL OR locked_until < now()) RETURNING key`);
   await purge('carts', q`DELETE FROM carts WHERE updated_at < now() - interval '60 days' OR recovered_at IS NOT NULL RETURNING email`);

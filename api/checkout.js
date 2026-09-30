@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { sql, ensureSchema } from './_lib/db.js';
+import { sql, ensureSchema, rateLimit } from './_lib/db.js';
 import { readCustomer } from './_lib/session.js';
 import { sendOrderEmail } from './_lib/email.js';
 import { normCode, isCode, redeemPromo, releasePromo, discountFor } from './_lib/promo.js';
-import { handler, bad, publicOrderId, normEmail, isEmail } from './_lib/util.js';
+import { handler, bad, publicOrderId, normEmail, isEmail, clientIp } from './_lib/util.js';
 
 const PRODUCTS = JSON.parse(readFileSync(join(process.cwd(), 'content/products.json'), 'utf8'));
 
@@ -33,6 +33,10 @@ export default handler(['POST'], async (req, res) => {
   const email = session ? session.email : normEmail(body.email);
   const userId = session ? session.uid : null;
   if (!isEmail(email)) throw bad('Please enter a valid email address for your order confirmation.');
+  // Every order sends an email — cap it so nobody can script fake orders to
+  // spam strangers' inboxes (and burn our sender reputation).
+  await rateLimit(`co:ip:${clientIp(req)}`, 10, 3600);
+  if (!session) await rateLimit(`co:em:${email}`, 5, 3600);
 
   const items = Array.isArray(body.items) ? body.items : [];
   if (!items.length || items.length > 20) throw bad('Your reserve is empty.');
@@ -100,7 +104,7 @@ export default handler(['POST'], async (req, res) => {
       })),
       ...(discounts ? { discounts } : {}),
       metadata: { public_id: publicId },
-      success_url: session ? `${origin}/account?session_id={CHECKOUT_SESSION_ID}` : `${origin}/track?placed=${publicId}`,
+      success_url: session ? `${origin}/account?session_id={CHECKOUT_SESSION_ID}` : `${origin}/track?placed=${publicId}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: session ? `${origin}/account?cancelled=1` : `${origin}/checkout?cancelled=1`,
     });
 
