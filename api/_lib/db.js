@@ -124,6 +124,16 @@ export function ensureSchema() {
       // account deletion keeps tax-required order/refund records but detaches the person
       await q`ALTER TABLE refunds ALTER COLUMN user_id DROP NOT NULL`;
       await q`ALTER TABLE throttle ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now()`;
+      // admin two-factor: single-use emailed codes (hash only, never the code)
+      await q`CREATE TABLE IF NOT EXISTS admin_otp (
+        id bigserial PRIMARY KEY,
+        code_hash text NOT NULL,
+        expires_at timestamptz NOT NULL,
+        attempts int NOT NULL DEFAULT 0,
+        used_at timestamptz,
+        ip text,
+        created_at timestamptz NOT NULL DEFAULT now()
+      )`;
       // fixed-window rate limits (abuse control: checkout spam, credential spraying)
       await q`CREATE TABLE IF NOT EXISTS rate (
         key text PRIMARY KEY,

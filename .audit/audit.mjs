@@ -158,5 +158,39 @@ await run('admin.data-requests PUT', '../api/admin/[action].js', { method: 'PUT'
 await run('admin.data-requests (anon)', '../api/admin/[action].js', { method: 'GET', query: { action: 'data-requests' } }, is(401));
 await run('admin.erase-email (has account)', '../api/admin/[action].js', { method: 'POST', query: { action: 'erase-email' }, cookie: ADMIN, body: { email: 'a@b.co' } }, is(409));
 
+/* ---- admin two-factor ---- */
+process.env.ADMIN_PASSWORD = 'correct-horse-battery';
+await run('admin.login wrong password', '../api/admin/[action].js', { method: 'POST', query: { action: 'login' }, body: { password: 'nope-nope-nope' } }, is(401));
+await run('admin.login (no email configured → no session, clear 503)', '../api/admin/[action].js', { method: 'POST', query: { action: 'login' }, body: { password: 'correct-horse-battery' } },
+  (c, b) => c === 503 && /sign-in code/.test(b.error));
+process.env.ADMIN_2FA = 'off';
+await run('admin.login (break-glass 2FA off)', '../api/admin/[action].js', { method: 'POST', query: { action: 'login' }, body: { password: 'correct-horse-battery' } }, ok);
+delete process.env.ADMIN_2FA;
+await run('admin.verify-otp (forged challenge)', '../api/admin/[action].js', { method: 'POST', query: { action: 'verify-otp' }, body: { challenge: 'x.y', code: '123456' } }, is(401));
+await run('admin.verify-otp (reset token as challenge)', '../api/admin/[action].js', { method: 'POST', query: { action: 'verify-otp' }, body: { challenge: signToken({ uid: 1, fp: 'x' }, 600), code: '123456' } }, is(401));
+{
+  const { createHmac } = await import('node:crypto');
+  const good = createHmac('sha256', process.env.AUTH_SECRET).update('admin-otp:424242').digest('hex');
+  const real = globalThis.__MOCK_SQL__;
+  globalThis.__MOCK_SQL__ = (strings, ...vals) => { const q = strings.join('?');
+    if (/UPDATE admin_otp SET attempts/.test(q)) return Promise.resolve([{ code_hash: good, attempts: 1 }]);
+    if (/UPDATE admin_otp SET used_at/.test(q)) return Promise.resolve([{ id: 7 }]);
+    return real(strings, ...vals); };
+  const ch = signToken({ adminOtp: 7 }, 600);
+  await run('admin.verify-otp (wrong code)', '../api/admin/[action].js', { method: 'POST', query: { action: 'verify-otp' }, body: { challenge: ch, code: '000000' } },
+    (c, b) => c === 401 && /4 attempts left/.test(b.error));
+  const res = { code: 200, h: {}, status(c) { this.code = c; return this; }, json(b) { this.b = b; return this; }, setHeader(k, v) { this.h[k.toLowerCase()] = v; }, getHeader(k) { return this.h[k.toLowerCase()]; } };
+  const h = (await import('../api/admin/[action].js')).default;
+  await h({ method: 'POST', query: { action: 'verify-otp' }, body: { challenge: ch, code: '424 242' }, headers: { 'x-forwarded-for': '1.2.3.4' } }, res);
+  const cookie = [].concat(res.h['set-cookie'] || []).join(';');
+  if (res.code === 200 && /mp_admin=/.test(cookie)) console.log('✓ admin.verify-otp (correct code → admin session cookie)'); else { console.log('✗ correct code did not sign in', res.code, res.b); fails++; }
+  globalThis.__MOCK_SQL__ = (strings, ...vals) => { const q = strings.join('?');
+    if (/UPDATE admin_otp SET attempts/.test(q)) return Promise.resolve([]);
+    return real(strings, ...vals); };
+  await run('admin.verify-otp (expired/used/5 attempts)', '../api/admin/[action].js', { method: 'POST', query: { action: 'verify-otp' }, body: { challenge: ch, code: '424242' } }, is(401));
+  globalThis.__MOCK_SQL__ = real;
+}
+delete process.env.ADMIN_PASSWORD;
+
 console.log(fails ? `\n${fails} FAILURE(S)` : '\nALL HANDLERS OK');
 process.exit(fails ? 1 : 0);

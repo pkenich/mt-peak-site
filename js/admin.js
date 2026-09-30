@@ -32,14 +32,36 @@
   }
   function showGate() { gate.hidden = false; panel.hidden = true; $('#btnAdminLogout').hidden = true; }
 
+  /* two-step sign-in: password → emailed 6-digit code */
+  let challenge = null;
+  const gateMsg = (t, cls = 'err') => { const m = $('#gateMsg'); m.textContent = t; m.className = t ? `form-msg ${cls}` : 'form-msg'; };
+  const showStep = (step) => { $('#gateForm').hidden = step !== 'pass'; $('#otpForm').hidden = step !== 'otp';
+    (step === 'otp' ? $('#adOtp') : $('#adPass')).focus(); };
   $('#gateForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const msg = $('#gateMsg'); msg.className = 'form-msg';
+    e.preventDefault(); gateMsg('');
+    const btn = e.target.querySelector('button'); btn.disabled = true; btn.textContent = 'Checking…';
     try {
-      await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: $('#adPass').value }) });
-      $('#adPass').value = ''; await openPanel();
-    } catch (err) { msg.textContent = err.message; msg.className = 'form-msg err'; }
+      const r = await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: $('#adPass').value }) });
+      $('#adPass').value = '';
+      if (r.twoFactor) {
+        challenge = r.challenge;
+        $('#otpNote').textContent = `We’ve emailed a 6-digit code to ${r.sentTo}. It expires in 10 minutes.`;
+        $('#adOtp').value = ''; showStep('otp');
+      } else await openPanel();
+    } catch (err) { gateMsg(err.message); }
+    btn.disabled = false; btn.textContent = 'Continue';
   });
+  $('#otpForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); gateMsg('');
+    try {
+      await api('/api/admin/verify-otp', { method: 'POST', body: JSON.stringify({ challenge, code: $('#adOtp').value }) });
+      challenge = null; $('#adOtp').value = ''; showStep('pass'); await openPanel();
+    } catch (err) {
+      gateMsg(err.message);
+      if (/password again/.test(err.message)) { challenge = null; showStep('pass'); }
+    }
+  });
+  $('#otpBack').addEventListener('click', () => { challenge = null; gateMsg(''); showStep('pass'); });
   $('#btnAdminLogout').addEventListener('click', async () => {
     await api('/api/admin/logout', { method: 'POST' }).catch(() => {}); showGate();
   });

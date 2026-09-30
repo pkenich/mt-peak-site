@@ -10,6 +10,6 @@ export async function resolve(specifier, context, next) {
 export async function load(url, context, next) {
   if (url === 'mock:neon')
     return { format: 'module', shortCircuit: true,
-      source: 'export function neon(){ return globalThis.__MOCK_SQL__; }' };
+      source: 'export function neon(){ return (...a) => globalThis.__MOCK_SQL__(...a); }' };
   return next(url, context);
 }

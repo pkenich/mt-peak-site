@@ -29,7 +29,15 @@
   <form class="form" id="gateForm">
     <div class="field"><label for="adPass">Admin password</label>
       <input id="adPass" type="password" autocomplete="current-password" required></div>
-    <button class="btn-gold" type="submit">Enter</button>
+    <button class="btn-gold" type="submit">Continue</button>
+  </form>
+  <form class="form" id="otpForm" hidden>
+    <p class="form-note" style="text-align:left;" id="otpNote">We’ve emailed you a 6-digit code.</p>
+    <div class="field"><label for="adOtp">Sign-in code</label>
+      <input id="adOtp" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required
+        style="letter-spacing:.5em;font-size:1.4rem;text-align:center;"></div>
+    <button class="btn-gold" type="submit">Verify &amp; enter</button>
+    <p class="form-note"><button type="button" class="linklike" id="otpBack">Use a different password / send a new code</button></p>
   </form>
 </div>
 

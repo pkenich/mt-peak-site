@@ -133,3 +133,4 @@
 @media(max-width:600px){.variant-row{grid-template-columns:1fr 1fr;}}
 .admin-warn{border:1px solid rgba(232,160,160,.45);color:#f0c8c8;background:rgba(232,160,160,.06);padding:.9rem 1rem;font-size:.8rem;line-height:1.6;margin:.8rem 0 1.2rem;}
 .wl-row.done{opacity:.55;}
+.linklike{background:none;border:0;padding:0;color:var(--gold);font:inherit;text-decoration:underline;cursor:pointer;}

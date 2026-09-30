@@ -1,6 +1,6 @@
-import { createHash, timingSafeEqual } from 'node:crypto';
-import { sql, ensureSchema, checkThrottle, recordFailure, clearThrottle } from '../_lib/db.js';
-import { issueAdmin, readAdmin, clearAdmin, requireAdmin } from '../_lib/session.js';
+import { createHash, createHmac, timingSafeEqual, randomInt } from 'node:crypto';
+import { sql, ensureSchema, checkThrottle, recordFailure, clearThrottle, rateLimit } from '../_lib/db.js';
+import { issueAdmin, readAdmin, clearAdmin, requireAdmin, signToken, verifyToken } from '../_lib/session.js';
 import { readRepoFile, writeRepoFile } from '../_lib/github.js';
 import { normCode, isCode } from '../_lib/promo.js';
 import { sendOrderEmail, sendBrandEmail } from '../_lib/email.js';
@@ -14,12 +14,12 @@ async function login(req, res) {
     throw bad('ADMIN_PASSWORD is not configured (set a 12+ character password in Vercel env vars).', 503);
   }
 
-  // Throttle via the DB when it exists; don't let a missing DB lock out the CMS.
   // per-IP, so a stranger failing logins can't lock YOU out of the back office
-  const tkey = `admin:login:${clientIp(req)}`;
-  let throttled = false;
-  try { await ensureSchema(); await checkThrottle(tkey); throttled = true; }
-  catch (e) { if (e.statusCode === 429) throw e; }
+  const ip = clientIp(req);
+  const tkey = `admin:login:${ip}`;
+  await ensureSchema();
+  await checkThrottle(tkey);
+  const throttled = true;
 
   const given = String(req.body?.password || '');
   const a = createHash('sha256').update(given).digest();
@@ -30,6 +30,56 @@ async function login(req, res) {
   }
 
   if (throttled) await clearThrottle(tkey);
+
+  // Break-glass only: ADMIN_2FA=off in Vercel (needs Vercel access anyway).
+  if (process.env.ADMIN_2FA === 'off') { issueAdmin(res); return res.json({ ok: true }); }
+
+  // Step 2: email a single-use 6-digit code. Only a keyed hash is stored.
+  await rateLimit(`admin:otp:send:${ip}`, 5, 900);
+  const code = String(randomInt(0, 1000000)).padStart(6, '0');
+  const rows = await sql()`INSERT INTO admin_otp (code_hash, expires_at, ip)
+    VALUES (${otpHash(code)}, now() + interval '10 minutes', ${ip}) RETURNING id`;
+  const to = adminEmail();
+  const sent = await sendBrandEmail({
+    to,
+    subject: `${code} is your Mt. Peak admin sign-in code`,
+    heading: `Your sign-in code: ${code}`,
+    message: `Someone entered the correct admin password and is signing in to the Mt. Peak back office${ip !== 'unknown' ? ` from IP ${ip}` : ''}. The code is valid for 10 minutes and works once. If this wasn’t you, your admin password is known to someone else — change ADMIN_PASSWORD in Vercel immediately and redeploy.`,
+  });
+  if (!sent.ok) {
+    await sql()`DELETE FROM admin_otp WHERE id = ${rows[0].id}`;
+    throw bad(`Couldn’t send your sign-in code: ${sent.error || 'email failed'}. Fix email delivery (Resend), or set ADMIN_2FA=off in Vercel temporarily.`, 503);
+  }
+  // challenge binds step 2 to this successful password step
+  res.json({ ok: true, twoFactor: true, sentTo: maskEmail(to),
+    challenge: signToken({ adminOtp: rows[0].id }, 600) });
+}
+
+const adminEmail = () => (process.env.ADMIN_EMAIL || 'pkenich@gmail.com').trim().toLowerCase();
+const maskEmail = (e) => e.replace(/^(.)(.*)(.@.*)$/, (m, a, mid, z) => a + '•'.repeat(Math.min(mid.length, 6)) + z);
+// keyed hash so a leaked DB row can't be brute-forced offline
+const otpHash = (code) => createHmac('sha256', process.env.AUTH_SECRET || '').update('admin-otp:' + code).digest('hex');
+
+async function verifyOtp(req, res) {
+  await ensureSchema();
+  const ip = clientIp(req);
+  await rateLimit(`admin:otp:verify:${ip}`, 15, 900);
+  const payload = verifyToken(req.body?.challenge);
+  if (!payload?.adminOtp) throw bad('Your sign-in expired — enter your password again.', 401);
+  const code = String(req.body?.code || '').replace(/\D/g, '');
+  if (code.length !== 6) throw bad('Enter the 6-digit code from the email.');
+  const rows = await sql()`UPDATE admin_otp SET attempts = attempts + 1
+    WHERE id = ${payload.adminOtp} AND used_at IS NULL AND expires_at > now() AND attempts < 5
+    RETURNING code_hash, attempts`;
+  if (!rows.length) throw bad('That code has expired or had too many attempts — enter your password again.', 401);
+  const a = Buffer.from(rows[0].code_hash), b = Buffer.from(otpHash(code));
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    const left = 5 - rows[0].attempts;
+    throw bad(left > 0 ? `That code isn’t right — ${left} attempt${left === 1 ? '' : 's'} left.` : 'Too many wrong codes — enter your password again.', 401);
+  }
+  // single use: only one request can win this update
+  const won = await sql()`UPDATE admin_otp SET used_at = now() WHERE id = ${payload.adminOtp} AND used_at IS NULL RETURNING id`;
+  if (!won.length) throw bad('That code was already used — enter your password again.', 401);
   issueAdmin(res);
   res.json({ ok: true });
 }
@@ -326,6 +376,7 @@ export default dispatch({
   'data-requests': { methods: ['GET', 'PUT'], fn: dataRequests },
   'erase-email': { methods: ['POST'], fn: eraseEmail },
   login: { methods: ['POST'], fn: login },
+  'verify-otp': { methods: ['POST'], fn: verifyOtp },
   'email-test': { methods: ['GET', 'POST'], fn: emailTest },
   logout: { methods: ['POST'], fn: async (req, res) => { clearAdmin(res); res.json({ ok: true }); } },
   me: { methods: ['GET'], fn: async (req, res) => { res.json({ admin: !!readAdmin(req) }); } },

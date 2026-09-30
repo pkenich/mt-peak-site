@@ -54,6 +54,7 @@ export default async function handler(req, res) {
   // ---- retention (promised in /privacy) ----
   const purged = {};
   const purge = async (label, query) => { try { purged[label] = (await query).length; } catch (e) { console.error('purge', label, e); } };
+  await purge('adminOtp', q`DELETE FROM admin_otp WHERE created_at < now() - interval '24 hours' RETURNING id`);
   await purge('rate', q`DELETE FROM rate WHERE window_start < now() - interval '24 hours' RETURNING key`);
   await purge('throttle', q`DELETE FROM throttle WHERE updated_at < now() - interval '24 hours'
     AND (locked_until IS NULL OR locked_until < now()) RETURNING key`);
