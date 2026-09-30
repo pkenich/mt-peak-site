@@ -228,3 +228,4 @@ body{animation:pageIn .7s ease both;}
 .lb-nav:hover{background:var(--gold);color:var(--ink);}
 .lightbox :focus-visible{outline:1px solid var(--gold);outline-offset:3px;}
 @media(max-width:600px){.lb-nav{width:44px;height:44px;}.lb-img{max-width:94vw;}}
+.reviews-note{font-size:.72rem;color:var(--cream-dim);line-height:1.7;margin-top:1.6rem;max-width:620px;}

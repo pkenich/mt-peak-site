@@ -245,6 +245,14 @@
 
   for (const prefix of ['sh', 'bi']) { streetAutocomplete(prefix); postcodeAutocomplete(prefix); }
 
+  /* be upfront about delivery outside the UK — never a surprise cost */
+  const intl = $('#coIntl');
+  const checkIntl = () => { const c = $('#shCountry').value.trim(); intl.hidden = !c || UK_RE.test(c); };
+  $('#shCountry').addEventListener('input', checkIntl);
+  $('#shCountry').addEventListener('change', checkIntl);
+  document.addEventListener('click', () => setTimeout(checkIntl, 0));
+  checkIntl();
+
   /* place order */
   const addr = (p) => ({
     name: $(`#${p}Name`).value, line1: $(`#${p}Line1`).value, line2: $(`#${p}Line2`).value,

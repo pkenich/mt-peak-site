@@ -10,5 +10,7 @@ export default handler(['POST'], async (req, res) => {
   const email = normEmail(req.body?.email);
   if (!isEmail(email)) throw bad('That email address doesn’t look right.');
   await sql()`INSERT INTO subscribers (email) VALUES (${email}) ON CONFLICT (email) DO NOTHING`;
+  // an explicit new sign-up overrides an earlier unsubscribe
+  await sql()`DELETE FROM email_optouts WHERE email = ${email}`;
   res.status(201).json({ ok: true });
 });

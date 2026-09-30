@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/account.css">
+<meta name="robots" content="noindex">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+{{> nav}}
+
+<main class="page-wrap narrow" id="main">
+  <div class="page-eyebrow">Email Preferences</div>
+  <h1 class="page-h" id="unsubH">Unsubscribing…</h1>
+  <div class="form-msg" id="formMsg" role="status" aria-live="polite"></div>
+  <p class="form-note" id="unsubNote" style="text-align:left;">One moment while we update your preferences.</p>
+  <p class="form-note" style="text-align:left;">Order confirmations and delivery updates will still reach you — those aren’t marketing. Changed your mind? You can re-subscribe from the footer, or turn reminders back on in <a href="/account">your account</a>.</p>
+</main>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/lux.js"></script>
+<script src="/js/unsubscribe.js"></script>
+</body>
+</html>

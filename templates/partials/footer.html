@@ -16,8 +16,11 @@
       <a href="/account">Your Account</a>
       <a href="/track">Track an Order</a>
       <a href="/delivery-returns">Delivery &amp; Returns</a>
-      <a href="/privacy">Privacy</a>
+      <a href="/refunds">Refund Policy</a>
       <a href="/terms">Terms of Sale</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/cookies">Cookie Policy</a>
+      <a href="/data-request">Your Data</a>
     </div>
     <div class="foot-col">
       <h4>From the Mountain</h4>
@@ -26,8 +29,9 @@
         <input type="email" id="newsEmail" placeholder="Your email" required aria-label="Email for newsletter">
         <button type="submit">Join</button>
       </form>
-      <div class="foot-news-msg" id="newsMsg"></div>
+      <div class="foot-news-msg" id="newsMsg" role="status" aria-live="polite"></div>
+      <p class="foot-consent">By joining you agree to receive our occasional emails. Every one has an unsubscribe link. <a href="/privacy">Privacy Policy</a>.</p>
     </div>
   </div>
-  <div class="foot-bottom">{{site.footerLegal}}</div>
+  <div class="foot-bottom">{{site.footerLegal}}{{#if site.bizLine}}<div class="foot-biz">{{{site.bizLine}}}</div>{{/if}}</div>
 </footer>

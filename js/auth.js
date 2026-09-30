@@ -49,7 +49,8 @@
   });
   forms.register.addEventListener('submit', e => {
     e.preventDefault();
-    submit('/api/auth/register', { name: $('#rgName').value, email: $('#rgEmail').value, password: $('#rgPass').value },
+    submit('/api/auth/register', { name: $('#rgName').value, email: $('#rgEmail').value, password: $('#rgPass').value,
+      agree: $('#rgAgree').checked, reminders: $('#rgRemind').checked },
       forms.register.querySelector('button[type=submit]'));
   });
 })();

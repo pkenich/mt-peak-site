@@ -132,7 +132,7 @@ if (btnAdd && !btnAdd.disabled) {
   if (!rEl) return;
   const slug = rEl.dataset.slug;
   const escR = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const starRow = n => '<span class="rstars">' + '★★★★★'.slice(0, Math.round(n)).padEnd(5, '☆') + '</span>';
+  const starRow = n => `<span class="rstars" role="img" aria-label="${Number(n)} out of 5 stars">` + '★★★★★'.slice(0, Math.round(n)).padEnd(5, '☆') + '</span>';
   try {
     const res = await fetch(`/api/shop/reviews?slug=${encodeURIComponent(slug)}`);
     if (!res.ok) return;

@@ -64,3 +64,8 @@
 /* guest checkout */
 .co-guest-hint{font-size:.72rem;color:var(--cream-dim);letter-spacing:.4px;line-height:1.65;margin:-.2rem 0 1.1rem;}
 #coEmail.locked{opacity:.75;cursor:not-allowed;}
+.co-dim{color:var(--cream-dim);font-size:.7em;letter-spacing:.5px;}
+.co-vat{font-size:.7rem;color:var(--cream-dim);line-height:1.6;margin:.9rem 0 1rem;letter-spacing:.3px;}
+.co-intl{font-size:.74rem;line-height:1.6;color:var(--cream);border:1px solid rgba(201,169,97,.4);padding:.8rem .9rem;margin-bottom:1rem;}
+.co-legal{font-size:.68rem;color:var(--cream-dim);line-height:1.65;margin-top:1rem;text-align:center;}
+.co-legal a{color:var(--gold);}

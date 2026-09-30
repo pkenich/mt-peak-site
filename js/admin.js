@@ -59,6 +59,7 @@
     loadDashboard();
     loadPromos();
     loadEmailStatus();
+    loadDataRequests();
     try {
       const [p, s] = await Promise.all([api('/api/admin/content?file=products'), api('/api/admin/content?file=site')]);
       products = p.data; site = s.data;
@@ -239,6 +240,38 @@
     }).join('');
     for (const b of wrap.querySelectorAll('button[data-emails]')) b.addEventListener('click', () =>
       navigator.clipboard.writeText(b.dataset.emails.split(',').join('\n')).then(() => notify('Waitlist emails copied.')));
+  }
+
+  /* ---------- privacy requests ---------- */
+  const DSR_LABEL = { erasure: 'Delete data', access: 'Copy of data', correction: 'Correct data', objection: 'Stop marketing' };
+  async function loadDataRequests() {
+    const wrap = $('#dsrList'); if (!wrap) return;
+    try {
+      const { requests } = await api('/api/admin/data-requests');
+      if (!requests.length) { wrap.innerHTML = '<p class="admin-note">No requests. 🌿</p>'; return; }
+      wrap.innerHTML = requests.map(r => {
+        const due = new Date(new Date(r.created_at).getTime() + 30 * 864e5);
+        const late = r.status === 'open' && due < new Date();
+        return `<div class="wl-row${r.status === 'done' ? ' done' : ''}">
+          <div><div class="oid" style="font-size:1rem;">${esc(DSR_LABEL[r.kind] || r.kind)} · ${esc(r.email)}</div>
+            <div class="odate">${new Date(r.created_at).toLocaleDateString('en-GB')} · ${r.has_account ? 'has an account' : 'guest'} · ${r.orders} order${r.orders === 1 ? '' : 's'}
+              ${r.status === 'open' ? ` · <span style="color:${late ? '#e8a0a0' : 'inherit'}">respond by ${due.toLocaleDateString('en-GB')}</span>` : ' · done'}</div>
+            ${r.note ? `<div class="admin-note" style="margin-top:.3rem;">“${esc(r.note)}”</div>` : ''}</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            ${r.status === 'open' && r.kind === 'erasure' && !r.has_account ? `<button class="btn-quiet danger" data-erase="${esc(r.email)}">Erase (after verifying)</button>` : ''}
+            ${r.status === 'open' ? `<button class="btn-quiet" data-done="${r.id}">Mark done</button>` : ''}
+          </div></div>`;
+      }).join('');
+      for (const b of wrap.querySelectorAll('[data-done]')) b.onclick = async () => {
+        try { await api('/api/admin/data-requests', { method: 'PUT', body: JSON.stringify({ id: Number(b.dataset.done) }) }); loadDataRequests(); }
+        catch (err) { notify(err.message, true); }
+      };
+      for (const b of wrap.querySelectorAll('[data-erase]')) b.onclick = async () => {
+        if (!confirm(`Erase marketing data, saved bag and order addresses for ${b.dataset.erase}? Have you verified it’s really them?`)) return;
+        try { await api('/api/admin/erase-email', { method: 'POST', body: JSON.stringify({ email: b.dataset.erase }) }); notify('Erased. Mark the request done once you’ve replied.'); }
+        catch (err) { notify(err.message, true); }
+      };
+    } catch (err) { wrap.innerHTML = `<p class="admin-note">${esc(err.message)}</p>`; }
   }
 
   /* ---------- email delivery ---------- */
@@ -506,6 +539,7 @@
   /* ---------- site copy ---------- */
   function fillSiteForm() {
     for (const el of document.querySelectorAll('[data-site]')) el.value = site[el.dataset.site] ?? '';
+    $('#bizWarn').hidden = !!(site.bizLegalName && (site.bizEmail || site.bizAddress));
     $('[data-site-lines]').value = (site.manifestoLines || []).join('\n');
     $('#siteJson').value = JSON.stringify(site, null, 2);
   }

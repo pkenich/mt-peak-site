@@ -15,6 +15,34 @@
     document.body.insertBefore(skip, document.body.firstChild);
   }
 
+  /* ---- cookie notice ----
+     We only use strictly necessary storage (sign-in, bag), which UK PECR exempts
+     from consent — so this is a transparent notice, not a consent wall, and
+     there is nothing to "accept" that changes tracking. Remembered 12 months. */
+  const NOTICE = 'mtpeak_notice';
+  let seen = 0;
+  try { seen = Number(localStorage.getItem(NOTICE)) || 0; } catch {}
+  if (!seen || Date.now() - seen > 365 * 864e5) {
+    const n = document.createElement('div');
+    n.className = 'cookie-notice'; n.setAttribute('role', 'region'); n.setAttribute('aria-label', 'Cookie notice');
+    n.innerHTML = '<p>We use only essential cookies — to keep you signed in and remember your bag. No tracking, no advertising. <a href="/cookies">Cookie Policy</a></p><button type="button">OK</button>';
+    n.querySelector('button').addEventListener('click', () => {
+      try { localStorage.setItem(NOTICE, String(Date.now())); } catch {}
+      n.classList.add('out'); setTimeout(() => n.remove(), 400);
+    });
+    document.body.appendChild(n);
+    requestAnimationFrame(() => n.classList.add('in'));
+  }
+
+  /* ---- confirmation after self-serve account deletion ---- */
+  if (new URLSearchParams(location.search).get('deleted') === '1') {
+    const t = document.createElement('div');
+    t.className = 'cart-toast show'; t.setAttribute('role', 'status');
+    t.innerHTML = '<span class="ct-msg">Your account has been deleted. Thank you for the time you spent with us.</span>';
+    document.body.appendChild(t); setTimeout(() => t.classList.remove('show'), 6000);
+    history.replaceState(null, '', location.pathname);
+  }
+
   /* ---- scroll-progress line (all pages) ---- */
   const bar = document.createElement('div');
   bar.className = 'scroll-progress';

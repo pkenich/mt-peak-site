@@ -285,7 +285,44 @@ async function emailTest(req, res) {
   res.status(200).json({ ok: r.ok, configured: true, from, status: r.status, error: r.error || null });
 }
 
+/* ---------- privacy (data subject) requests ---------- */
+async function dataRequests(req, res) {
+  requireAdmin(req);
+  await ensureSchema();
+  if (req.method === 'PUT') {
+    const id = Math.floor(Number(req.body?.id));
+    if (!Number.isFinite(id)) throw bad('Bad request id.');
+    await sql()`UPDATE data_requests SET status = 'done', resolved_at = now() WHERE id = ${id}`;
+    return res.json({ ok: true });
+  }
+  const rows = await sql()`SELECT d.id, d.email, d.kind, d.note, d.status, d.created_at,
+      (SELECT count(*)::int FROM orders o WHERE o.email = d.email) AS orders,
+      EXISTS (SELECT 1 FROM users u WHERE u.email = d.email) AS has_account
+    FROM data_requests d ORDER BY (d.status = 'open') DESC, d.created_at DESC LIMIT 100`;
+  res.json({ requests: rows });
+}
+
+/* Erase a guest's personal data after the owner has verified identity by email.
+   Order rows are kept for tax but their addresses/gift notes are scrubbed. */
+async function eraseEmail(req, res) {
+  requireAdmin(req);
+  await ensureSchema();
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  if (!isEmail(email)) throw bad('Bad email.');
+  const q = sql();
+  const acct = await q`SELECT 1 FROM users WHERE email = ${email}`;
+  if (acct.length) throw bad('This person has an account — ask them to use “Delete my account” (it needs their password), or delete it for them after verifying.', 409);
+  await q`DELETE FROM subscribers WHERE email = ${email}`;
+  await q`DELETE FROM stock_notify WHERE email = ${email}`;
+  await q`DELETE FROM carts WHERE email = ${email}`;
+  await q`UPDATE orders SET gift_note = NULL, billing = NULL WHERE email = ${email}`;
+  await q`INSERT INTO email_optouts (email) VALUES (${email}) ON CONFLICT DO NOTHING`;
+  res.json({ ok: true });
+}
+
 export default dispatch({
+  'data-requests': { methods: ['GET', 'PUT'], fn: dataRequests },
+  'erase-email': { methods: ['POST'], fn: eraseEmail },
   login: { methods: ['POST'], fn: login },
   'email-test': { methods: ['GET', 'POST'], fn: emailTest },
   logout: { methods: ['POST'], fn: async (req, res) => { clearAdmin(res); res.json({ ok: true }); } },

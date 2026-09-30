@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{> head}}
+<link rel="stylesheet" href="/css/account.css">
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+{{> nav}}
+
+<main class="page-wrap narrow" id="main">
+  <div class="page-eyebrow">Your Data</div>
+  <h1 class="page-h">See, correct or delete your data</h1>
+
+  <p class="form-note" style="text-align:left;margin-bottom:1.6rem;"><strong>Have an account?</strong> You can download all your data and delete your account instantly from <a href="/account#profile">your account page</a> — no form needed.</p>
+  <p class="form-note" style="text-align:left;margin-bottom:1.6rem;">Ordered as a guest, or can’t sign in? Tell us what you’d like below. To protect you, we’ll confirm the request by email before we act on it, and reply within one month.</p>
+
+  <div class="form-msg" id="formMsg" role="status" aria-live="polite"></div>
+  <form class="form" id="dsrForm">
+    <div class="field"><label for="dsrEmail">Email address the request is about</label>
+      <input id="dsrEmail" type="email" autocomplete="email" required></div>
+    <div class="field"><label for="dsrKind">What would you like us to do?</label>
+      <select id="dsrKind" required>
+        <option value="erasure">Delete my data</option>
+        <option value="access">Send me a copy of my data</option>
+        <option value="correction">Correct my data</option>
+        <option value="objection">Stop using my data for marketing</option>
+      </select></div>
+    <div class="field"><label for="dsrNote">Anything else? <span class="opt">(optional)</span></label>
+      <textarea id="dsrNote" rows="3" maxlength="1000"></textarea></div>
+    <button class="btn-gold" type="submit">Send request</button>
+  </form>
+  <p class="form-note">Read our <a href="/privacy">Privacy Policy</a>.</p>
+</main>
+
+{{> footer}}
+{{> cart}}
+
+<script src="/js/cart.js"></script>
+<script src="/js/lux.js"></script>
+<script src="/js/data-request.js"></script>
+</body>
+</html>

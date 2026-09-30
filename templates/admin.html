@@ -12,7 +12,7 @@
 
 <nav id="nav">
   <a class="nav-brand" href="/">
-    <img class="nav-logo" src="/assets/mt-peak-mark.svg" alt="{{site.brand}}">
+    <img class="nav-logo" src="/assets/mt-peak-mark.svg" alt="">
     <div class="nav-name">{{site.brand}} · Admin</div>
   </a>
   <div class="nav-links">
@@ -49,6 +49,7 @@
     <button class="admin-navtab" data-view="products">Products</button>
     <button class="admin-navtab" data-view="promos">Promo codes</button>
     <button class="admin-navtab" data-view="marketing">Marketing</button>
+    <button class="admin-navtab" data-view="privacy">Privacy</button>
     <button class="admin-navtab" data-view="site">Site copy</button>
   </div>
 
@@ -131,6 +132,15 @@
     </div>
   </section>
 
+  <!-- PRIVACY -->
+  <section class="admin-view" id="view-privacy" hidden>
+    <div class="admin-card">
+      <h3>Data requests</h3>
+      <p class="admin-note" style="margin-bottom:1rem;">Requests from the <a href="/data-request" target="_blank">Your Data</a> page. UK law gives you one month to respond. Always confirm identity by emailing the address first — reply from your inbox, then act here.</p>
+      <div id="dsrList"><p class="admin-note">Loading…</p></div>
+    </div>
+  </section>
+
   <!-- SITE COPY -->
   <section class="admin-view" id="view-site" hidden>
     <div class="admin-card" id="siteEditor">
@@ -143,6 +153,16 @@
         <div class="field wide"><label>Footer blurb</label><textarea data-site="footerBlurb"></textarea></div>
         <div class="field"><label>Cart note</label><input data-site="cartNote"></div>
         <div class="field"><label>Footer legal line</label><input data-site="footerLegal"></div>
+      </div>
+      <h3 style="margin-top:2rem;">Business details <span class="admin-note" style="font-size:.7rem;">— required by UK law on your website</span></h3>
+      <div class="admin-warn" id="bizWarn" hidden>Your trading name and a contact email / geographic address must be shown on the site (E-Commerce Regulations 2002). Fill these in and save — they appear in the footer, legal pages and emails.</div>
+      <div class="admin-grid">
+        <div class="field"><label>Legal / trading name</label><input data-site="bizLegalName" placeholder="e.g. Mt. Peak Ltd"></div>
+        <div class="field"><label>Contact email</label><input data-site="bizEmail" placeholder="e.g. hello@mtpeakofficial.com"></div>
+        <div class="field wide"><label>Business address (geographic, not a PO box)</label><input data-site="bizAddress"></div>
+        <div class="field"><label>Company number <span class="opt">(if a limited company)</span></label><input data-site="bizCompanyNo"></div>
+        <div class="field"><label>VAT number <span class="opt">(if VAT-registered)</span></label><input data-site="bizVatNo"></div>
+        <div class="field"><label>Phone <span class="opt">(optional)</span></label><input data-site="bizPhone"></div>
       </div>
       <details style="margin-top:1.4rem;">
         <summary class="admin-note" style="cursor:pointer;">Advanced: full site JSON</summary>

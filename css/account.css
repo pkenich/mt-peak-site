@@ -171,3 +171,26 @@ nav{padding:1.6rem 3.5rem;
 body{animation:pageIn .7s ease both;}
 
 .link-btn.danger{color:#e8a0a0;}
+.legal-updated{font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream-dim);margin:-1rem 0 2rem;}
+.legal-body table{width:100%;border-collapse:collapse;margin:1rem 0 1.6rem;font-size:.85rem;}
+.legal-body th,.legal-body td{text-align:left;vertical-align:top;padding:.7rem .8rem .7rem 0;border-bottom:1px solid rgba(201,169,97,.18);line-height:1.6;}
+.legal-body th{color:var(--gold);font-weight:400;letter-spacing:1px;font-size:.72rem;text-transform:uppercase;}
+.legal-body .pending{border:1px dashed rgba(201,169,97,.5);padding:.9rem 1rem;color:var(--cream);font-size:.85rem;}
+/* consent checkboxes — never pre-ticked */
+.consent{display:flex;gap:.7rem;align-items:flex-start;font-size:.78rem;line-height:1.6;color:var(--cream-dim);margin:.2rem 0 .9rem;cursor:pointer;}
+.consent input{appearance:none;-webkit-appearance:none;flex:none;width:16px;height:16px;margin-top:.2rem;border:1px solid var(--gold);background:transparent;cursor:pointer;position:relative;}
+.consent input:checked{background:var(--gold);}
+.consent input:checked::after{content:'';position:absolute;left:4px;top:1px;width:5px;height:9px;border:solid var(--ink);border-width:0 2px 2px 0;transform:rotate(45deg);}
+.consent input:focus-visible{outline:2px solid var(--gold-bright);outline-offset:2px;}
+.consent span{display:none;}
+.consent a{color:var(--gold);}
+.consent em{font-style:normal;opacity:.7;}
+.field select,.field textarea{width:100%;background:rgba(244,239,230,.04);border:1px solid rgba(201,169,97,.25);
+  color:var(--cream);padding:1rem 1.1rem;font-family:'Jost',sans-serif;font-weight:300;font-size:.95rem;letter-spacing:.5px;}
+.field select option{background:#0a1410;color:var(--cream);}
+.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);}
+.btn-quiet.danger{border-color:rgba(232,160,160,.45);color:#e8a0a0;}
+.btn-quiet.danger:hover{background:#e8a0a0;color:var(--ink);}
+a.btn-quiet{display:inline-block;text-decoration:none;}
+button.star{background:none;border:0;padding:0 .08rem;font:inherit;line-height:1;cursor:pointer;color:var(--gold);}
+button.star:focus-visible{outline:2px solid var(--gold-bright);outline-offset:2px;opacity:1;}

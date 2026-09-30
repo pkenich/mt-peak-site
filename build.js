@@ -102,6 +102,19 @@ const render = (tpl, scopes) => renderNodes(toAst(tpl), scopes);
 const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
 const productsMap = JSON.parse(readFileSync(join(ROOT, 'content/products.json'), 'utf8'));
 
+/* Trading details (UK E-Commerce Regs 2002 reg.6 / Companies Act). Only the
+   fields actually filled in (Admin → Site copy) are ever shown — nothing is
+   invented. bizLine feeds the footer; the legal pages use the parts. */
+site.bizName = site.bizLegalName || site.brand;
+site.bizLine = [site.bizLegalName, site.bizAddress,
+  site.bizCompanyNo && `Company no. ${site.bizCompanyNo}`,
+  site.bizVatNo && `VAT no. ${site.bizVatNo}`,
+  site.bizEmail && `<a href="mailto:${site.bizEmail}">${site.bizEmail}</a>`,
+  site.bizPhone].filter(Boolean).join(' · ');
+site.bizContact = site.bizEmail
+  ? `<a href="mailto:${site.bizEmail}">${site.bizEmail}</a>`
+  : 'replying to any email we have sent you';
+
 // derived fields the templates rely on
 const products = Object.values(productsMap).sort((a, b) => a.num.localeCompare(b.num));
 for (const p of products) {
@@ -135,6 +148,10 @@ const orgSchema = {
   '@context': 'https://schema.org', '@type': 'Organization',
   name: site.brand, url: site.siteUrl, logo: `${site.siteUrl}/assets/mt-peak-logo.png`,
   description: site.metaDesc,
+  ...(site.bizLegalName ? { legalName: site.bizLegalName } : {}),
+  ...(site.bizEmail ? { email: site.bizEmail } : {}),
+  ...(site.bizAddress ? { address: site.bizAddress } : {}),
+  ...(site.bizVatNo ? { vatID: site.bizVatNo } : {}),
 };
 const orgLd = jsonLd(orgSchema);
 
@@ -159,9 +176,10 @@ for (const p of products) {
     pageSchema: productLd + orgLd }]));
 }
 
-for (const name of ['login', 'account', 'track', 'checkout', 'reset', 'admin', '404']) {
+const PAGE_TITLES = { '404': 'Not Found', unsubscribe: 'Email Preferences', 'data-request': 'Your Data' };
+for (const name of ['login', 'account', 'track', 'checkout', 'reset', 'admin', '404', 'unsubscribe', 'data-request']) {
   emit(`${name}.html`, render(page(`${name}.html`), [{ site,
-    pageTitle: `${site.brand} — ${name === '404' ? 'Not Found' : name[0].toUpperCase() + name.slice(1)}`,
+    pageTitle: `${site.brand} — ${PAGE_TITLES[name] || name[0].toUpperCase() + name.slice(1)}`,
     pageDesc: site.metaDesc, pageUrl: `${site.siteUrl}/${name}`, ogImage: `${site.siteUrl}/assets/tea-giftset.webp` }]));
 }
 
@@ -169,7 +187,7 @@ const legal = JSON.parse(readFileSync(join(ROOT, 'content/legal.json'), 'utf8'))
 const legalTpl = page('legal.html');
 for (const [slug, l] of Object.entries(legal)) {
   emit(`${slug}.html`, render(legalTpl, [{ site,
-    legalEyebrow: l.eyebrow, legalTitle: l.title, legalBody: l.body,
+    legalEyebrow: l.eyebrow, legalTitle: l.title, legalBody: render(l.body, [{ site }]), legalUpdated: l.updated || '',
     pageTitle: `${site.brand} — ${l.title}`, pageDesc: site.metaDesc,
     pageUrl: `${site.siteUrl}/${slug}`, ogImage: `${site.siteUrl}/assets/tea-giftset.webp` }]));
 }
@@ -179,6 +197,6 @@ for (const dir of ['css', 'js', 'assets']) cpSync(join(ROOT, dir), join(OUT, dir
 writeFileSync(join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: ${site.siteUrl}/sitemap.xml\n`);
 writeFileSync(join(OUT, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  ['', ...products.map(p => p.slug), ...Object.keys(legal), 'track'].map(s => `  <url><loc>${site.siteUrl}/${s}</loc></url>`).join('\n') +
+  ['', ...products.map(p => p.slug), ...Object.keys(legal), 'track', 'data-request'].map(s => `  <url><loc>${site.siteUrl}/${s}</loc></url>`).join('\n') +
   `\n</urlset>\n`);
 console.log('build complete');

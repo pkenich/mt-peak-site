@@ -46,8 +46,35 @@
     }
 
     await loadOrders();
-    if (params.get('tab')) switchTab(params.get('tab'));
+    const wantTab = params.get('tab') || location.hash.slice(1);
+    if (['overview', 'orders', 'addresses', 'profile'].includes(wantTab)) switchTab(wantTab);
+    loadPrefs();
   }
+
+  /* ---------- privacy: preferences, export, deletion ---------- */
+  async function loadPrefs() {
+    try { const p = await api('/api/account/preferences'); $('#pfRemind').checked = p.reminders; } catch {}
+  }
+  $('#pfRemind').addEventListener('change', async (e) => {
+    const pm = $('#profMsg');
+    try {
+      await api('/api/account/preferences', { method: 'PUT', body: JSON.stringify({ reminders: e.target.checked }) });
+      pm.textContent = e.target.checked ? 'Bag reminders on.' : 'Bag reminders off — and any saved bag deleted.'; pm.className = 'form-msg ok';
+    } catch (err) { e.target.checked = !e.target.checked; pm.textContent = err.message; pm.className = 'form-msg err'; }
+  });
+  $('#pfDeleteOpen').addEventListener('click', () => {
+    const f = $('#deleteForm'); f.hidden = !f.hidden; if (!f.hidden) $('#delPass').focus();
+  });
+  $('#deleteForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const dm = $('#delMsg'); dm.className = 'form-msg';
+    if (!confirm('Permanently delete your Mt. Peak account? This can’t be undone.')) return;
+    try {
+      await api('/api/account/delete-account', { method: 'POST', body: JSON.stringify({ password: $('#delPass').value }) });
+      try { localStorage.removeItem('mtpeak_cart_v2'); } catch {}
+      location.href = '/?deleted=1';
+    } catch (err) { dm.textContent = err.message; dm.className = 'form-msg err'; }
+  });
 
   /* ---------- tabs ---------- */
   function switchTab(name) {
@@ -111,8 +138,9 @@
     return list;
   }
 
-  const stars = (n, active) => Array.from({ length: 5 }, (_, i) =>
-    `<span class="star${i < n ? ' on' : ''}${active ? ' act' : ''}" data-v="${i + 1}">★</span>`).join('');
+  const stars = (n, active) => Array.from({ length: 5 }, (_, i) => active
+    ? `<button type="button" class="star${i < n ? ' on' : ''} act" data-v="${i + 1}" aria-label="${i + 1} star${i ? 's' : ''}" aria-pressed="${i < n}">★</button>`
+    : `<span class="star${i < n ? ' on' : ''}" aria-hidden="true">★</span>`).join('');
 
   function orderCard(o) {
     const canRate = ['paid', 'fulfilled', 'reserved'].includes(o.status);
@@ -129,7 +157,7 @@
         <div class="ord-status">
           <span class="status ${o.status}">${STATUS_LABEL[o.status] || o.status}</span>
           ${o.refund_status ? `<span class="status refund-${o.refund_status}">${REFUND_LABEL[o.refund_status] || o.refund_status}</span>` : ''}
-          ${o.rating ? `<div class="mini-stars">${stars(o.rating, false)}</div>` : ''}
+          ${o.rating ? `<div class="mini-stars" role="img" aria-label="Rated ${o.rating} out of 5">${stars(o.rating, false)}</div>` : ''}
         </div>
       </div>
       <div class="ord-actions">
@@ -204,7 +232,9 @@
 
     // star inputs
     for (const si of card.querySelectorAll('.star-input')) {
-      const set = v => { si.dataset.value = v; si.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('on', i < v)); };
+      si.setAttribute('role', 'group');
+      si.setAttribute('aria-label', si.dataset.field === 'ship' ? 'Rate the delivery' : 'Rate the tea');
+      const set = v => { si.dataset.value = v; si.querySelectorAll('.star').forEach((s, i) => { s.classList.toggle('on', i < v); s.setAttribute('aria-pressed', i < v); }); };
       si.querySelectorAll('.star').forEach(s => s.addEventListener('click', () => set(+s.dataset.v)));
       si.dataset.value = [...si.querySelectorAll('.star.on')].length;
     }

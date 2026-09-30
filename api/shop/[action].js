@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { sql, ensureSchema, checkThrottle, recordFailure } from '../_lib/db.js';
 import { readCustomer, verifyToken } from '../_lib/session.js';
+import { unsubscribeEmail } from '../_lib/email.js';
 import { dispatch, bad, normEmail, isEmail } from '../_lib/util.js';
 
 const slugRe = /^[a-z0-9-]{1,60}$/;
@@ -40,6 +41,11 @@ async function saveCart(req, res) {
   const s = readCustomer(req);
   if (!s) return res.json({ ok: true, saved: false }); // nobody to remind
   await ensureSchema();
+  // Only store a bag for people who opted in to reminders and haven't unsubscribed
+  // (data minimisation — see /privacy).
+  const pref = await sql()`SELECT u.reminders_opt_in AND NOT EXISTS (SELECT 1 FROM email_optouts e WHERE e.email = u.email) AS ok
+    FROM users u WHERE u.id = ${s.uid}`;
+  if (!pref[0]?.ok) return res.json({ ok: true, saved: false });
   const { items, subtotalPence } = normalizeCart(req.body?.items);
   if (!items.length) {
     await sql()`DELETE FROM carts WHERE email = ${s.email}`;
@@ -99,7 +105,37 @@ async function notifyStock(req, res) {
   res.status(201).json({ ok: true });
 }
 
+/* One-click unsubscribe (RFC 8058) + the link in every marketing email.
+   GET  ?t=token → used by /unsubscribe page; POST ?t=token → mail clients' one-click. */
+async function unsubscribe(req, res) {
+  const payload = verifyToken(req.query.t || req.body?.t);
+  if (!payload?.unsub || !isEmail(payload.unsub)) throw bad('That unsubscribe link is invalid or has expired — email us and we’ll remove you by hand.', 400);
+  await ensureSchema();
+  await unsubscribeEmail(payload.unsub);
+  res.json({ ok: true, email: payload.unsub.replace(/^(.).*(@.*)$/, '$1•••$2') });
+}
+
+/* Data-protection request from someone without an account (access / erasure /
+   correction). Identity is verified by us by email before anything is deleted,
+   so this only records the request for the back office. */
+const REQ_KINDS = ['erasure', 'access', 'correction', 'objection'];
+async function dataRequest(req, res) {
+  await ensureSchema();
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  await checkThrottle(`dsr:${ip}`);
+  await recordFailure(`dsr:${ip}`);
+  const email = normEmail(req.body?.email);
+  const kind = String(req.body?.kind || '');
+  const note = String(req.body?.note || '').trim().slice(0, 1000) || null;
+  if (!isEmail(email)) throw bad('Enter the email address the request is about.');
+  if (!REQ_KINDS.includes(kind)) throw bad('Choose what you would like us to do.');
+  await sql()`INSERT INTO data_requests (email, kind, note) VALUES (${email}, ${kind}, ${note})`;
+  res.status(201).json({ ok: true });
+}
+
 export default dispatch({
+  unsubscribe: { methods: ['GET', 'POST'], fn: unsubscribe },
+  'data-request': { methods: ['POST'], fn: dataRequest },
   reviews: { methods: ['GET'], fn: reviews },
   'notify-stock': { methods: ['POST'], fn: notifyStock },
   'save-cart': { methods: ['POST'], fn: saveCart },

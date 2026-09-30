@@ -51,15 +51,16 @@ function toastAdded(name) {
   clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 3400);
 }
 
+const escC = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 function render() {
   const b = document.getElementById('cartBody');
   const t = cart.reduce((s, i) => s + i.p * i.q, 0);
   document.getElementById('cartTotal').textContent = t;
   navCart.textContent = 'Cart · ' + cart.reduce((s, i) => s + i.q, 0);
   if (!cart.length) { b.innerHTML = '<div class="cart-empty">Your reserve is empty</div>'; return; }
-  b.innerHTML = cart.map((i, x) => `<div class="cart-line"><div><h3>${i.n}</h3>
-    <div class="cart-qty"><button onclick="chg(${x},-1)" aria-label="Decrease quantity">−</button><span>${i.q}</span><button onclick="chg(${x},1)" aria-label="Increase quantity">+</button></div></div>
-    <div class="right"><div class="price">£${i.p * i.q}</div><button class="cart-rm" onclick="rm(${x})">Remove</button></div></div>`).join('');
+  b.innerHTML = cart.map((i, x) => `<div class="cart-line"><div><h3>${escC(i.n)}</h3>
+    <div class="cart-qty"><button onclick="chg(${x},-1)" aria-label="Decrease quantity of ${escC(i.n)}">−</button><span>${i.q}</span><button onclick="chg(${x},1)" aria-label="Increase quantity of ${escC(i.n)}">+</button></div></div>
+    <div class="right"><div class="price">£${i.p * i.q}</div><button class="cart-rm" onclick="rm(${x})" aria-label="Remove ${escC(i.n)}">Remove</button></div></div>`).join('');
 }
 
 function chg(x, d) {
@@ -74,16 +75,30 @@ function openCart() {
   cartReturnFocus = document.activeElement;
   document.getElementById('cartOverlay').classList.add('open');
   document.getElementById('cartPanel').classList.add('open');
+  document.getElementById('cartPanel').inert = false;
+  if (navCart) navCart.setAttribute('aria-expanded', 'true');
   const c = document.querySelector('.cart-close'); if (c) c.focus();
 }
 function closeCart() {
   document.getElementById('cartOverlay').classList.remove('open');
   document.getElementById('cartPanel').classList.remove('open');
+  document.getElementById('cartPanel').inert = true; // closed panel leaves the tab order
+  if (navCart) navCart.setAttribute('aria-expanded', 'false');
   if (cartReturnFocus && cartReturnFocus.focus) cartReturnFocus.focus();
 }
 addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && document.getElementById('cartPanel').classList.contains('open')) closeCart();
+  const panel = document.getElementById('cartPanel');
+  if (!panel.classList.contains('open')) return;
+  if (e.key === 'Escape') { closeCart(); return; }
+  if (e.key === 'Tab') { // keep keyboard focus inside the open cart dialog
+    const f = [...panel.querySelectorAll('button:not([disabled]), a[href], input, [tabindex]:not([tabindex="-1"])')];
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
 });
+if (navCart) { navCart.setAttribute('aria-haspopup', 'dialog'); navCart.setAttribute('aria-controls', 'cartPanel'); navCart.setAttribute('aria-expanded', 'false'); }
 
 function checkout() {
   if (!cart.length) return;
@@ -125,7 +140,9 @@ const navToggle = document.getElementById('navToggle');
 if (navToggle) {
   const drawer = document.getElementById('navDrawer');
   const scrim = document.getElementById('navScrim');
+  drawer.inert = true;
   const setMenu = (open) => {
+    drawer.inert = !open;
     drawer.classList.toggle('open', open);
     scrim.classList.toggle('open', open);
     navToggle.classList.toggle('is-open', open);

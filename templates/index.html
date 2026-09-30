@@ -7,11 +7,11 @@
 <body>
 <div class="grain"></div>
 <div class="vignette"></div>
-<canvas id="leaves"></canvas>
+<canvas id="leaves" aria-hidden="true"></canvas>
 
 <!-- LOADER -->
-<div class="loader" id="loader">
-  <img class="loader-logo" src="/assets/mt-peak-mark.svg" alt="{{site.brand}}">
+<div class="loader" id="loader" aria-hidden="true">
+  <img class="loader-logo" src="/assets/mt-peak-mark.svg" alt="">
   <div class="loader-bar"></div>
   <div class="loader-text">{{site.loaderText}}</div>
 </div>
@@ -20,7 +20,7 @@
 
 <!-- HERO -->
 <header class="hero">
-  <canvas id="heroScene"></canvas>
+  <canvas id="heroScene" aria-hidden="true"></canvas>
   <div class="hero-mist"></div>
 
   <!-- Giant faint emblem as the mountain backdrop -->
@@ -28,7 +28,7 @@
 
   <div class="hero-center">
     <p class="hero-eyebrow" id="heroEyebrow">{{site.heroEyebrow}}</p>
-    <img class="hero-mark" id="heroMark" src="/assets/mt-peak-mark.svg" alt="{{site.brand}}">
+    <img class="hero-mark" id="heroMark" src="/assets/mt-peak-mark.svg" alt="">
     <h1 class="hero-title">
       <span class="line"><span class="big">{{site.heroTitle}}</span></span>
     </h1>
@@ -59,8 +59,8 @@
 <!-- ORIGIN -->
 <section class="origin" id="origin">
   <div class="origin-visual">
-    <canvas id="originCanvas"></canvas>
-    <img class="origin-emblem" loading="lazy" decoding="async" src="/assets/mt-peak-mark.svg" alt="{{site.brand}}">
+    <canvas id="originCanvas" aria-hidden="true"></canvas>
+    <img class="origin-emblem" loading="lazy" decoding="async" src="/assets/mt-peak-mark.svg" alt="">
   </div>
   <div class="origin-content">
     {{#each site.originBlocks}}
@@ -79,7 +79,7 @@
     <div class="ritual-bg-glow" id="ritualGlow"></div>
     <div class="ritual-label">The Ritual</div>
     <h2 class="ritual-title">{{{site.ritualTitle}}}</h2>
-    <div class="ritual-stage"><canvas id="brewCanvas"></canvas></div>
+    <div class="ritual-stage"><canvas id="brewCanvas" role="img" aria-label="Animation: tea leaves steeping in a cup as you scroll"></canvas></div>
     <div class="ritual-status" id="brewStatus">Scroll to begin the pour</div>
     <div class="ritual-steps">
       <div class="ritual-step" data-step="0"><span class="dot"></span>Warm</div>
@@ -138,7 +138,7 @@
 
 <!-- CLOSER -->
 <section class="closer">
-  <img class="closer-mark r-fade" loading="lazy" decoding="async" src="/assets/mt-peak-mark.svg" alt="{{site.brand}}">
+  <img class="closer-mark r-fade" loading="lazy" decoding="async" src="/assets/mt-peak-mark.svg" alt="">
   <h2 class="r-up">{{{site.closerH}}}</h2>
   <p class="r-up">{{site.closerP}}</p>
   <button class="closer-btn" onclick="scrollToId('collection')">{{site.closerBtn}}</button>

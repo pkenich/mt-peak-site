@@ -102,6 +102,27 @@
         <button class="btn-gold" type="submit">Save changes</button>
       </form>
     </div>
+
+    <div class="ov-card" style="max-width:480px;margin-top:1.4rem;">
+      <h3>Email preferences</h3>
+      <label class="consent" style="margin-top:.8rem;"><input type="checkbox" id="pfRemind"><span></span>Remind me if I leave tea in my bag (at most two emails).</label>
+      <p class="form-note" style="text-align:left;">Order confirmations and delivery updates are always sent — they aren’t marketing.</p>
+    </div>
+
+    <div class="ov-card" style="max-width:480px;margin-top:1.4rem;">
+      <h3>Your data</h3>
+      <p class="form-note" style="text-align:left;">Download everything we hold about you, or delete your account. See our <a href="/privacy">Privacy Policy</a>.</p>
+      <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1rem;">
+        <a class="btn-quiet" href="/api/account/export" download>Download my data</a>
+        <button class="btn-quiet danger" type="button" id="pfDeleteOpen">Delete my account</button>
+      </div>
+      <form class="form" id="deleteForm" hidden style="margin-top:1.2rem;">
+        <div class="form-msg" id="delMsg" role="status" aria-live="polite"></div>
+        <p class="form-note" style="text-align:left;">This permanently deletes your account, saved addresses, reviews, saved bag and email preferences. Past order records are kept only as long as UK tax law requires, no longer linked to you. This can’t be undone.</p>
+        <div class="field"><label for="delPass">Enter your password to confirm</label><input id="delPass" type="password" autocomplete="current-password" required></div>
+        <button class="btn-gold" type="submit" style="background:#7a2e2e;color:#f4efe6;">Permanently delete my account</button>
+      </form>
+    </div>
   </section>
 </div>
 

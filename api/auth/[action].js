@@ -18,10 +18,13 @@ async function register(req, res) {
   if (!name || String(name).trim().length < 1 || String(name).length > 80) throw bad('Please give us a name.');
   if (!isEmail(email)) throw bad('That email address doesn’t look right.');
   if (!password || String(password).length < 8) throw bad('Password must be at least 8 characters.');
+  if (req.body?.agree !== true) throw bad('Please confirm you’re 18 or over and agree to the Terms and Privacy Policy.');
+  const reminders = req.body?.reminders === true;
 
   const hash = await bcrypt.hash(String(password), 11);
   const rows = await sql()`
-    INSERT INTO users (email, name, pass_hash) VALUES (${email}, ${String(name).trim()}, ${hash})
+    INSERT INTO users (email, name, pass_hash, reminders_opt_in, terms_accepted_at)
+    VALUES (${email}, ${String(name).trim()}, ${hash}, ${reminders}, now())
     ON CONFLICT (email) DO NOTHING
     RETURNING id, email, name`;
   if (!rows.length) throw bad('An account with that email already exists — sign in instead.', 409);

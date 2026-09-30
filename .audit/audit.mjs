@@ -68,7 +68,8 @@ const is = n => c => c === n;
 /* ---- auth ---- */
 await run('auth.me (anon)', '../api/auth/[action].js', { query: { action: 'me' } }, ok);
 await run('auth.me (session)', '../api/auth/[action].js', { query: { action: 'me' }, cookie: CUST }, ok);
-await run('auth.register', '../api/auth/[action].js', { method: 'POST', query: { action: 'register' }, body: { name: 'Sam', email: 'new@b.co', password: 'password1' } }, ok);
+await run('auth.register', '../api/auth/[action].js', { method: 'POST', query: { action: 'register' }, body: { name: 'Sam', email: 'new@b.co', password: 'password1', agree: true, reminders: false } }, ok);
+await run('auth.register (no terms agree)', '../api/auth/[action].js', { method: 'POST', query: { action: 'register' }, body: { name: 'Sam', email: 'new2@b.co', password: 'password1' } }, is(400));
 await run('auth.register (bad email)', '../api/auth/[action].js', { method: 'POST', query: { action: 'register' }, body: { name: 'S', email: 'nope', password: 'password1' } }, is(400));
 await run('auth.login', '../api/auth/[action].js', { method: 'POST', query: { action: 'login' }, body: { email: 'a@b.co', password: 'password1' } }, c => ok(c) || c === 401);
 await run('auth.logout', '../api/auth/[action].js', { method: 'POST', query: { action: 'logout' }, cookie: CUST }, ok);
@@ -89,6 +90,12 @@ await run('account.addresses GET', '../api/account/[action].js', { method: 'GET'
 await run('account.addresses PUT', '../api/account/[action].js', { method: 'PUT', query: { action: 'addresses' }, cookie: CUST, body: { addresses: [{ label: 'Home', name: 'S', line1: '1 St', city: 'London', postcode: 'N1', country: 'UK' }] } }, ok);
 await run('account.profile', '../api/account/[action].js', { method: 'PUT', query: { action: 'profile' }, cookie: CUST, body: { name: 'New Name' } }, ok);
 
+await run('account.preferences GET', '../api/account/[action].js', { method: 'GET', query: { action: 'preferences' }, cookie: CUST }, ok);
+await run('account.preferences PUT', '../api/account/[action].js', { method: 'PUT', query: { action: 'preferences' }, cookie: CUST, body: { reminders: true } }, ok);
+await run('account.export', '../api/account/[action].js', { method: 'GET', query: { action: 'export' }, cookie: CUST }, ok);
+await run('account.export (anon)', '../api/account/[action].js', { method: 'GET', query: { action: 'export' } }, is(401));
+await run('account.delete-account (wrong pw)', '../api/account/[action].js', { method: 'POST', query: { action: 'delete-account' }, cookie: CUST, body: { password: 'nope' } }, is(401));
+
 /* ---- orders ---- */
 await run('orders.index', '../api/orders/index.js', { query: {}, cookie: CUST }, ok);
 await run('orders.index (anon)', '../api/orders/index.js', {}, is(401));
@@ -103,6 +110,11 @@ await run('shop.save-cart (empty→clear)', '../api/shop/[action].js', { method:
 await run('shop.save-cart (anon no-op)', '../api/shop/[action].js', { method: 'POST', query: { action: 'save-cart' }, body: { items: [{ s: 'golden-harvest', q: 1 }] } }, ok);
 await run('shop.restore-cart', '../api/shop/[action].js', { query: { action: 'restore-cart', token: signToken({ cart: 'a@b.co' }, 3600) } }, ok);
 await run('shop.restore-cart (bad token)', '../api/shop/[action].js', { query: { action: 'restore-cart', token: 'nope' } }, is(400));
+
+await run('shop.unsubscribe (valid)', '../api/shop/[action].js', { method: 'POST', query: { action: 'unsubscribe', t: signToken({ unsub: 'a@b.co' }, 3600) } }, ok);
+await run('shop.unsubscribe (bad)', '../api/shop/[action].js', { method: 'POST', query: { action: 'unsubscribe', t: 'x' } }, is(400));
+await run('shop.data-request', '../api/shop/[action].js', { method: 'POST', query: { action: 'data-request' }, body: { email: 'g@b.co', kind: 'erasure' } }, ok);
+await run('shop.data-request (bad kind)', '../api/shop/[action].js', { method: 'POST', query: { action: 'data-request' }, body: { email: 'g@b.co', kind: 'nuke' } }, is(400));
 
 /* ---- cron: abandoned-cart reminders ---- */
 await run('cron.reminders', '../api/cron/reminders.js', { query: {} }, ok);
@@ -136,6 +148,11 @@ await run('admin.email-test GET', '../api/admin/[action].js', { method: 'GET', q
 await run('admin.email-test POST', '../api/admin/[action].js', { method: 'POST', query: { action: 'email-test' }, cookie: ADMIN, body: { to: 'a@b.co' } }, ok);
 await run('admin.email-test (bad email)', '../api/admin/[action].js', { method: 'POST', query: { action: 'email-test' }, cookie: ADMIN, body: { to: 'nope' } }, is(400));
 await run('admin.email-test (anon)', '../api/admin/[action].js', { method: 'GET', query: { action: 'email-test' } }, is(401));
+
+await run('admin.data-requests GET', '../api/admin/[action].js', { method: 'GET', query: { action: 'data-requests' }, cookie: ADMIN }, ok);
+await run('admin.data-requests PUT', '../api/admin/[action].js', { method: 'PUT', query: { action: 'data-requests' }, cookie: ADMIN, body: { id: 1 } }, ok);
+await run('admin.data-requests (anon)', '../api/admin/[action].js', { method: 'GET', query: { action: 'data-requests' } }, is(401));
+await run('admin.erase-email (has account)', '../api/admin/[action].js', { method: 'POST', query: { action: 'erase-email' }, cookie: ADMIN, body: { email: 'a@b.co' } }, is(409));
 
 console.log(fails ? `\n${fails} FAILURE(S)` : '\nALL HANDLERS OK');
 process.exit(fails ? 1 : 0);

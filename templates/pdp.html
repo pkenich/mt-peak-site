@@ -61,7 +61,8 @@
         <input id="notifyEmail" type="email" placeholder="Your email" required>
         <button type="submit">Notify me</button>
       </div>
-      <div class="notify-msg" id="notifyMsg"></div>
+      <div class="notify-msg" id="notifyMsg" role="status" aria-live="polite"></div>
+      <p class="notify-consent">We’ll email you once, about this tea only. <a href="/privacy">Privacy</a>.</p>
     </form>
     {{/if}}
 
@@ -120,7 +121,7 @@
 
 <!-- ORIGIN STORY -->
 <section class="origin-story">
-  <div class="os-visual"><img loading="lazy" decoding="async" src="/assets/mt-peak-mark.svg" alt="{{site.brand}} emblem"></div>
+  <div class="os-visual"><img loading="lazy" decoding="async" src="/assets/mt-peak-mark.svg" alt=""></div>
   <div class="os-content">
     <div class="sec-label">The Origin</div>
     <p class="lead">{{p.originLead}}</p>
@@ -146,11 +147,12 @@
   <div class="sec-label">From the Reserve</div>
   <h2 class="sec-h" id="reviewsHead">What drinkers say</h2>
   <div class="reviews-grid" id="reviewsGrid"></div>
+  <p class="reviews-note">Every review is from a customer who bought this tea, posted from their own account after their order. We publish good and bad alike, and never pay for, edit or write reviews.</p>
 </section>
 
 <!-- CLOSER -->
 <section class="pdp-closer">
-  <img loading="lazy" decoding="async" src="/assets/mt-peak-mark.svg" alt="{{site.brand}}">
+  <img loading="lazy" decoding="async" src="/assets/mt-peak-mark.svg" alt="">
   <h2>{{{p.closerH}}}</h2>
   <p>{{p.closerP}}</p>
   {{#if p.available}}<a class="cbtn" id="btnAdd2" href="#" data-slug="{{p.slug}}" data-name="{{p.cartName}}" data-price="{{p.price}}">Add to Reserve</a>{{/if}}

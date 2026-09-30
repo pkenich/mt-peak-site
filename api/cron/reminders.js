@@ -32,6 +32,8 @@ export default async function handler(req, res) {
       AND updated_at <= now() - interval '24 hours'
       AND updated_at >  now() - interval '20 days'
       AND jsonb_array_length(items) > 0
+      AND EXISTS (SELECT 1 FROM users u WHERE u.email = carts.email AND u.reminders_opt_in)
+      AND NOT EXISTS (SELECT 1 FROM email_optouts e WHERE e.email = carts.email)
     ORDER BY updated_at ASC LIMIT 100`;
   for (const c of due24) {
     const r = await sendCartEmail(c, '24h', restoreUrl(c.email));
@@ -44,6 +46,8 @@ export default async function handler(req, res) {
     WHERE recovered_at IS NULL AND reminded_1mo IS NULL
       AND updated_at <= now() - interval '30 days'
       AND jsonb_array_length(items) > 0
+      AND EXISTS (SELECT 1 FROM users u WHERE u.email = carts.email AND u.reminders_opt_in)
+      AND NOT EXISTS (SELECT 1 FROM email_optouts e WHERE e.email = carts.email)
     ORDER BY updated_at ASC LIMIT 100`;
   for (const c of due30) {
     const r = await sendCartEmail(c, '1mo', restoreUrl(c.email));
@@ -51,5 +55,18 @@ export default async function handler(req, res) {
     else result['1mo'].failed++;
   }
 
-  res.json({ ok: true, ...result });
+  // ---- retention (promised in /privacy) ----
+  const purged = {};
+  const purge = async (label, query) => { try { purged[label] = (await query).length; } catch (e) { console.error('purge', label, e); } };
+  await purge('throttle', q`DELETE FROM throttle WHERE updated_at < now() - interval '24 hours'
+    AND (locked_until IS NULL OR locked_until < now()) RETURNING key`);
+  await purge('carts', q`DELETE FROM carts WHERE updated_at < now() - interval '60 days' OR recovered_at IS NOT NULL RETURNING email`);
+  await purge('stockNotify', q`DELETE FROM stock_notify WHERE created_at < now() - interval '12 months' RETURNING email`);
+  await purge('dataRequests', q`DELETE FROM data_requests WHERE status = 'done' AND resolved_at < now() - interval '12 months' RETURNING id`);
+  // orders older than the 6-year tax retention period (children first for FKs)
+  await purge('oldReviews', q`DELETE FROM reviews WHERE order_id IN (SELECT id FROM orders WHERE created_at < now() - interval '6 years') RETURNING order_id`);
+  await purge('oldRefunds', q`DELETE FROM refunds WHERE order_id IN (SELECT id FROM orders WHERE created_at < now() - interval '6 years') RETURNING id`);
+  await purge('oldOrders', q`DELETE FROM orders WHERE created_at < now() - interval '6 years' RETURNING id`);
+
+  res.json({ ok: true, ...result, purged });
 }

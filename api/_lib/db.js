@@ -104,6 +104,26 @@ export function ensureSchema() {
         recovered_at timestamptz
       )`;
       await q`CREATE INDEX IF NOT EXISTS carts_sweep_idx ON carts(updated_at) WHERE recovered_at IS NULL`;
+      // Privacy & consent (see /privacy): bag reminders are opt-in, every
+      // marketing email can be unsubscribed from, and data requests are tracked.
+      await q`ALTER TABLE users ADD COLUMN IF NOT EXISTS reminders_opt_in boolean NOT NULL DEFAULT false`;
+      await q`ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_accepted_at timestamptz`;
+      await q`CREATE TABLE IF NOT EXISTS email_optouts (
+        email text PRIMARY KEY,
+        created_at timestamptz NOT NULL DEFAULT now()
+      )`;
+      await q`CREATE TABLE IF NOT EXISTS data_requests (
+        id bigserial PRIMARY KEY,
+        email text NOT NULL,
+        kind text NOT NULL,
+        note text,
+        status text NOT NULL DEFAULT 'open',
+        created_at timestamptz NOT NULL DEFAULT now(),
+        resolved_at timestamptz
+      )`;
+      // account deletion keeps tax-required order/refund records but detaches the person
+      await q`ALTER TABLE refunds ALTER COLUMN user_id DROP NOT NULL`;
+      await q`ALTER TABLE throttle ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now()`;
     })().catch(e => { _ready = null; throw e; });
   }
   return _ready;
@@ -128,7 +148,7 @@ export async function recordFailure(key) {
   const q = sql();
   await q`INSERT INTO throttle (key, fails) VALUES (${key}, 1)
     ON CONFLICT (key) DO UPDATE SET
-      fails = throttle.fails + 1,
+      fails = throttle.fails + 1, updated_at = now(),
       locked_until = CASE WHEN throttle.fails + 1 >= 8
         THEN now() + interval '15 minutes' ELSE throttle.locked_until END`;
 }

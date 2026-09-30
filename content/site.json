@@ -1,13 +1,13 @@
 {
   "brand": "Mt. Peak",
-  "title": "MT. PEAK — Himalayan Black Tea · Sourced at Altitude",
-  "metaDesc": "MT. PEAK — single-origin, organic Himalayan black tea grown at 2,500m in eastern Nepal, plucked by hand. Three expressions: Light & Bright, Mountain Green, Golden Harvest.",
+  "title": "MT. PEAK — Himalayan Tea · Sourced at Altitude",
+  "metaDesc": "MT. PEAK — single-origin Himalayan tea from eastern Nepal, grown at 2,500m and plucked by hand. Three expressions: Light & Bright, Mountain Green, Golden Harvest.",
   "siteUrl": "https://www.mtpeakofficial.com",
   "altitude": "2,500m",
   "altitudeLabel": "Garden elevation",
   "heroEyebrow": "From the roof of the world",
   "heroTitle": "Mt. Peak",
-  "heroSub": "Himalayan Black Tea · Single Origin · Nepal",
+  "heroSub": "Himalayan Tea · Single Origin · Nepal",
   "loaderText": "Sourced at Altitude",
   "manifestoLabel": "The Philosophy",
   "manifestoLines": [
@@ -18,26 +18,56 @@
     "into a single, slow, deliberate harvest."
   ],
   "originBlocks": [
-    { "num": "01 — The Land", "h": "Where clouds become gardens", "p": "In eastern Nepal, our gardens sit at 2,500 metres. The mountains do the work no machine can: mist that slows growth, granite soils that sharpen flavour, and a stillness you can taste in the cup." },
-    { "num": "02 — The Hands", "h": "Plucked by people, not machines", "p": "Two leaves and a bud. Each one chosen by hands that have read these slopes for generations. No shortcuts. No volume targets. Only the standard the leaf deserves." },
-    { "num": "03 — The Proof", "h": "Certified, traced, honest", "p": "Organic certified and single-origin — every batch traceable to the garden and the season it was picked. Provenance you can verify, not just believe." }
+    {
+      "num": "01 — The Land",
+      "h": "Where clouds become gardens",
+      "p": "In eastern Nepal, the garden sits at 2,500 metres. The mountain does the work no machine can: mist that slows growth, cold nights that concentrate the leaf, and a stillness you can taste in the cup."
+    },
+    {
+      "num": "02 — The Hands",
+      "h": "Plucked by people, not machines",
+      "p": "Leaf and bud, chosen by hand rather than cut by machine. No shortcuts, no volume targets — only the standard the leaf deserves."
+    },
+    {
+      "num": "03 — The Proof",
+      "h": "Single origin, honestly told",
+      "p": "One origin, one garden, each tea made the same careful way every season. What we tell you about the leaf — how it was withered, rolled and dried — is exactly how it was made."
+    }
   ],
   "ritualTitle": "A cup worth slowing<br>down for",
   "collectionEyebrow": "The Reserve",
   "collectionTitle": "Three Expressions",
   "provenance": [
-    { "num": "2,500m", "label": "Garden Elevation" },
-    { "num": "100%", "label": "Organic Certified" },
-    { "num": "2", "label": "Leaves & a Bud" },
-    { "num": "1", "label": "Single Origin" }
+    {
+      "num": "2,500m",
+      "label": "Garden Elevation"
+    },
+    {
+      "num": "3",
+      "label": "Expressions"
+    },
+    {
+      "num": "2g",
+      "label": "Per 180ml Cup"
+    },
+    {
+      "num": "1",
+      "label": "Single Origin"
+    }
   ],
-  "marqueeText": "Single Origin — <em>2,500 Metres</em> — Hand-Plucked — <em>Certified Organic</em> — Eastern Nepal — <em>The Mountain Is Patient</em> — ",
+  "marqueeText": "Single Origin — <em>2,500 Metres</em> — Hand-Plucked — <em>Eastern Nepal</em> — Leaf &amp; Bud — <em>The Mountain Is Patient</em> — ",
   "closerH": "Begin your<br><em>ritual</em>",
   "closerP": "A tea grown slowly, at altitude, for those who taste the difference.",
   "closerBtn": "Explore the Reserve",
-  "footerBlurb": "Single-origin Himalayan black tea, grown at altitude in eastern Nepal and plucked by hand. Sourced with intention. Crafted for ritual.",
-  "footerLegal": "© 2026 Mt. Peak — Himalayan Black Tea · Sourced at Altitude · Nepal",
-  "cartNote": "Complimentary UK delivery · Gift wrapping at checkout",
+  "footerBlurb": "Single-origin Himalayan tea, grown at altitude in eastern Nepal and plucked by hand. Sourced with intention. Crafted for ritual.",
+  "footerLegal": "© 2026 Mt. Peak — Himalayan Tea · Sourced at Altitude · Nepal",
+  "cartNote": "Complimentary UK delivery · Prices include VAT · Gift message at checkout",
   "currency": "GBP",
-  "currencySymbol": "£"
+  "currencySymbol": "£",
+  "bizLegalName": "",
+  "bizAddress": "",
+  "bizEmail": "",
+  "bizPhone": "",
+  "bizCompanyNo": "",
+  "bizVatNo": ""
 }

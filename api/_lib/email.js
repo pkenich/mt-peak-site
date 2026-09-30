@@ -1,6 +1,17 @@
 /* Transactional email via Resend's REST API (no SDK). Unconfigured → silent
    no-op so email can never break an order flow; failures are logged, not thrown. */
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { sql } from './db.js';
+import { signToken } from './session.js';
+
+/* Trading details for the footer of every email (only what's filled in). */
+let SITE = {};
+try { SITE = JSON.parse(readFileSync(join(process.cwd(), 'content/site.json'), 'utf8')); } catch {}
+const BIZ_NAME = SITE.bizLegalName || 'Mt. Peak';
+const BIZ_ADDR = [SITE.bizAddress, SITE.bizCompanyNo && `Company no. ${SITE.bizCompanyNo}`].filter(Boolean).join(' · ');
+
 /* Packaging palette — deep pine green + gold, matched to the MT. PEAK mark
    (#c6a06a). INK = primary text (cream), MUTE = secondary, BG = outer pine,
    CARD = green panel, LINE = gold hairline, GOLD = accent/CTA. */
@@ -45,7 +56,7 @@ const LOGO = `${ASSET}/assets/mt-peak-logo.png`;
 /* One place every email goes through. Returns { ok, status, error } so callers
    (and the admin "send test" tool) can surface Resend's real response instead
    of a silent boolean. Unconfigured key → ok:false with a clear reason. */
-async function sendViaResend({ to, subject, html }) {
+async function sendViaResend({ to, subject, html, headers }) {
   const key = process.env.RESEND_API_KEY;
   if (!key) return { ok: false, status: 0, error: 'RESEND_API_KEY is not set in this deployment. Add it in Vercel → Settings → Environment Variables, then redeploy.' };
   const from = process.env.EMAIL_FROM || 'Mt. Peak <onboarding@resend.dev>';
@@ -53,7 +64,7 @@ async function sendViaResend({ to, subject, html }) {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [to], subject, html }),
+      body: JSON.stringify({ from, to: [to], subject, html, ...(headers ? { headers } : {}) }),
     });
     if (res.ok) return { ok: true, status: res.status, error: null };
     const detail = await res.text().catch(() => '');
@@ -128,7 +139,7 @@ export function orderEmailHtml({ heading, message, order, siteUrl }) {
     </td></tr>
     <tr><td align="center" style="padding:26px 8px;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:11px;letter-spacing:1px;line-height:1.8;">
       Single-origin Himalayan tea · Grown at 2,500m · Eastern Nepal<br>
-      © Mt. Peak — The mountain is patient. So are we.
+      © ${esc(BIZ_NAME)} — The mountain is patient. So are we.${BIZ_ADDR ? `<br>${esc(BIZ_ADDR)}` : ''}
     </td></tr>
   </table>
 </td></tr>
@@ -160,7 +171,7 @@ export async function sendBrandEmail({ to, subject, heading, message, ctaLabel, 
       </table>` : ''}
     </td></tr>
     <tr><td align="center" style="padding:26px 8px;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:11px;letter-spacing:1px;line-height:1.8;">
-      © Mt. Peak — The mountain is patient. So are we.
+      © ${esc(BIZ_NAME)} — The mountain is patient. So are we.${BIZ_ADDR ? `<br>${esc(BIZ_ADDR)}` : ''}
     </td></tr>
   </table>
 </td></tr>
@@ -197,7 +208,7 @@ const CART_COPY = {
   },
 };
 
-function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl }) {
+function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl, unsubUrl }) {
   const rows = (cart.items || []).map(l => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid ${LINE};color:${INK};font-size:14px;">${esc(l.n || l.name)}</td>
@@ -234,7 +245,8 @@ function cartReminderHtml({ heading, message, cart, siteUrl, ctaUrl }) {
     </td></tr>
     <tr><td align="center" style="padding:26px 8px;font-family:Helvetica,Arial,sans-serif;color:${MUTE};font-size:11px;letter-spacing:1px;line-height:1.8;">
       Single-origin Himalayan tea · Grown at 2,500m · Eastern Nepal<br>
-      © Mt. Peak — The mountain is patient. So are we.
+      © ${esc(BIZ_NAME)} — The mountain is patient. So are we.${BIZ_ADDR ? `<br>${esc(BIZ_ADDR)}` : ''}
+      ${unsubUrl ? `<br><br>You’re receiving this because you asked us to remind you about tea left in your bag.<br><a href="${unsubUrl}" style="color:${GOLD};">Unsubscribe from reminders</a>` : ''}
     </td></tr>
   </table>
 </td></tr>
@@ -248,11 +260,31 @@ export async function sendCartEmail(cart, which, restoreUrl) {
   const copy = CART_COPY[which];
   if (!copy) return { ok: false, status: 0, error: 'unknown reminder' };
   const siteUrl = process.env.SITE_URL || 'https://www.mtpeakofficial.com';
+  const { page, oneClick } = unsubscribeUrls(cart.email);
   return sendViaResend({
     to: cart.email,
     subject: copy.subject,
-    html: cartReminderHtml({ heading: copy.heading, message: copy.message, cart, siteUrl, ctaUrl: restoreUrl || `${siteUrl}/#collection` }),
+    html: cartReminderHtml({ heading: copy.heading, message: copy.message, cart, siteUrl,
+      ctaUrl: restoreUrl || `${siteUrl}/#collection`, unsubUrl: page }),
+    // Gmail/Yahoo bulk-sender rules + RFC 8058 one-click unsubscribe
+    headers: { 'List-Unsubscribe': `<${oneClick}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
   });
+}
+
+/* Signed, long-lived unsubscribe links for marketing email. */
+export function unsubscribeUrls(email) {
+  const siteUrl = process.env.SITE_URL || 'https://www.mtpeakofficial.com';
+  const t = encodeURIComponent(signToken({ unsub: email }, 400 * 24 * 3600));
+  return { page: `${siteUrl}/unsubscribe?t=${t}`, oneClick: `${siteUrl}/api/shop/unsubscribe?t=${t}` };
+}
+
+/* Suppress all marketing to an address: newsletter, bag reminders, saved bag. */
+export async function unsubscribeEmail(email) {
+  const q = sql();
+  await q`INSERT INTO email_optouts (email) VALUES (${email}) ON CONFLICT (email) DO NOTHING`;
+  await q`DELETE FROM subscribers WHERE email = ${email}`;
+  await q`DELETE FROM carts WHERE email = ${email}`;
+  await q`UPDATE users SET reminders_opt_in = false WHERE email = ${email}`;
 }
 
 export { cartReminderHtml };

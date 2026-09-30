@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { sql, ensureSchema } from '../_lib/db.js';
-import { requireCustomer, issueCustomer } from '../_lib/session.js';
+import { requireCustomer, issueCustomer, clearCustomer } from '../_lib/session.js';
 import { sendBrandEmail, sendOrderEmail } from '../_lib/email.js';
 import { dispatch, bad } from '../_lib/util.js';
 
@@ -119,7 +119,73 @@ async function profile(req, res) {
   res.json({ ok: true, name });
 }
 
+/* ---- privacy: preferences, export, self-serve deletion ---- */
+async function preferences(req, res) {
+  await ensureSchema();
+  const user = requireCustomer(req);
+  if (req.method === 'PUT') {
+    const on = req.body?.reminders === true;
+    await sql()`UPDATE users SET reminders_opt_in = ${on} WHERE id = ${user.uid}`;
+    if (on) await sql()`DELETE FROM email_optouts WHERE email = ${user.email}`;
+    else await sql()`DELETE FROM carts WHERE email = ${user.email}`;
+  }
+  const rows = await sql()`SELECT reminders_opt_in FROM users WHERE id = ${user.uid}`;
+  const sub = await sql()`SELECT 1 FROM subscribers WHERE email = ${user.email}`;
+  res.json({ reminders: !!rows[0]?.reminders_opt_in, newsletter: sub.length > 0 });
+}
+
+/* Right of access / portability: everything we hold about the account, as JSON. */
+async function exportData(req, res) {
+  await ensureSchema();
+  const user = requireCustomer(req);
+  const q = sql();
+  const [u, orders, reviews, refunds, carts, sub] = await Promise.all([
+    q`SELECT email, name, addresses, reminders_opt_in, terms_accepted_at, created_at FROM users WHERE id = ${user.uid}`,
+    q`SELECT public_id, items, total_pence, discount_pence, status, shipping, billing, gift_note, promo_code, created_at
+      FROM orders WHERE user_id = ${user.uid} ORDER BY created_at`,
+    q`SELECT o.public_id, r.rating, r.shipping_rating, r.body, r.created_at FROM reviews r JOIN orders o ON o.id = r.order_id WHERE r.user_id = ${user.uid}`,
+    q`SELECT o.public_id, rf.reason, rf.status, rf.created_at FROM refunds rf JOIN orders o ON o.id = rf.order_id WHERE rf.user_id = ${user.uid}`,
+    q`SELECT items, updated_at FROM carts WHERE email = ${user.email}`,
+    q`SELECT created_at FROM subscribers WHERE email = ${user.email}`,
+  ]);
+  res.setHeader('Content-Disposition', 'attachment; filename="mt-peak-my-data.json"');
+  res.setHeader('Cache-Control', 'no-store');
+  res.json({ exportedAt: new Date().toISOString(), account: u[0] || null, orders, reviews, refunds,
+    savedBag: carts[0] || null, newsletterSince: sub[0]?.created_at || null });
+}
+
+/* Right to erasure. Password re-entry guards against a hijacked session.
+   Order + refund rows are kept (UK tax law requires 6 years) but detached from
+   the person; everything else about them is deleted outright. */
+async function deleteAccount(req, res) {
+  await ensureSchema();
+  const user = requireCustomer(req);
+  const rows = await sql()`SELECT pass_hash FROM users WHERE id = ${user.uid}`;
+  if (!rows.length) { clearCustomer(res); return res.json({ ok: true }); }
+  const ok = await bcrypt.compare(String(req.body?.password || ''), rows[0].pass_hash);
+  if (!ok) throw bad('That password isn’t right.', 401);
+  const q = sql();
+  await q`DELETE FROM reviews WHERE user_id = ${user.uid}`;
+  await q`UPDATE refunds SET user_id = NULL WHERE user_id = ${user.uid}`;
+  await q`UPDATE orders SET user_id = NULL WHERE user_id = ${user.uid}`;
+  await q`DELETE FROM carts WHERE email = ${user.email}`;
+  await q`DELETE FROM subscribers WHERE email = ${user.email}`;
+  await q`DELETE FROM stock_notify WHERE email = ${user.email}`;
+  await q`DELETE FROM users WHERE id = ${user.uid}`;
+  clearCustomer(res);
+  await sendBrandEmail({
+    to: user.email,
+    subject: 'Your Mt. Peak account has been deleted',
+    heading: 'Your account is deleted',
+    message: 'As you asked, we have deleted your account, saved addresses, reviews, saved bag and email preferences. Records of past orders are kept only as long as UK tax law requires, and are no longer linked to an account. If this wasn’t you, reply to this email straight away.',
+  });
+  res.json({ ok: true });
+}
+
 export default dispatch({
+  preferences: { methods: ['GET', 'PUT'], fn: preferences },
+  export: { methods: ['GET'], fn: exportData },
+  'delete-account': { methods: ['POST'], fn: deleteAccount },
   review: { methods: ['POST'], fn: review },
   refund: { methods: ['POST'], fn: refund },
   cancel: { methods: ['POST'], fn: cancel },
