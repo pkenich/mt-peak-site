@@ -25,7 +25,7 @@
   if (!seen || Date.now() - seen > 365 * 864e5) {
     const n = document.createElement('div');
     n.className = 'cookie-notice'; n.setAttribute('role', 'region'); n.setAttribute('aria-label', 'Cookie notice');
-    n.innerHTML = '<p>We use only essential cookies — to keep you signed in and remember your bag. No tracking, no advertising. <a href="/cookies">Cookie Policy</a></p><button type="button">OK</button>';
+    n.innerHTML = '<p>We use only essential cookies — to keep you signed in and remember your bag. Page views are counted anonymously, without cookies. No advertising. <a href="/cookies">Cookie Policy</a></p><button type="button">OK</button>';
     n.querySelector('button').addEventListener('click', () => {
       try { localStorage.setItem(NOTICE, String(Date.now())); } catch {}
       n.classList.add('out'); setTimeout(() => n.remove(), 400);
